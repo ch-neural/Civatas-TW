@@ -39,6 +39,23 @@ export const useLocaleStore = create<LocaleState>()(
     }),
     {
       name: "civatas-locale",
+      // Bumping version to 1 triggers migrate() once per browser on first load
+      // after the Civatas-USA → Civatas-TW conversion. Users whose localStorage
+      // still holds the pre-TW default `"en"` get flipped to `"zh-TW"` exactly
+      // once; they can still manually toggle back to EN via StatusBar, and that
+      // manual choice will stick (no re-migration).
+      version: 1,
+      migrate: (persistedState: any, fromVersion: number) => {
+        if (fromVersion < 1) {
+          const s = persistedState?.state || persistedState || {};
+          // If legacy default "en" is present (the Civatas-USA source of truth
+          // default), flip to zh-TW. Preserve any non-default choice.
+          if (s.locale === "en" || s.locale === undefined) {
+            return { ...persistedState, state: { ...s, locale: "zh-TW" } };
+          }
+        }
+        return persistedState;
+      },
       storage: {
         getItem: (name) => {
           if (typeof window === "undefined") return null;

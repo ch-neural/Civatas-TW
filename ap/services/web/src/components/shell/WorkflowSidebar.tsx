@@ -81,8 +81,8 @@ export function WorkflowSidebar() {
     <div className="h-full flex flex-col text-sm select-none" style={{ backgroundColor: "var(--bg-sidebar)", color: "var(--text-primary)" }}>
       {/* Logo */}
       <div className="px-4 py-3" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
-        <div className="font-bold text-lg tracking-wide" style={{ color: "var(--accent)" }}>CIVATAS USA</div>
-        <div className="text-[10px] mt-0.5" style={{ color: "var(--text-muted)" }}>Open Source Edition</div>
+        <div className="font-bold text-lg tracking-wide" style={{ color: "var(--accent)" }}>CIVATAS TW</div>
+        <div className="text-[10px] mt-0.5" style={{ color: "var(--text-muted)" }}>台灣開源版</div>
       </div>
 
       {/* Project selector */}
