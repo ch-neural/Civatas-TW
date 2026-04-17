@@ -113,15 +113,47 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
   const [candidateParty, setCandidateParty] = useState<string>("IND");
   const customCandidatesLoadedRef = useRef(false);
 
-  // Party code → internal "alignment class" used by backend scoring.
-  // Taiwan buckets DPP/KMT/TPP/IND — match build_templates.py PARTY_DETECTION.
-  // Name-inference is a last-resort fallback when a custom candidate is
-  // added without an explicit party; typical cases get IND.
+  // Taiwan parties — UI-level codes with their alignment bucket.
+  // ``bucket`` is one of DPP/KMT/TPP/IND (the 4 the evolution engine
+  // understands). Small parties map to their politically-aligned big
+  // party so partisan bonuses still apply (e.g. 時代力量 and 台灣基進
+  // both bucket into DPP; 親民黨 and 新黨 bucket into KMT).
+  interface PartyDef {
+    code: string;   // internal + UI display code
+    label: string;  // 中文全名
+    bucket: string; // backend alignment bucket (DPP/KMT/TPP/IND)
+    color: string;
+    group: string;  // UI grouping: "green" / "blue" / "white" / "other"
+  }
+  const TW_PARTIES: PartyDef[] = [
+    // ── 綠營 ──
+    { code: "DPP", label: "民進黨",   bucket: "DPP", color: "#1B9431", group: "green" },
+    { code: "NPP", label: "時代力量", bucket: "DPP", color: "#FBBF24", group: "green" },
+    { code: "TSP", label: "台灣基進", bucket: "DPP", color: "#7C3AED", group: "green" },
+    // ── 藍營 ──
+    { code: "KMT", label: "國民黨",   bucket: "KMT", color: "#000095", group: "blue" },
+    { code: "PFP", label: "親民黨",   bucket: "KMT", color: "#F97316", group: "blue" },
+    { code: "NP",  label: "新黨",     bucket: "KMT", color: "#EAB308", group: "blue" },
+    // ── 白營 ──
+    { code: "TPP", label: "民眾黨",   bucket: "TPP", color: "#28C8C8", group: "white" },
+    // ── 其他／獨立 ──
+    { code: "GPT", label: "綠黨",     bucket: "IND", color: "#10B981", group: "other" },
+    { code: "IND", label: "無黨籍",   bucket: "IND", color: "#6B7280", group: "other" },
+  ];
+  const _partyByCode = (code: string): PartyDef | undefined =>
+    TW_PARTIES.find((p) => p.code === code || p.bucket === code);
+
+  // Alignment bucket inference when template/UI didn't supply an explicit party.
   const _inferParty = (name: string): string => {
     const n = (name || "").toLowerCase();
     if (n.includes("民進") || n.includes("dpp")) return "DPP";
+    if (n.includes("時代力量") || n.includes("npp")) return "NPP";
+    if (n.includes("台灣基進") || n.includes("tsp")) return "TSP";
     if (n.includes("國民") || n.includes("kmt")) return "KMT";
+    if (n.includes("親民黨") || n.includes("pfp")) return "PFP";
+    if (n.includes("新黨")) return "NP";
     if (n.includes("民眾黨") || n.includes("tpp")) return "TPP";
+    if (n.includes("綠黨")) return "GPT";
     return "IND";
   };
 
@@ -614,10 +646,15 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
     const candPartyMap: Record<string, string> = {};
     for (const c of _cands) {
       if (c.name && c.description) candDescs[c.name] = c.description;
-      // Authoritative party code from the template (DPP/KMT/TPP/IND) —
-      // lets the evolver skip description-keyword heuristics that can
-      // misclassify e.g. a KMT candidate whose description mentions 民進黨.
-      if (c.name && c.party) candPartyMap[c.name] = String(c.party).toUpperCase();
+      // Authoritative alignment bucket for the evolver (DPP/KMT/TPP/IND).
+      // Small parties (NPP/TSP/PFP/NP/GPT) map to their aligned big bucket
+      // so partisan bonuses still apply. Falls through to raw code if
+      // not recognised.
+      if (c.name && c.party) {
+        const code = String(c.party).toUpperCase();
+        const matched = _partyByCode(code);
+        candPartyMap[c.name] = matched?.bucket || code;
+      }
     }
     const partyDetection = _elec?.party_detection ?? undefined;
     // Fetch all configured agent vendors (non-system) so newly-added vendors are included
@@ -812,18 +849,22 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
   const windowSpan = daysBetween(startDate, endDate);
   const progressPct = totalRounds > 0 ? Math.round((currentRound / totalRounds) * 100) : 0;
 
-  // Taiwan party color palette, matches build_templates.py PARTY_PALETTE
-  const candidateColors: Record<string, string> = {
-    DPP: "#1B9431",   // 民進黨 — 綠營
-    KMT: "#000095",   // 國民黨 — 藍營
-    TPP: "#28C8C8",   // 民眾黨 — 白（偏青）
-    IND: "#6B7280",   // 無黨籍 — 灰
-    // Legacy US codes (kept so older persisted UI state doesn't crash)
-    D: "#1B9431", R: "#000095", I: "#6B7280", L: "#f59e0b", G: "#22c55e",
-  };
-  const candidatePartyLabels: Record<string, string> = {
-    DPP: "民進黨", KMT: "國民黨", TPP: "民眾黨", IND: "無黨籍",
-  };
+  // Taiwan party color palette, derived from TW_PARTIES at the top of
+  // this component. Matches build_templates.py PARTY_PALETTE for the big
+  // 4 buckets; small parties get their own distinctive colours.
+  const candidateColors: Record<string, string> = (() => {
+    const m: Record<string, string> = {};
+    for (const p of TW_PARTIES) m[p.code] = p.color;
+    // Legacy US codes (older persisted state may still have these)
+    m.D = "#1B9431"; m.R = "#000095"; m.I = "#6B7280";
+    m.L = "#F59E0B"; m.G = "#22C55E";
+    return m;
+  })();
+  const candidatePartyLabels: Record<string, string> = (() => {
+    const m: Record<string, string> = {};
+    for (const p of TW_PARTIES) m[p.code] = p.label;
+    return m;
+  })();
 
   if (tplLoading) {
     return (
@@ -929,8 +970,9 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
                 <select
                   value={candidateParty}
                   onChange={(e) => setCandidateParty(e.target.value)}
-                  title={en ? "Party (DPP / KMT / TPP / IND)"
-                            : "政黨（DPP 民進黨 / KMT 國民黨 / TPP 民眾黨 / IND 無黨籍）"}
+                  title={en
+                    ? "Party — small parties inherit their aligned bucket (NPP/TSP→DPP, PFP/NP→KMT, GPT→IND)"
+                    : "政黨 — 小黨會歸屬到對應陣營：時代力量/台灣基進 → 綠營；親民黨/新黨 → 藍營；綠黨 → 獨立"}
                   style={{
                     padding: "6px 10px", borderRadius: 6,
                     border: `1px solid ${candidateColors[candidateParty] || "#6b7280"}60`,
@@ -939,10 +981,26 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
                     fontWeight: 700, fontSize: 13, outline: "none", cursor: "pointer",
                   }}
                 >
-                  <option value="DPP">DPP · 民進黨</option>
-                  <option value="KMT">KMT · 國民黨</option>
-                  <option value="TPP">TPP · 民眾黨</option>
-                  <option value="IND">IND · 無黨籍</option>
+                  <optgroup label="🟢 綠營">
+                    {TW_PARTIES.filter(p => p.group === "green").map(p => (
+                      <option key={p.code} value={p.code}>{p.code} · {p.label}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="🔵 藍營">
+                    {TW_PARTIES.filter(p => p.group === "blue").map(p => (
+                      <option key={p.code} value={p.code}>{p.code} · {p.label}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="⚪ 白營">
+                    {TW_PARTIES.filter(p => p.group === "white").map(p => (
+                      <option key={p.code} value={p.code}>{p.code} · {p.label}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="其他／獨立">
+                    {TW_PARTIES.filter(p => p.group === "other").map(p => (
+                      <option key={p.code} value={p.code}>{p.code} · {p.label}</option>
+                    ))}
+                  </optgroup>
                 </select>
                 <input
                   value={candidateInput}
