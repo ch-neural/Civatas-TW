@@ -825,30 +825,21 @@ def _person_fields(p: Person) -> dict[str, str]:
     political_leaning = ""
     party_lean = p.party_lean or ""
 
-    # Civatas-USA Stage 1.5+: when running US, the party_lean from synthesis
-    # The party_lean from US templates is already a 5-tier Cook label.
-    # Pass it through directly as the political_leaning.
+    # Accept either TW 5-bucket labels (canonical for Civatas-TW) or the
+    # legacy US 5-tier Cook labels (backward-compat with pre-TW snapshots).
+    _TW_LEANING_5 = {"深綠", "偏綠", "中間", "偏藍", "深藍"}
     _US_LEANING_5 = {"Solid Dem", "Lean Dem", "Tossup", "Lean Rep", "Solid Rep"}
-    if party_lean in _US_LEANING_5:
+    _US_TO_TW = {
+        "Solid Dem": "深綠", "Lean Dem": "偏綠", "Tossup": "中間",
+        "Lean Rep": "偏藍", "Solid Rep": "深藍",
+    }
+    if party_lean in _TW_LEANING_5:
         political_leaning = party_lean
+    elif party_lean in _US_LEANING_5:
+        political_leaning = _US_TO_TW.get(party_lean, party_lean)
     else:
-        # No party_lean from template → try the per-county PVI lookup,
-        # else default to Tossup.
-        try:
-            import sys as _sys
-            _sys.path.insert(0, "/app/shared")
-            import us_leaning  # type: ignore
-            us_leaning.load_county_pvi()
-            fips_for = None
-            _d = (p.district or "").strip()
-            if _d.isdigit() and len(_d) == 5:
-                fips_for = _d
-            if fips_for:
-                political_leaning = us_leaning.county_leaning(fips_for)
-        except Exception:
-            pass
-        if not political_leaning:
-            political_leaning = "Tossup"
+        # No party_lean from template — fall back to 中間 (neutral TW bucket).
+        political_leaning = "中間"
 
     # Fallback to inference if still empty
     if not political_leaning:
@@ -927,13 +918,30 @@ def _person_fields(p: Person) -> dict[str, str]:
     # Fix district name format (remove stray spaces like "中 區" → "中區")
     _district = (p.district or "").replace(" ", "")
 
+    # Resolve Taiwan ethnicity; fall back to legacy `race` if older personas.
+    ethnicity = getattr(p, "ethnicity", "") or getattr(p, "race", "") or ""
+    # Derive county / township from admin_key if the template only filled
+    # one or the other. ``township`` here is the "縣市|鄉鎮" admin key; we
+    # keep both the raw key and a human-readable form.
+    county_val = getattr(p, "county", "") or ""
+    township_val = getattr(p, "township", "") or ""
+    if not county_val and "|" in township_val:
+        county_val = township_val.split("|", 1)[0]
+    if not township_val and _district:
+        township_val = _district
+    cross_strait_val = getattr(p, "cross_strait", "") or ""
+
     fields = {
         "person_id": str(p.person_id),
         "age": str(p.age),
         "gender": p.gender,
         "district": _district,
+        "county": county_val,
+        "township": township_val,
         "education": p.education or "",
         "occupation": p.occupation or "",
+        # Taiwan ethnicity (primary) + legacy race/hispanic (kept for older snapshots)
+        "ethnicity": ethnicity,
         "race": getattr(p, "race", "") or "",
         "hispanic_or_latino": getattr(p, "hispanic_or_latino", "") or "",
         "household_income": getattr(p, "household_income", "") or income_band,
@@ -942,6 +950,7 @@ def _person_fields(p: Person) -> dict[str, str]:
         "household_tenure": getattr(p, "household_tenure", "") or "",
         "marital_status": p.marital_status or "",
         "party_lean": party_lean,
+        "cross_strait": cross_strait_val,
         "issue_1": issue_1,
         "issue_2": issue_2,
         "media_habit": media_habit,
