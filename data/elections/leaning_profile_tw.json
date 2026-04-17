@@ -1,0 +1,7715 @@
+{
+  "schema_version": 1,
+  "methodology": "Taiwan Blue-Green PVI = 鄉鎮/縣市 綠營 (民進黨) 兩黨得票率 減去全國綠營兩黨得票率。多屆計算取平均。5-bucket label: 深綠 (>+8%) / 偏綠 (+3~+8%) / 中間 (-3~+3%) / 偏藍 (-8~-3%) / 深藍 (<-8%). 當前基於 2024 單屆資料計算；補 2020 可增強穩定性。",
+  "source": "中選會 2024 總統大選鄉鎮級開票資料 (via ap/shared/builtin_modules/president_2024.json)",
+  "years": [
+    2024
+  ],
+  "national": {
+    "2024": {
+      "green_votes": 5586061,
+      "kmt_votes": 4670994,
+      "white_votes": 3690470,
+      "total_valid": 13947506,
+      "green_share_two_party": 0.544607,
+      "kmt_share_two_party": 0.455393,
+      "green_share_all": 0.400506,
+      "kmt_share_all": 0.334898,
+      "white_share_all": 0.264597
+    }
+  },
+  "townships": {
+    "南投縣|中寮鄉": {
+      "county": "南投縣",
+      "township": "中寮鄉",
+      "admin_key": "南投縣|中寮鄉",
+      "pvi": -0.031148,
+      "pvi_label": "B+3",
+      "bucket": "偏藍",
+      "white_share_avg": 0.234152,
+      "cycles": {
+        "2024": {
+          "green": 3300,
+          "kmt": 3127,
+          "white": 1965,
+          "total_valid": 8392,
+          "green_share_two_party": 0.513459,
+          "white_share_all": 0.234152,
+          "delta": -0.031148
+        }
+      }
+    },
+    "南投縣|仁愛鄉": {
+      "county": "南投縣",
+      "township": "仁愛鄉",
+      "admin_key": "南投縣|仁愛鄉",
+      "pvi": -0.369585,
+      "pvi_label": "B+37",
+      "bucket": "深藍",
+      "white_share_avg": 0.248174,
+      "cycles": {
+        "2024": {
+          "green": 1009,
+          "kmt": 4756,
+          "white": 1903,
+          "total_valid": 7668,
+          "green_share_two_party": 0.175022,
+          "white_share_all": 0.248174,
+          "delta": -0.369585
+        }
+      }
+    },
+    "南投縣|信義鄉": {
+      "county": "南投縣",
+      "township": "信義鄉",
+      "admin_key": "南投縣|信義鄉",
+      "pvi": -0.210224,
+      "pvi_label": "B+21",
+      "bucket": "深藍",
+      "white_share_avg": 0.249285,
+      "cycles": {
+        "2024": {
+          "green": 2018,
+          "kmt": 4017,
+          "white": 2004,
+          "total_valid": 8039,
+          "green_share_two_party": 0.334383,
+          "white_share_all": 0.249285,
+          "delta": -0.210224
+        }
+      }
+    },
+    "南投縣|南投市": {
+      "county": "南投縣",
+      "township": "南投市",
+      "admin_key": "南投縣|南投市",
+      "pvi": -0.063458,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.270398,
+      "cycles": {
+        "2024": {
+          "green": 20879,
+          "kmt": 22515,
+          "white": 16080,
+          "total_valid": 59468,
+          "green_share_two_party": 0.481149,
+          "white_share_all": 0.270398,
+          "delta": -0.063458
+        }
+      }
+    },
+    "南投縣|名間鄉": {
+      "county": "南投縣",
+      "township": "名間鄉",
+      "admin_key": "南投縣|名間鄉",
+      "pvi": 0.045712,
+      "pvi_label": "G+5",
+      "bucket": "偏綠",
+      "white_share_avg": 0.251582,
+      "cycles": {
+        "2024": {
+          "green": 9915,
+          "kmt": 6881,
+          "white": 5646,
+          "total_valid": 22442,
+          "green_share_two_party": 0.590319,
+          "white_share_all": 0.251582,
+          "delta": 0.045712
+        }
+      }
+    },
+    "南投縣|國姓鄉": {
+      "county": "南投縣",
+      "township": "國姓鄉",
+      "admin_key": "南投縣|國姓鄉",
+      "pvi": -0.100235,
+      "pvi_label": "B+10",
+      "bucket": "深藍",
+      "white_share_avg": 0.237039,
+      "cycles": {
+        "2024": {
+          "green": 3407,
+          "kmt": 4260,
+          "white": 2382,
+          "total_valid": 10049,
+          "green_share_two_party": 0.444372,
+          "white_share_all": 0.237039,
+          "delta": -0.100235
+        }
+      }
+    },
+    "南投縣|埔里鎮": {
+      "county": "南投縣",
+      "township": "埔里鎮",
+      "admin_key": "南投縣|埔里鎮",
+      "pvi": -0.086135,
+      "pvi_label": "B+9",
+      "bucket": "深藍",
+      "white_share_avg": 0.263302,
+      "cycles": {
+        "2024": {
+          "green": 15307,
+          "kmt": 18080,
+          "white": 11931,
+          "total_valid": 45313,
+          "green_share_two_party": 0.458472,
+          "white_share_all": 0.263302,
+          "delta": -0.086135
+        }
+      }
+    },
+    "南投縣|水里鄉": {
+      "county": "南投縣",
+      "township": "水里鄉",
+      "admin_key": "南投縣|水里鄉",
+      "pvi": -0.062558,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.227606,
+      "cycles": {
+        "2024": {
+          "green": 3558,
+          "kmt": 3823,
+          "white": 2175,
+          "total_valid": 9556,
+          "green_share_two_party": 0.482049,
+          "white_share_all": 0.227606,
+          "delta": -0.062558
+        }
+      }
+    },
+    "南投縣|竹山鎮": {
+      "county": "南投縣",
+      "township": "竹山鎮",
+      "admin_key": "南投縣|竹山鎮",
+      "pvi": -0.00764,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.24921,
+      "cycles": {
+        "2024": {
+          "green": 12630,
+          "kmt": 10891,
+          "white": 7808,
+          "total_valid": 31331,
+          "green_share_two_party": 0.536967,
+          "white_share_all": 0.24921,
+          "delta": -0.00764
+        }
+      }
+    },
+    "南投縣|草屯鎮": {
+      "county": "南投縣",
+      "township": "草屯鎮",
+      "admin_key": "南投縣|草屯鎮",
+      "pvi": -0.035019,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share_avg": 0.285707,
+      "cycles": {
+        "2024": {
+          "green": 21818,
+          "kmt": 20997,
+          "white": 17125,
+          "total_valid": 59939,
+          "green_share_two_party": 0.509588,
+          "white_share_all": 0.285707,
+          "delta": -0.035019
+        }
+      }
+    },
+    "南投縣|集集鎮": {
+      "county": "南投縣",
+      "township": "集集鎮",
+      "admin_key": "南投縣|集集鎮",
+      "pvi": -0.054952,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.253059,
+      "cycles": {
+        "2024": {
+          "green": 2272,
+          "kmt": 2368,
+          "white": 1572,
+          "total_valid": 6212,
+          "green_share_two_party": 0.489655,
+          "white_share_all": 0.253059,
+          "delta": -0.054952
+        }
+      }
+    },
+    "南投縣|魚池鄉": {
+      "county": "南投縣",
+      "township": "魚池鄉",
+      "admin_key": "南投縣|魚池鄉",
+      "pvi": -0.042617,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share_avg": 0.235968,
+      "cycles": {
+        "2024": {
+          "green": 3280,
+          "kmt": 3254,
+          "white": 2018,
+          "total_valid": 8552,
+          "green_share_two_party": 0.50199,
+          "white_share_all": 0.235968,
+          "delta": -0.042617
+        }
+      }
+    },
+    "南投縣|鹿谷鄉": {
+      "county": "南投縣",
+      "township": "鹿谷鄉",
+      "admin_key": "南投縣|鹿谷鄉",
+      "pvi": -0.063771,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.217417,
+      "cycles": {
+        "2024": {
+          "green": 3889,
+          "kmt": 4199,
+          "white": 2247,
+          "total_valid": 10335,
+          "green_share_two_party": 0.480836,
+          "white_share_all": 0.217417,
+          "delta": -0.063771
+        }
+      }
+    },
+    "嘉義市|東區": {
+      "county": "嘉義市",
+      "township": "東區",
+      "admin_key": "嘉義市|東區",
+      "pvi": 0.014576,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.246396,
+      "cycles": {
+        "2024": {
+          "green": 29904,
+          "kmt": 23574,
+          "white": 17485,
+          "total_valid": 70963,
+          "green_share_two_party": 0.559183,
+          "white_share_all": 0.246396,
+          "delta": 0.014576
+        }
+      }
+    },
+    "嘉義市|西區": {
+      "county": "嘉義市",
+      "township": "西區",
+      "admin_key": "嘉義市|西區",
+      "pvi": 0.051694,
+      "pvi_label": "G+5",
+      "bucket": "偏綠",
+      "white_share_avg": 0.259098,
+      "cycles": {
+        "2024": {
+          "green": 38301,
+          "kmt": 25930,
+          "white": 22462,
+          "total_valid": 86693,
+          "green_share_two_party": 0.596301,
+          "white_share_all": 0.259098,
+          "delta": 0.051694
+        }
+      }
+    },
+    "嘉義縣|中埔鄉": {
+      "county": "嘉義縣",
+      "township": "中埔鄉",
+      "admin_key": "嘉義縣|中埔鄉",
+      "pvi": 0.057914,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.245497,
+      "cycles": {
+        "2024": {
+          "green": 11710,
+          "kmt": 7725,
+          "white": 6324,
+          "total_valid": 25760,
+          "green_share_two_party": 0.602521,
+          "white_share_all": 0.245497,
+          "delta": 0.057914
+        }
+      }
+    },
+    "嘉義縣|六腳鄉": {
+      "county": "嘉義縣",
+      "township": "六腳鄉",
+      "admin_key": "嘉義縣|六腳鄉",
+      "pvi": 0.123241,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.183673,
+      "cycles": {
+        "2024": {
+          "green": 6973,
+          "kmt": 3468,
+          "white": 2349,
+          "total_valid": 12789,
+          "green_share_two_party": 0.667848,
+          "white_share_all": 0.183673,
+          "delta": 0.123241
+        }
+      }
+    },
+    "嘉義縣|大埔鄉": {
+      "county": "嘉義縣",
+      "township": "大埔鄉",
+      "admin_key": "嘉義縣|大埔鄉",
+      "pvi": 0.002334,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.216793,
+      "cycles": {
+        "2024": {
+          "green": 903,
+          "kmt": 748,
+          "white": 457,
+          "total_valid": 2108,
+          "green_share_two_party": 0.546941,
+          "white_share_all": 0.216793,
+          "delta": 0.002334
+        }
+      }
+    },
+    "嘉義縣|大林鎮": {
+      "county": "嘉義縣",
+      "township": "大林鎮",
+      "admin_key": "嘉義縣|大林鎮",
+      "pvi": 0.061187,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.236178,
+      "cycles": {
+        "2024": {
+          "green": 8469,
+          "kmt": 5511,
+          "white": 4323,
+          "total_valid": 18304,
+          "green_share_two_party": 0.605794,
+          "white_share_all": 0.236178,
+          "delta": 0.061187
+        }
+      }
+    },
+    "嘉義縣|太保市": {
+      "county": "嘉義縣",
+      "township": "太保市",
+      "admin_key": "嘉義縣|太保市",
+      "pvi": 0.086855,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.272011,
+      "cycles": {
+        "2024": {
+          "green": 10505,
+          "kmt": 6131,
+          "white": 6216,
+          "total_valid": 22852,
+          "green_share_two_party": 0.631462,
+          "white_share_all": 0.272011,
+          "delta": 0.086855
+        }
+      }
+    },
+    "嘉義縣|布袋鎮": {
+      "county": "嘉義縣",
+      "township": "布袋鎮",
+      "admin_key": "嘉義縣|布袋鎮",
+      "pvi": 0.070129,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.199531,
+      "cycles": {
+        "2024": {
+          "green": 7142,
+          "kmt": 4476,
+          "white": 2896,
+          "total_valid": 14514,
+          "green_share_two_party": 0.614736,
+          "white_share_all": 0.199531,
+          "delta": 0.070129
+        }
+      }
+    },
+    "嘉義縣|新港鄉": {
+      "county": "嘉義縣",
+      "township": "新港鄉",
+      "admin_key": "嘉義縣|新港鄉",
+      "pvi": 0.157327,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.225694,
+      "cycles": {
+        "2024": {
+          "green": 10018,
+          "kmt": 4254,
+          "white": 4160,
+          "total_valid": 18432,
+          "green_share_two_party": 0.701934,
+          "white_share_all": 0.225694,
+          "delta": 0.157327
+        }
+      }
+    },
+    "嘉義縣|朴子市": {
+      "county": "嘉義縣",
+      "township": "朴子市",
+      "admin_key": "嘉義縣|朴子市",
+      "pvi": 0.055139,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.21601,
+      "cycles": {
+        "2024": {
+          "green": 11319,
+          "kmt": 7554,
+          "white": 5200,
+          "total_valid": 24073,
+          "green_share_two_party": 0.599746,
+          "white_share_all": 0.21601,
+          "delta": 0.055139
+        }
+      }
+    },
+    "嘉義縣|東石鄉": {
+      "county": "嘉義縣",
+      "township": "東石鄉",
+      "admin_key": "嘉義縣|東石鄉",
+      "pvi": 0.058645,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.17807,
+      "cycles": {
+        "2024": {
+          "green": 6529,
+          "kmt": 4294,
+          "white": 2345,
+          "total_valid": 13169,
+          "green_share_two_party": 0.603252,
+          "white_share_all": 0.17807,
+          "delta": 0.058645
+        }
+      }
+    },
+    "嘉義縣|梅山鄉": {
+      "county": "嘉義縣",
+      "township": "梅山鄉",
+      "admin_key": "嘉義縣|梅山鄉",
+      "pvi": 0.035722,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.217403,
+      "cycles": {
+        "2024": {
+          "green": 4974,
+          "kmt": 3597,
+          "white": 2381,
+          "total_valid": 10952,
+          "green_share_two_party": 0.580329,
+          "white_share_all": 0.217403,
+          "delta": 0.035722
+        }
+      }
+    },
+    "嘉義縣|民雄鄉": {
+      "county": "嘉義縣",
+      "township": "民雄鄉",
+      "admin_key": "嘉義縣|民雄鄉",
+      "pvi": 0.078406,
+      "pvi_label": "G+8",
+      "bucket": "偏綠",
+      "white_share_avg": 0.264791,
+      "cycles": {
+        "2024": {
+          "green": 19714,
+          "kmt": 11929,
+          "white": 11395,
+          "total_valid": 43034,
+          "green_share_two_party": 0.623013,
+          "white_share_all": 0.264791,
+          "delta": 0.078406
+        }
+      }
+    },
+    "嘉義縣|水上鄉": {
+      "county": "嘉義縣",
+      "township": "水上鄉",
+      "admin_key": "嘉義縣|水上鄉",
+      "pvi": 0.072298,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.244415,
+      "cycles": {
+        "2024": {
+          "green": 13918,
+          "kmt": 8643,
+          "white": 7297,
+          "total_valid": 29855,
+          "green_share_two_party": 0.616905,
+          "white_share_all": 0.244415,
+          "delta": 0.072298
+        }
+      }
+    },
+    "嘉義縣|溪口鄉": {
+      "county": "嘉義縣",
+      "township": "溪口鄉",
+      "admin_key": "嘉義縣|溪口鄉",
+      "pvi": 0.146084,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.213709,
+      "cycles": {
+        "2024": {
+          "green": 4437,
+          "kmt": 1987,
+          "white": 1746,
+          "total_valid": 8170,
+          "green_share_two_party": 0.690691,
+          "white_share_all": 0.213709,
+          "delta": 0.146084
+        }
+      }
+    },
+    "嘉義縣|番路鄉": {
+      "county": "嘉義縣",
+      "township": "番路鄉",
+      "admin_key": "嘉義縣|番路鄉",
+      "pvi": 0.008747,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.230142,
+      "cycles": {
+        "2024": {
+          "green": 2821,
+          "kmt": 2277,
+          "white": 1524,
+          "total_valid": 6622,
+          "green_share_two_party": 0.553354,
+          "white_share_all": 0.230142,
+          "delta": 0.008747
+        }
+      }
+    },
+    "嘉義縣|竹崎鄉": {
+      "county": "嘉義縣",
+      "township": "竹崎鄉",
+      "admin_key": "嘉義縣|竹崎鄉",
+      "pvi": 0.061343,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.227014,
+      "cycles": {
+        "2024": {
+          "green": 9471,
+          "kmt": 6159,
+          "white": 4590,
+          "total_valid": 20219,
+          "green_share_two_party": 0.60595,
+          "white_share_all": 0.227014,
+          "delta": 0.061343
+        }
+      }
+    },
+    "嘉義縣|義竹鄉": {
+      "county": "嘉義縣",
+      "township": "義竹鄉",
+      "admin_key": "嘉義縣|義竹鄉",
+      "pvi": 0.094577,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.178655,
+      "cycles": {
+        "2024": {
+          "green": 5357,
+          "kmt": 3024,
+          "white": 1823,
+          "total_valid": 10204,
+          "green_share_two_party": 0.639184,
+          "white_share_all": 0.178655,
+          "delta": 0.094577
+        }
+      }
+    },
+    "嘉義縣|阿里山鄉": {
+      "county": "嘉義縣",
+      "township": "阿里山鄉",
+      "admin_key": "嘉義縣|阿里山鄉",
+      "pvi": -0.25529,
+      "pvi_label": "B+26",
+      "bucket": "深藍",
+      "white_share_avg": 0.22246,
+      "cycles": {
+        "2024": {
+          "green": 631,
+          "kmt": 1550,
+          "white": 624,
+          "total_valid": 2805,
+          "green_share_two_party": 0.289317,
+          "white_share_all": 0.22246,
+          "delta": -0.25529
+        }
+      }
+    },
+    "嘉義縣|鹿草鄉": {
+      "county": "嘉義縣",
+      "township": "鹿草鄉",
+      "admin_key": "嘉義縣|鹿草鄉",
+      "pvi": 0.12206,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.199839,
+      "cycles": {
+        "2024": {
+          "green": 4626,
+          "kmt": 2313,
+          "white": 1733,
+          "total_valid": 8672,
+          "green_share_two_party": 0.666667,
+          "white_share_all": 0.199839,
+          "delta": 0.12206
+        }
+      }
+    },
+    "基隆市|七堵區": {
+      "county": "基隆市",
+      "township": "七堵區",
+      "admin_key": "基隆市|七堵區",
+      "pvi": -0.045104,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.271794,
+      "cycles": {
+        "2024": {
+          "green": 11555,
+          "kmt": 11578,
+          "white": 8633,
+          "total_valid": 31763,
+          "green_share_two_party": 0.499503,
+          "white_share_all": 0.271794,
+          "delta": -0.045104
+        }
+      }
+    },
+    "基隆市|中山區": {
+      "county": "基隆市",
+      "township": "中山區",
+      "admin_key": "基隆市|中山區",
+      "pvi": -0.060339,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.265896,
+      "cycles": {
+        "2024": {
+          "green": 9835,
+          "kmt": 10474,
+          "white": 7356,
+          "total_valid": 27665,
+          "green_share_two_party": 0.484268,
+          "white_share_all": 0.265896,
+          "delta": -0.060339
+        }
+      }
+    },
+    "基隆市|中正區": {
+      "county": "基隆市",
+      "township": "中正區",
+      "admin_key": "基隆市|中正區",
+      "pvi": -0.077834,
+      "pvi_label": "B+8",
+      "bucket": "偏藍",
+      "white_share_avg": 0.267208,
+      "cycles": {
+        "2024": {
+          "green": 10241,
+          "kmt": 11699,
+          "white": 8001,
+          "total_valid": 29943,
+          "green_share_two_party": 0.466773,
+          "white_share_all": 0.267208,
+          "delta": -0.077834
+        }
+      }
+    },
+    "基隆市|仁愛區": {
+      "county": "基隆市",
+      "township": "仁愛區",
+      "admin_key": "基隆市|仁愛區",
+      "pvi": -0.036044,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share_avg": 0.239683,
+      "cycles": {
+        "2024": {
+          "green": 9265,
+          "kmt": 8953,
+          "white": 5744,
+          "total_valid": 23965,
+          "green_share_two_party": 0.508563,
+          "white_share_all": 0.239683,
+          "delta": -0.036044
+        }
+      }
+    },
+    "基隆市|信義區": {
+      "county": "基隆市",
+      "township": "信義區",
+      "admin_key": "基隆市|信義區",
+      "pvi": -0.109915,
+      "pvi_label": "B+11",
+      "bucket": "深藍",
+      "white_share_avg": 0.271607,
+      "cycles": {
+        "2024": {
+          "green": 10480,
+          "kmt": 13629,
+          "white": 8991,
+          "total_valid": 33103,
+          "green_share_two_party": 0.434692,
+          "white_share_all": 0.271607,
+          "delta": -0.109915
+        }
+      }
+    },
+    "基隆市|安樂區": {
+      "county": "基隆市",
+      "township": "安樂區",
+      "admin_key": "基隆市|安樂區",
+      "pvi": -0.073833,
+      "pvi_label": "B+7",
+      "bucket": "偏藍",
+      "white_share_avg": 0.262695,
+      "cycles": {
+        "2024": {
+          "green": 17026,
+          "kmt": 19140,
+          "white": 12886,
+          "total_valid": 49053,
+          "green_share_two_party": 0.470774,
+          "white_share_all": 0.262695,
+          "delta": -0.073833
+        }
+      }
+    },
+    "基隆市|暖暖區": {
+      "county": "基隆市",
+      "township": "暖暖區",
+      "admin_key": "基隆市|暖暖區",
+      "pvi": -0.085306,
+      "pvi_label": "B+9",
+      "bucket": "深藍",
+      "white_share_avg": 0.282709,
+      "cycles": {
+        "2024": {
+          "green": 7674,
+          "kmt": 9034,
+          "white": 6584,
+          "total_valid": 23289,
+          "green_share_two_party": 0.459301,
+          "white_share_all": 0.282709,
+          "delta": -0.085306
+        }
+      }
+    },
+    "宜蘭縣|三星鄉": {
+      "county": "宜蘭縣",
+      "township": "三星鄉",
+      "admin_key": "宜蘭縣|三星鄉",
+      "pvi": 0.109382,
+      "pvi_label": "G+11",
+      "bucket": "深綠",
+      "white_share_avg": 0.229236,
+      "cycles": {
+        "2024": {
+          "green": 6500,
+          "kmt": 3439,
+          "white": 2956,
+          "total_valid": 12895,
+          "green_share_two_party": 0.653989,
+          "white_share_all": 0.229236,
+          "delta": 0.109382
+        }
+      }
+    },
+    "宜蘭縣|五結鄉": {
+      "county": "宜蘭縣",
+      "township": "五結鄉",
+      "admin_key": "宜蘭縣|五結鄉",
+      "pvi": 0.119855,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.271798,
+      "cycles": {
+        "2024": {
+          "green": 12157,
+          "kmt": 6139,
+          "white": 6830,
+          "total_valid": 25129,
+          "green_share_two_party": 0.664462,
+          "white_share_all": 0.271798,
+          "delta": 0.119855
+        }
+      }
+    },
+    "宜蘭縣|冬山鄉": {
+      "county": "宜蘭縣",
+      "township": "冬山鄉",
+      "admin_key": "宜蘭縣|冬山鄉",
+      "pvi": 0.133083,
+      "pvi_label": "G+13",
+      "bucket": "深綠",
+      "white_share_avg": 0.267814,
+      "cycles": {
+        "2024": {
+          "green": 16169,
+          "kmt": 7690,
+          "white": 8727,
+          "total_valid": 32586,
+          "green_share_two_party": 0.67769,
+          "white_share_all": 0.267814,
+          "delta": 0.133083
+        }
+      }
+    },
+    "宜蘭縣|南澳鄉": {
+      "county": "宜蘭縣",
+      "township": "南澳鄉",
+      "admin_key": "宜蘭縣|南澳鄉",
+      "pvi": -0.424055,
+      "pvi_label": "B+42",
+      "bucket": "深藍",
+      "white_share_avg": 0.236413,
+      "cycles": {
+        "2024": {
+          "green": 271,
+          "kmt": 1977,
+          "white": 696,
+          "total_valid": 2944,
+          "green_share_two_party": 0.120552,
+          "white_share_all": 0.236413,
+          "delta": -0.424055
+        }
+      }
+    },
+    "宜蘭縣|員山鄉": {
+      "county": "宜蘭縣",
+      "township": "員山鄉",
+      "admin_key": "宜蘭縣|員山鄉",
+      "pvi": 0.106179,
+      "pvi_label": "G+11",
+      "bucket": "深綠",
+      "white_share_avg": 0.260924,
+      "cycles": {
+        "2024": {
+          "green": 9521,
+          "kmt": 5109,
+          "white": 5165,
+          "total_valid": 19795,
+          "green_share_two_party": 0.650786,
+          "white_share_all": 0.260924,
+          "delta": 0.106179
+        }
+      }
+    },
+    "宜蘭縣|壯圍鄉": {
+      "county": "宜蘭縣",
+      "township": "壯圍鄉",
+      "admin_key": "宜蘭縣|壯圍鄉",
+      "pvi": 0.101084,
+      "pvi_label": "G+10",
+      "bucket": "深綠",
+      "white_share_avg": 0.258918,
+      "cycles": {
+        "2024": {
+          "green": 7111,
+          "kmt": 3902,
+          "white": 3847,
+          "total_valid": 14858,
+          "green_share_two_party": 0.645691,
+          "white_share_all": 0.258918,
+          "delta": 0.101084
+        }
+      }
+    },
+    "宜蘭縣|大同鄉": {
+      "county": "宜蘭縣",
+      "township": "大同鄉",
+      "admin_key": "宜蘭縣|大同鄉",
+      "pvi": -0.343041,
+      "pvi_label": "B+34",
+      "bucket": "深藍",
+      "white_share_avg": 0.249613,
+      "cycles": {
+        "2024": {
+          "green": 489,
+          "kmt": 1937,
+          "white": 807,
+          "total_valid": 3233,
+          "green_share_two_party": 0.201566,
+          "white_share_all": 0.249613,
+          "delta": -0.343041
+        }
+      }
+    },
+    "宜蘭縣|宜蘭市": {
+      "county": "宜蘭縣",
+      "township": "宜蘭市",
+      "admin_key": "宜蘭縣|宜蘭市",
+      "pvi": 0.015336,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.271097,
+      "cycles": {
+        "2024": {
+          "green": 22648,
+          "kmt": 17799,
+          "white": 15041,
+          "total_valid": 55482,
+          "green_share_two_party": 0.559943,
+          "white_share_all": 0.271097,
+          "delta": 0.015336
+        }
+      }
+    },
+    "宜蘭縣|礁溪鄉": {
+      "county": "宜蘭縣",
+      "township": "礁溪鄉",
+      "admin_key": "宜蘭縣|礁溪鄉",
+      "pvi": 0.076994,
+      "pvi_label": "G+8",
+      "bucket": "偏綠",
+      "white_share_avg": 0.255017,
+      "cycles": {
+        "2024": {
+          "green": 9922,
+          "kmt": 6040,
+          "white": 5464,
+          "total_valid": 21426,
+          "green_share_two_party": 0.621601,
+          "white_share_all": 0.255017,
+          "delta": 0.076994
+        }
+      }
+    },
+    "宜蘭縣|羅東鎮": {
+      "county": "宜蘭縣",
+      "township": "羅東鎮",
+      "admin_key": "宜蘭縣|羅東鎮",
+      "pvi": 0.071732,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.264707,
+      "cycles": {
+        "2024": {
+          "green": 18235,
+          "kmt": 11351,
+          "white": 10651,
+          "total_valid": 40237,
+          "green_share_two_party": 0.616339,
+          "white_share_all": 0.264707,
+          "delta": 0.071732
+        }
+      }
+    },
+    "宜蘭縣|蘇澳鎮": {
+      "county": "宜蘭縣",
+      "township": "蘇澳鎮",
+      "admin_key": "宜蘭縣|蘇澳鎮",
+      "pvi": 0.068122,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.247599,
+      "cycles": {
+        "2024": {
+          "green": 10224,
+          "kmt": 6462,
+          "white": 5491,
+          "total_valid": 22177,
+          "green_share_two_party": 0.612729,
+          "white_share_all": 0.247599,
+          "delta": 0.068122
+        }
+      }
+    },
+    "宜蘭縣|頭城鎮": {
+      "county": "宜蘭縣",
+      "township": "頭城鎮",
+      "admin_key": "宜蘭縣|頭城鎮",
+      "pvi": -0.016246,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.275127,
+      "cycles": {
+        "2024": {
+          "green": 6269,
+          "kmt": 5596,
+          "white": 4503,
+          "total_valid": 16367,
+          "green_share_two_party": 0.528361,
+          "white_share_all": 0.275127,
+          "delta": -0.016246
+        }
+      }
+    },
+    "屏東縣|三地門鄉": {
+      "county": "屏東縣",
+      "township": "三地門鄉",
+      "admin_key": "屏東縣|三地門鄉",
+      "pvi": -0.309492,
+      "pvi_label": "B+31",
+      "bucket": "深藍",
+      "white_share_avg": 0.232682,
+      "cycles": {
+        "2024": {
+          "green": 849,
+          "kmt": 2762,
+          "white": 1095,
+          "total_valid": 4706,
+          "green_share_two_party": 0.235115,
+          "white_share_all": 0.232682,
+          "delta": -0.309492
+        }
+      }
+    },
+    "屏東縣|九如鄉": {
+      "county": "屏東縣",
+      "township": "九如鄉",
+      "admin_key": "屏東縣|九如鄉",
+      "pvi": 0.182784,
+      "pvi_label": "G+18",
+      "bucket": "深綠",
+      "white_share_avg": 0.209675,
+      "cycles": {
+        "2024": {
+          "green": 7818,
+          "kmt": 2930,
+          "white": 2852,
+          "total_valid": 13602,
+          "green_share_two_party": 0.727391,
+          "white_share_all": 0.209675,
+          "delta": 0.182784
+        }
+      }
+    },
+    "屏東縣|佳冬鄉": {
+      "county": "屏東縣",
+      "township": "佳冬鄉",
+      "admin_key": "屏東縣|佳冬鄉",
+      "pvi": 0.127925,
+      "pvi_label": "G+13",
+      "bucket": "深綠",
+      "white_share_avg": 0.182254,
+      "cycles": {
+        "2024": {
+          "green": 5962,
+          "kmt": 2903,
+          "white": 1976,
+          "total_valid": 10842,
+          "green_share_two_party": 0.672532,
+          "white_share_all": 0.182254,
+          "delta": 0.127925
+        }
+      }
+    },
+    "屏東縣|來義鄉": {
+      "county": "屏東縣",
+      "township": "來義鄉",
+      "admin_key": "屏東縣|來義鄉",
+      "pvi": -0.343778,
+      "pvi_label": "B+34",
+      "bucket": "深藍",
+      "white_share_avg": 0.25061,
+      "cycles": {
+        "2024": {
+          "green": 678,
+          "kmt": 2698,
+          "white": 1129,
+          "total_valid": 4505,
+          "green_share_two_party": 0.200829,
+          "white_share_all": 0.25061,
+          "delta": -0.343778
+        }
+      }
+    },
+    "屏東縣|內埔鄉": {
+      "county": "屏東縣",
+      "township": "內埔鄉",
+      "admin_key": "屏東縣|內埔鄉",
+      "pvi": 0.091881,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.214613,
+      "cycles": {
+        "2024": {
+          "green": 15832,
+          "kmt": 9042,
+          "white": 6797,
+          "total_valid": 31671,
+          "green_share_two_party": 0.636488,
+          "white_share_all": 0.214613,
+          "delta": 0.091881
+        }
+      }
+    },
+    "屏東縣|南州鄉": {
+      "county": "屏東縣",
+      "township": "南州鄉",
+      "admin_key": "屏東縣|南州鄉",
+      "pvi": 0.13231,
+      "pvi_label": "G+13",
+      "bucket": "深綠",
+      "white_share_avg": 0.188709,
+      "cycles": {
+        "2024": {
+          "green": 3434,
+          "kmt": 1639,
+          "white": 1180,
+          "total_valid": 6253,
+          "green_share_two_party": 0.676917,
+          "white_share_all": 0.188709,
+          "delta": 0.13231
+        }
+      }
+    },
+    "屏東縣|屏東市": {
+      "county": "屏東縣",
+      "township": "屏東市",
+      "admin_key": "屏東縣|屏東市",
+      "pvi": 0.019202,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.231303,
+      "cycles": {
+        "2024": {
+          "green": 50347,
+          "kmt": 38951,
+          "white": 26870,
+          "total_valid": 116168,
+          "green_share_two_party": 0.563809,
+          "white_share_all": 0.231303,
+          "delta": 0.019202
+        }
+      }
+    },
+    "屏東縣|崁頂鄉": {
+      "county": "屏東縣",
+      "township": "崁頂鄉",
+      "admin_key": "屏東縣|崁頂鄉",
+      "pvi": 0.143744,
+      "pvi_label": "G+14",
+      "bucket": "深綠",
+      "white_share_avg": 0.202612,
+      "cycles": {
+        "2024": {
+          "green": 4497,
+          "kmt": 2036,
+          "white": 1660,
+          "total_valid": 8193,
+          "green_share_two_party": 0.688351,
+          "white_share_all": 0.202612,
+          "delta": 0.143744
+        }
+      }
+    },
+    "屏東縣|恆春鎮": {
+      "county": "屏東縣",
+      "township": "恆春鎮",
+      "admin_key": "屏東縣|恆春鎮",
+      "pvi": 0.009816,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.235831,
+      "cycles": {
+        "2024": {
+          "green": 6362,
+          "kmt": 5113,
+          "white": 3541,
+          "total_valid": 15015,
+          "green_share_two_party": 0.554423,
+          "white_share_all": 0.235831,
+          "delta": 0.009816
+        }
+      }
+    },
+    "屏東縣|新園鄉": {
+      "county": "屏東縣",
+      "township": "新園鄉",
+      "admin_key": "屏東縣|新園鄉",
+      "pvi": 0.171039,
+      "pvi_label": "G+17",
+      "bucket": "深綠",
+      "white_share_avg": 0.200177,
+      "cycles": {
+        "2024": {
+          "green": 11650,
+          "kmt": 4629,
+          "white": 4075,
+          "total_valid": 20357,
+          "green_share_two_party": 0.715646,
+          "white_share_all": 0.200177,
+          "delta": 0.171039
+        }
+      }
+    },
+    "屏東縣|新埤鄉": {
+      "county": "屏東縣",
+      "township": "新埤鄉",
+      "admin_key": "屏東縣|新埤鄉",
+      "pvi": 0.08222,
+      "pvi_label": "G+8",
+      "bucket": "深綠",
+      "white_share_avg": 0.186002,
+      "cycles": {
+        "2024": {
+          "green": 2916,
+          "kmt": 1736,
+          "white": 1063,
+          "total_valid": 5715,
+          "green_share_two_party": 0.626827,
+          "white_share_all": 0.186002,
+          "delta": 0.08222
+        }
+      }
+    },
+    "屏東縣|春日鄉": {
+      "county": "屏東縣",
+      "township": "春日鄉",
+      "admin_key": "屏東縣|春日鄉",
+      "pvi": -0.375557,
+      "pvi_label": "B+38",
+      "bucket": "深藍",
+      "white_share_avg": 0.265291,
+      "cycles": {
+        "2024": {
+          "green": 331,
+          "kmt": 1627,
+          "white": 707,
+          "total_valid": 2665,
+          "green_share_two_party": 0.16905,
+          "white_share_all": 0.265291,
+          "delta": -0.375557
+        }
+      }
+    },
+    "屏東縣|東港鎮": {
+      "county": "屏東縣",
+      "township": "東港鎮",
+      "admin_key": "屏東縣|東港鎮",
+      "pvi": 0.132306,
+      "pvi_label": "G+13",
+      "bucket": "深綠",
+      "white_share_avg": 0.218817,
+      "cycles": {
+        "2024": {
+          "green": 14270,
+          "kmt": 6811,
+          "white": 5905,
+          "total_valid": 26986,
+          "green_share_two_party": 0.676913,
+          "white_share_all": 0.218817,
+          "delta": 0.132306
+        }
+      }
+    },
+    "屏東縣|枋寮鄉": {
+      "county": "屏東縣",
+      "township": "枋寮鄉",
+      "admin_key": "屏東縣|枋寮鄉",
+      "pvi": 0.083188,
+      "pvi_label": "G+8",
+      "bucket": "深綠",
+      "white_share_avg": 0.198904,
+      "cycles": {
+        "2024": {
+          "green": 6794,
+          "kmt": 4028,
+          "white": 2687,
+          "total_valid": 13509,
+          "green_share_two_party": 0.627795,
+          "white_share_all": 0.198904,
+          "delta": 0.083188
+        }
+      }
+    },
+    "屏東縣|枋山鄉": {
+      "county": "屏東縣",
+      "township": "枋山鄉",
+      "admin_key": "屏東縣|枋山鄉",
+      "pvi": 0.081822,
+      "pvi_label": "G+8",
+      "bucket": "深綠",
+      "white_share_avg": 0.171579,
+      "cycles": {
+        "2024": {
+          "green": 1479,
+          "kmt": 882,
+          "white": 489,
+          "total_valid": 2850,
+          "green_share_two_party": 0.626429,
+          "white_share_all": 0.171579,
+          "delta": 0.081822
+        }
+      }
+    },
+    "屏東縣|林邊鄉": {
+      "county": "屏東縣",
+      "township": "林邊鄉",
+      "admin_key": "屏東縣|林邊鄉",
+      "pvi": 0.132151,
+      "pvi_label": "G+13",
+      "bucket": "深綠",
+      "white_share_avg": 0.174703,
+      "cycles": {
+        "2024": {
+          "green": 5745,
+          "kmt": 2744,
+          "white": 1797,
+          "total_valid": 10286,
+          "green_share_two_party": 0.676758,
+          "white_share_all": 0.174703,
+          "delta": 0.132151
+        }
+      }
+    },
+    "屏東縣|泰武鄉": {
+      "county": "屏東縣",
+      "township": "泰武鄉",
+      "admin_key": "屏東縣|泰武鄉",
+      "pvi": -0.325022,
+      "pvi_label": "B+33",
+      "bucket": "深藍",
+      "white_share_avg": 0.266708,
+      "cycles": {
+        "2024": {
+          "green": 518,
+          "kmt": 1841,
+          "white": 858,
+          "total_valid": 3217,
+          "green_share_two_party": 0.219585,
+          "white_share_all": 0.266708,
+          "delta": -0.325022
+        }
+      }
+    },
+    "屏東縣|滿州鄉": {
+      "county": "屏東縣",
+      "township": "滿州鄉",
+      "admin_key": "屏東縣|滿州鄉",
+      "pvi": 0.048098,
+      "pvi_label": "G+5",
+      "bucket": "偏綠",
+      "white_share_avg": 0.187208,
+      "cycles": {
+        "2024": {
+          "green": 1755,
+          "kmt": 1206,
+          "white": 682,
+          "total_valid": 3643,
+          "green_share_two_party": 0.592705,
+          "white_share_all": 0.187208,
+          "delta": 0.048098
+        }
+      }
+    },
+    "屏東縣|潮州鎮": {
+      "county": "屏東縣",
+      "township": "潮州鎮",
+      "admin_key": "屏東縣|潮州鎮",
+      "pvi": 0.066726,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.226198,
+      "cycles": {
+        "2024": {
+          "green": 15018,
+          "kmt": 9548,
+          "white": 7182,
+          "total_valid": 31751,
+          "green_share_two_party": 0.611333,
+          "white_share_all": 0.226198,
+          "delta": 0.066726
+        }
+      }
+    },
+    "屏東縣|牡丹鄉": {
+      "county": "屏東縣",
+      "township": "牡丹鄉",
+      "admin_key": "屏東縣|牡丹鄉",
+      "pvi": -0.316537,
+      "pvi_label": "B+32",
+      "bucket": "深藍",
+      "white_share_avg": 0.225844,
+      "cycles": {
+        "2024": {
+          "green": 455,
+          "kmt": 1540,
+          "white": 582,
+          "total_valid": 2577,
+          "green_share_two_party": 0.22807,
+          "white_share_all": 0.225844,
+          "delta": -0.316537
+        }
+      }
+    },
+    "屏東縣|獅子鄉": {
+      "county": "屏東縣",
+      "township": "獅子鄉",
+      "admin_key": "屏東縣|獅子鄉",
+      "pvi": -0.380294,
+      "pvi_label": "B+38",
+      "bucket": "深藍",
+      "white_share_avg": 0.233766,
+      "cycles": {
+        "2024": {
+          "green": 349,
+          "kmt": 1775,
+          "white": 648,
+          "total_valid": 2772,
+          "green_share_two_party": 0.164313,
+          "white_share_all": 0.233766,
+          "delta": -0.380294
+        }
+      }
+    },
+    "屏東縣|琉球鄉": {
+      "county": "屏東縣",
+      "township": "琉球鄉",
+      "admin_key": "屏東縣|琉球鄉",
+      "pvi": -0.08556,
+      "pvi_label": "B+9",
+      "bucket": "深藍",
+      "white_share_avg": 0.230146,
+      "cycles": {
+        "2024": {
+          "green": 2225,
+          "kmt": 2622,
+          "white": 1449,
+          "total_valid": 6296,
+          "green_share_two_party": 0.459047,
+          "white_share_all": 0.230146,
+          "delta": -0.08556
+        }
+      }
+    },
+    "屏東縣|瑪家鄉": {
+      "county": "屏東縣",
+      "township": "瑪家鄉",
+      "admin_key": "屏東縣|瑪家鄉",
+      "pvi": -0.316903,
+      "pvi_label": "B+32",
+      "bucket": "深藍",
+      "white_share_avg": 0.258269,
+      "cycles": {
+        "2024": {
+          "green": 720,
+          "kmt": 2442,
+          "white": 1101,
+          "total_valid": 4263,
+          "green_share_two_party": 0.227704,
+          "white_share_all": 0.258269,
+          "delta": -0.316903
+        }
+      }
+    },
+    "屏東縣|竹田鄉": {
+      "county": "屏東縣",
+      "township": "竹田鄉",
+      "admin_key": "屏東縣|竹田鄉",
+      "pvi": 0.119124,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.185713,
+      "cycles": {
+        "2024": {
+          "green": 5576,
+          "kmt": 2825,
+          "white": 1916,
+          "total_valid": 10317,
+          "green_share_two_party": 0.663731,
+          "white_share_all": 0.185713,
+          "delta": 0.119124
+        }
+      }
+    },
+    "屏東縣|萬丹鄉": {
+      "county": "屏東縣",
+      "township": "萬丹鄉",
+      "admin_key": "屏東縣|萬丹鄉",
+      "pvi": 0.123039,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.221906,
+      "cycles": {
+        "2024": {
+          "green": 15685,
+          "kmt": 7808,
+          "white": 6700,
+          "total_valid": 30193,
+          "green_share_two_party": 0.667646,
+          "white_share_all": 0.221906,
+          "delta": 0.123039
+        }
+      }
+    },
+    "屏東縣|萬巒鄉": {
+      "county": "屏東縣",
+      "township": "萬巒鄉",
+      "admin_key": "屏東縣|萬巒鄉",
+      "pvi": 0.145114,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.191424,
+      "cycles": {
+        "2024": {
+          "green": 6502,
+          "kmt": 2925,
+          "white": 2232,
+          "total_valid": 11660,
+          "green_share_two_party": 0.689721,
+          "white_share_all": 0.191424,
+          "delta": 0.145114
+        }
+      }
+    },
+    "屏東縣|車城鄉": {
+      "county": "屏東縣",
+      "township": "車城鄉",
+      "admin_key": "屏東縣|車城鄉",
+      "pvi": 0.079667,
+      "pvi_label": "G+8",
+      "bucket": "偏綠",
+      "white_share_avg": 0.190647,
+      "cycles": {
+        "2024": {
+          "green": 2258,
+          "kmt": 1359,
+          "white": 852,
+          "total_valid": 4469,
+          "green_share_two_party": 0.624274,
+          "white_share_all": 0.190647,
+          "delta": 0.079667
+        }
+      }
+    },
+    "屏東縣|里港鄉": {
+      "county": "屏東縣",
+      "township": "里港鄉",
+      "admin_key": "屏東縣|里港鄉",
+      "pvi": 0.145936,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.225722,
+      "cycles": {
+        "2024": {
+          "green": 8368,
+          "kmt": 3750,
+          "white": 3533,
+          "total_valid": 15652,
+          "green_share_two_party": 0.690543,
+          "white_share_all": 0.225722,
+          "delta": 0.145936
+        }
+      }
+    },
+    "屏東縣|長治鄉": {
+      "county": "屏東縣",
+      "township": "長治鄉",
+      "admin_key": "屏東縣|長治鄉",
+      "pvi": 0.069501,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.225189,
+      "cycles": {
+        "2024": {
+          "green": 8697,
+          "kmt": 5465,
+          "white": 4116,
+          "total_valid": 18278,
+          "green_share_two_party": 0.614108,
+          "white_share_all": 0.225189,
+          "delta": 0.069501
+        }
+      }
+    },
+    "屏東縣|霧臺鄉": {
+      "county": "屏東縣",
+      "township": "霧臺鄉",
+      "admin_key": "屏東縣|霧臺鄉",
+      "pvi": -0.282866,
+      "pvi_label": "B+28",
+      "bucket": "深藍",
+      "white_share_avg": 0.205641,
+      "cycles": {
+        "2024": {
+          "green": 457,
+          "kmt": 1289,
+          "white": 452,
+          "total_valid": 2198,
+          "green_share_two_party": 0.261741,
+          "white_share_all": 0.205641,
+          "delta": -0.282866
+        }
+      }
+    },
+    "屏東縣|高樹鄉": {
+      "county": "屏東縣",
+      "township": "高樹鄉",
+      "admin_key": "屏東縣|高樹鄉",
+      "pvi": 0.163386,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.166329,
+      "cycles": {
+        "2024": {
+          "green": 8149,
+          "kmt": 3361,
+          "white": 2296,
+          "total_valid": 13804,
+          "green_share_two_party": 0.707993,
+          "white_share_all": 0.166329,
+          "delta": 0.163386
+        }
+      }
+    },
+    "屏東縣|鹽埔鄉": {
+      "county": "屏東縣",
+      "township": "鹽埔鄉",
+      "admin_key": "屏東縣|鹽埔鄉",
+      "pvi": 0.045256,
+      "pvi_label": "G+5",
+      "bucket": "偏綠",
+      "white_share_avg": 0.224083,
+      "cycles": {
+        "2024": {
+          "green": 6587,
+          "kmt": 4580,
+          "white": 3225,
+          "total_valid": 14392,
+          "green_share_two_party": 0.589863,
+          "white_share_all": 0.224083,
+          "delta": 0.045256
+        }
+      }
+    },
+    "屏東縣|麟洛鄉": {
+      "county": "屏東縣",
+      "township": "麟洛鄉",
+      "admin_key": "屏東縣|麟洛鄉",
+      "pvi": 0.121653,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.193906,
+      "cycles": {
+        "2024": {
+          "green": 3825,
+          "kmt": 1916,
+          "white": 1381,
+          "total_valid": 7122,
+          "green_share_two_party": 0.66626,
+          "white_share_all": 0.193906,
+          "delta": 0.121653
+        }
+      }
+    },
+    "彰化縣|二林鎮": {
+      "county": "彰化縣",
+      "township": "二林鎮",
+      "admin_key": "彰化縣|二林鎮",
+      "pvi": -0.05626,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.263206,
+      "cycles": {
+        "2024": {
+          "green": 9911,
+          "kmt": 10384,
+          "white": 7250,
+          "total_valid": 27545,
+          "green_share_two_party": 0.488347,
+          "white_share_all": 0.263206,
+          "delta": -0.05626
+        }
+      }
+    },
+    "彰化縣|二水鄉": {
+      "county": "彰化縣",
+      "township": "二水鄉",
+      "admin_key": "彰化縣|二水鄉",
+      "pvi": 0.004249,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.225631,
+      "cycles": {
+        "2024": {
+          "green": 3741,
+          "kmt": 3075,
+          "white": 1986,
+          "total_valid": 8802,
+          "green_share_two_party": 0.548856,
+          "white_share_all": 0.225631,
+          "delta": 0.004249
+        }
+      }
+    },
+    "彰化縣|伸港鄉": {
+      "county": "彰化縣",
+      "township": "伸港鄉",
+      "admin_key": "彰化縣|伸港鄉",
+      "pvi": -0.034489,
+      "pvi_label": "B+3",
+      "bucket": "偏藍",
+      "white_share_avg": 0.33311,
+      "cycles": {
+        "2024": {
+          "green": 7613,
+          "kmt": 7311,
+          "white": 7454,
+          "total_valid": 22377,
+          "green_share_two_party": 0.510118,
+          "white_share_all": 0.33311,
+          "delta": -0.034489
+        }
+      }
+    },
+    "彰化縣|北斗鎮": {
+      "county": "彰化縣",
+      "township": "北斗鎮",
+      "admin_key": "彰化縣|北斗鎮",
+      "pvi": -0.004001,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.281707,
+      "cycles": {
+        "2024": {
+          "green": 7642,
+          "kmt": 6494,
+          "white": 5544,
+          "total_valid": 19680,
+          "green_share_two_party": 0.540606,
+          "white_share_all": 0.281707,
+          "delta": -0.004001
+        }
+      }
+    },
+    "彰化縣|和美鎮": {
+      "county": "彰化縣",
+      "township": "和美鎮",
+      "admin_key": "彰化縣|和美鎮",
+      "pvi": -0.013914,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.314407,
+      "cycles": {
+        "2024": {
+          "green": 19426,
+          "kmt": 17179,
+          "white": 16784,
+          "total_valid": 53383,
+          "green_share_two_party": 0.530693,
+          "white_share_all": 0.314407,
+          "delta": -0.013914
+        }
+      }
+    },
+    "彰化縣|員林市": {
+      "county": "彰化縣",
+      "township": "員林市",
+      "admin_key": "彰化縣|員林市",
+      "pvi": -0.01924,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.288502,
+      "cycles": {
+        "2024": {
+          "green": 27276,
+          "kmt": 24642,
+          "white": 21052,
+          "total_valid": 72970,
+          "green_share_two_party": 0.525367,
+          "white_share_all": 0.288502,
+          "delta": -0.01924
+        }
+      }
+    },
+    "彰化縣|埔心鄉": {
+      "county": "彰化縣",
+      "township": "埔心鄉",
+      "admin_key": "彰化縣|埔心鄉",
+      "pvi": 0.017918,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.295524,
+      "cycles": {
+        "2024": {
+          "green": 8340,
+          "kmt": 6486,
+          "white": 6219,
+          "total_valid": 21044,
+          "green_share_two_party": 0.562525,
+          "white_share_all": 0.295524,
+          "delta": 0.017918
+        }
+      }
+    },
+    "彰化縣|埔鹽鄉": {
+      "county": "彰化縣",
+      "township": "埔鹽鄉",
+      "admin_key": "彰化縣|埔鹽鄉",
+      "pvi": -0.080048,
+      "pvi_label": "B+8",
+      "bucket": "深藍",
+      "white_share_avg": 0.283413,
+      "cycles": {
+        "2024": {
+          "green": 6364,
+          "kmt": 7335,
+          "white": 5418,
+          "total_valid": 19117,
+          "green_share_two_party": 0.464559,
+          "white_share_all": 0.283413,
+          "delta": -0.080048
+        }
+      }
+    },
+    "彰化縣|埤頭鄉": {
+      "county": "彰化縣",
+      "township": "埤頭鄉",
+      "admin_key": "彰化縣|埤頭鄉",
+      "pvi": -0.001127,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.282375,
+      "cycles": {
+        "2024": {
+          "green": 6556,
+          "kmt": 5507,
+          "white": 4747,
+          "total_valid": 16811,
+          "green_share_two_party": 0.54348,
+          "white_share_all": 0.282375,
+          "delta": -0.001127
+        }
+      }
+    },
+    "彰化縣|大城鄉": {
+      "county": "彰化縣",
+      "township": "大城鄉",
+      "admin_key": "彰化縣|大城鄉",
+      "pvi": -0.049801,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.236435,
+      "cycles": {
+        "2024": {
+          "green": 3001,
+          "kmt": 3064,
+          "white": 1878,
+          "total_valid": 7943,
+          "green_share_two_party": 0.494806,
+          "white_share_all": 0.236435,
+          "delta": -0.049801
+        }
+      }
+    },
+    "彰化縣|大村鄉": {
+      "county": "彰化縣",
+      "township": "大村鄉",
+      "admin_key": "彰化縣|大村鄉",
+      "pvi": -0.002267,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.313789,
+      "cycles": {
+        "2024": {
+          "green": 9024,
+          "kmt": 7615,
+          "white": 7610,
+          "total_valid": 24252,
+          "green_share_two_party": 0.54234,
+          "white_share_all": 0.313789,
+          "delta": -0.002267
+        }
+      }
+    },
+    "彰化縣|彰化市": {
+      "county": "彰化縣",
+      "township": "彰化市",
+      "admin_key": "彰化縣|彰化市",
+      "pvi": -0.018913,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.295602,
+      "cycles": {
+        "2024": {
+          "green": 50658,
+          "kmt": 45706,
+          "white": 40439,
+          "total_valid": 136802,
+          "green_share_two_party": 0.525694,
+          "white_share_all": 0.295602,
+          "delta": -0.018913
+        }
+      }
+    },
+    "彰化縣|永靖鄉": {
+      "county": "彰化縣",
+      "township": "永靖鄉",
+      "admin_key": "彰化縣|永靖鄉",
+      "pvi": 0.001333,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.281594,
+      "cycles": {
+        "2024": {
+          "green": 8485,
+          "kmt": 7057,
+          "white": 6092,
+          "total_valid": 21634,
+          "green_share_two_party": 0.54594,
+          "white_share_all": 0.281594,
+          "delta": 0.001333
+        }
+      }
+    },
+    "彰化縣|溪州鄉": {
+      "county": "彰化縣",
+      "township": "溪州鄉",
+      "admin_key": "彰化縣|溪州鄉",
+      "pvi": 0.064327,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.256386,
+      "cycles": {
+        "2024": {
+          "green": 7675,
+          "kmt": 4929,
+          "white": 4346,
+          "total_valid": 16951,
+          "green_share_two_party": 0.608934,
+          "white_share_all": 0.256386,
+          "delta": 0.064327
+        }
+      }
+    },
+    "彰化縣|溪湖鎮": {
+      "county": "彰化縣",
+      "township": "溪湖鎮",
+      "admin_key": "彰化縣|溪湖鎮",
+      "pvi": -0.029108,
+      "pvi_label": "B+3",
+      "bucket": "中間",
+      "white_share_avg": 0.29661,
+      "cycles": {
+        "2024": {
+          "green": 11358,
+          "kmt": 10675,
+          "white": 9291,
+          "total_valid": 31324,
+          "green_share_two_party": 0.515499,
+          "white_share_all": 0.29661,
+          "delta": -0.029108
+        }
+      }
+    },
+    "彰化縣|田中鎮": {
+      "county": "彰化縣",
+      "township": "田中鎮",
+      "admin_key": "彰化縣|田中鎮",
+      "pvi": -0.021408,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.271802,
+      "cycles": {
+        "2024": {
+          "green": 9100,
+          "kmt": 8293,
+          "white": 6492,
+          "total_valid": 23885,
+          "green_share_two_party": 0.523199,
+          "white_share_all": 0.271802,
+          "delta": -0.021408
+        }
+      }
+    },
+    "彰化縣|田尾鄉": {
+      "county": "彰化縣",
+      "township": "田尾鄉",
+      "admin_key": "彰化縣|田尾鄉",
+      "pvi": 0.002748,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.283971,
+      "cycles": {
+        "2024": {
+          "green": 6230,
+          "kmt": 5152,
+          "white": 4514,
+          "total_valid": 15896,
+          "green_share_two_party": 0.547355,
+          "white_share_all": 0.283971,
+          "delta": 0.002748
+        }
+      }
+    },
+    "彰化縣|社頭鄉": {
+      "county": "彰化縣",
+      "township": "社頭鄉",
+      "admin_key": "彰化縣|社頭鄉",
+      "pvi": 0.021818,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.286387,
+      "cycles": {
+        "2024": {
+          "green": 10220,
+          "kmt": 7823,
+          "white": 7241,
+          "total_valid": 25284,
+          "green_share_two_party": 0.566425,
+          "white_share_all": 0.286387,
+          "delta": 0.021818
+        }
+      }
+    },
+    "彰化縣|福興鄉": {
+      "county": "彰化縣",
+      "township": "福興鄉",
+      "admin_key": "彰化縣|福興鄉",
+      "pvi": 0.038997,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.288789,
+      "cycles": {
+        "2024": {
+          "green": 11127,
+          "kmt": 7939,
+          "white": 7743,
+          "total_valid": 26812,
+          "green_share_two_party": 0.583604,
+          "white_share_all": 0.288789,
+          "delta": 0.038997
+        }
+      }
+    },
+    "彰化縣|秀水鄉": {
+      "county": "彰化縣",
+      "township": "秀水鄉",
+      "admin_key": "彰化縣|秀水鄉",
+      "pvi": 0.000568,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.302787,
+      "cycles": {
+        "2024": {
+          "green": 8864,
+          "kmt": 7395,
+          "white": 7061,
+          "total_valid": 23320,
+          "green_share_two_party": 0.545175,
+          "white_share_all": 0.302787,
+          "delta": 0.000568
+        }
+      }
+    },
+    "彰化縣|竹塘鄉": {
+      "county": "彰化縣",
+      "township": "竹塘鄉",
+      "admin_key": "彰化縣|竹塘鄉",
+      "pvi": 0.044575,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.245871,
+      "cycles": {
+        "2024": {
+          "green": 3551,
+          "kmt": 2476,
+          "white": 1965,
+          "total_valid": 7992,
+          "green_share_two_party": 0.589182,
+          "white_share_all": 0.245871,
+          "delta": 0.044575
+        }
+      }
+    },
+    "彰化縣|線西鄉": {
+      "county": "彰化縣",
+      "township": "線西鄉",
+      "admin_key": "彰化縣|線西鄉",
+      "pvi": -0.079201,
+      "pvi_label": "B+8",
+      "bucket": "偏藍",
+      "white_share_avg": 0.334357,
+      "cycles": {
+        "2024": {
+          "green": 3027,
+          "kmt": 3477,
+          "white": 3267,
+          "total_valid": 9771,
+          "green_share_two_party": 0.465406,
+          "white_share_all": 0.334357,
+          "delta": -0.079201
+        }
+      }
+    },
+    "彰化縣|芬園鄉": {
+      "county": "彰化縣",
+      "township": "芬園鄉",
+      "admin_key": "彰化縣|芬園鄉",
+      "pvi": 0.02797,
+      "pvi_label": "G+3",
+      "bucket": "中間",
+      "white_share_avg": 0.275508,
+      "cycles": {
+        "2024": {
+          "green": 5696,
+          "kmt": 4252,
+          "white": 3783,
+          "total_valid": 13731,
+          "green_share_two_party": 0.572577,
+          "white_share_all": 0.275508,
+          "delta": 0.02797
+        }
+      }
+    },
+    "彰化縣|花壇鄉": {
+      "county": "彰化縣",
+      "township": "花壇鄉",
+      "admin_key": "彰化縣|花壇鄉",
+      "pvi": -0.041897,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share_avg": 0.30239,
+      "cycles": {
+        "2024": {
+          "green": 9554,
+          "kmt": 9451,
+          "white": 8238,
+          "total_valid": 27243,
+          "green_share_two_party": 0.50271,
+          "white_share_all": 0.30239,
+          "delta": -0.041897
+        }
+      }
+    },
+    "彰化縣|芳苑鄉": {
+      "county": "彰化縣",
+      "township": "芳苑鄉",
+      "admin_key": "彰化縣|芳苑鄉",
+      "pvi": 0.025681,
+      "pvi_label": "G+3",
+      "bucket": "中間",
+      "white_share_avg": 0.240423,
+      "cycles": {
+        "2024": {
+          "green": 7497,
+          "kmt": 5649,
+          "white": 4161,
+          "total_valid": 17307,
+          "green_share_two_party": 0.570288,
+          "white_share_all": 0.240423,
+          "delta": 0.025681
+        }
+      }
+    },
+    "彰化縣|鹿港鎮": {
+      "county": "彰化縣",
+      "township": "鹿港鎮",
+      "admin_key": "彰化縣|鹿港鎮",
+      "pvi": 0.037428,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.285703,
+      "cycles": {
+        "2024": {
+          "green": 20579,
+          "kmt": 14778,
+          "white": 14140,
+          "total_valid": 49492,
+          "green_share_two_party": 0.582035,
+          "white_share_all": 0.285703,
+          "delta": 0.037428
+        }
+      }
+    },
+    "新北市|三峽區": {
+      "county": "新北市",
+      "township": "三峽區",
+      "admin_key": "新北市|三峽區",
+      "pvi": -0.016045,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.275199,
+      "cycles": {
+        "2024": {
+          "green": 25492,
+          "kmt": 22737,
+          "white": 18312,
+          "total_valid": 66541,
+          "green_share_two_party": 0.528562,
+          "white_share_all": 0.275199,
+          "delta": -0.016045
+        }
+      }
+    },
+    "新北市|三芝區": {
+      "county": "新北市",
+      "township": "三芝區",
+      "admin_key": "新北市|三芝區",
+      "pvi": -0.060637,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.234888,
+      "cycles": {
+        "2024": {
+          "green": 4876,
+          "kmt": 5199,
+          "white": 3093,
+          "total_valid": 13168,
+          "green_share_two_party": 0.48397,
+          "white_share_all": 0.234888,
+          "delta": -0.060637
+        }
+      }
+    },
+    "新北市|三重區": {
+      "county": "新北市",
+      "township": "三重區",
+      "admin_key": "新北市|三重區",
+      "pvi": 0.056809,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.264299,
+      "cycles": {
+        "2024": {
+          "green": 105107,
+          "kmt": 69659,
+          "white": 62793,
+          "total_valid": 237583,
+          "green_share_two_party": 0.601416,
+          "white_share_all": 0.264299,
+          "delta": 0.056809
+        }
+      }
+    },
+    "新北市|中和區": {
+      "county": "新北市",
+      "township": "中和區",
+      "admin_key": "新北市|中和區",
+      "pvi": -0.092225,
+      "pvi_label": "B+9",
+      "bucket": "深藍",
+      "white_share_avg": 0.252501,
+      "cycles": {
+        "2024": {
+          "green": 87482,
+          "kmt": 105899,
+          "white": 65314,
+          "total_valid": 258668,
+          "green_share_two_party": 0.452382,
+          "white_share_all": 0.252501,
+          "delta": -0.092225
+        }
+      }
+    },
+    "新北市|五股區": {
+      "county": "新北市",
+      "township": "五股區",
+      "admin_key": "新北市|五股區",
+      "pvi": 0.029382,
+      "pvi_label": "G+3",
+      "bucket": "中間",
+      "white_share_avg": 0.288503,
+      "cycles": {
+        "2024": {
+          "green": 22513,
+          "kmt": 16709,
+          "white": 15904,
+          "total_valid": 55126,
+          "green_share_two_party": 0.573989,
+          "white_share_all": 0.288503,
+          "delta": 0.029382
+        }
+      }
+    },
+    "新北市|八里區": {
+      "county": "新北市",
+      "township": "八里區",
+      "admin_key": "新北市|八里區",
+      "pvi": -0.013123,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.266404,
+      "cycles": {
+        "2024": {
+          "green": 9715,
+          "kmt": 8564,
+          "white": 6638,
+          "total_valid": 24917,
+          "green_share_two_party": 0.531484,
+          "white_share_all": 0.266404,
+          "delta": -0.013123
+        }
+      }
+    },
+    "新北市|土城區": {
+      "county": "新北市",
+      "township": "土城區",
+      "admin_key": "新北市|土城區",
+      "pvi": -0.002914,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.277899,
+      "cycles": {
+        "2024": {
+          "green": 57147,
+          "kmt": 48350,
+          "white": 40606,
+          "total_valid": 146118,
+          "green_share_two_party": 0.541693,
+          "white_share_all": 0.277899,
+          "delta": -0.002914
+        }
+      }
+    },
+    "新北市|坪林區": {
+      "county": "新北市",
+      "township": "坪林區",
+      "admin_key": "新北市|坪林區",
+      "pvi": 0.069497,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.17193,
+      "cycles": {
+        "2024": {
+          "green": 2029,
+          "kmt": 1275,
+          "white": 686,
+          "total_valid": 3990,
+          "green_share_two_party": 0.614104,
+          "white_share_all": 0.17193,
+          "delta": 0.069497
+        }
+      }
+    },
+    "新北市|平溪區": {
+      "county": "新北市",
+      "township": "平溪區",
+      "admin_key": "新北市|平溪區",
+      "pvi": -0.018906,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.152475,
+      "cycles": {
+        "2024": {
+          "green": 1125,
+          "kmt": 1015,
+          "white": 385,
+          "total_valid": 2525,
+          "green_share_two_party": 0.525701,
+          "white_share_all": 0.152475,
+          "delta": -0.018906
+        }
+      }
+    },
+    "新北市|新店區": {
+      "county": "新北市",
+      "township": "新店區",
+      "admin_key": "新北市|新店區",
+      "pvi": -0.145418,
+      "pvi_label": "B+15",
+      "bucket": "深藍",
+      "white_share_avg": 0.235702,
+      "cycles": {
+        "2024": {
+          "green": 58450,
+          "kmt": 87972,
+          "white": 45155,
+          "total_valid": 191577,
+          "green_share_two_party": 0.399189,
+          "white_share_all": 0.235702,
+          "delta": -0.145418
+        }
+      }
+    },
+    "新北市|新莊區": {
+      "county": "新北市",
+      "township": "新莊區",
+      "admin_key": "新北市|新莊區",
+      "pvi": 0.035338,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.281999,
+      "cycles": {
+        "2024": {
+          "green": 105550,
+          "kmt": 76450,
+          "white": 71482,
+          "total_valid": 253483,
+          "green_share_two_party": 0.579945,
+          "white_share_all": 0.281999,
+          "delta": 0.035338
+        }
+      }
+    },
+    "新北市|板橋區": {
+      "county": "新北市",
+      "township": "板橋區",
+      "admin_key": "新北市|板橋區",
+      "pvi": 0.009468,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.2565,
+      "cycles": {
+        "2024": {
+          "green": 139832,
+          "kmt": 112538,
+          "white": 87077,
+          "total_valid": 339481,
+          "green_share_two_party": 0.554075,
+          "white_share_all": 0.2565,
+          "delta": 0.009468
+        }
+      }
+    },
+    "新北市|林口區": {
+      "county": "新北市",
+      "township": "林口區",
+      "admin_key": "新北市|林口區",
+      "pvi": -0.038173,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share_avg": 0.284795,
+      "cycles": {
+        "2024": {
+          "green": 26958,
+          "kmt": 26273,
+          "white": 21197,
+          "total_valid": 74429,
+          "green_share_two_party": 0.506434,
+          "white_share_all": 0.284795,
+          "delta": -0.038173
+        }
+      }
+    },
+    "新北市|樹林區": {
+      "county": "新北市",
+      "township": "樹林區",
+      "admin_key": "新北市|樹林區",
+      "pvi": 0.01739,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.277498,
+      "cycles": {
+        "2024": {
+          "green": 43634,
+          "kmt": 34007,
+          "white": 29816,
+          "total_valid": 107446,
+          "green_share_two_party": 0.561997,
+          "white_share_all": 0.277498,
+          "delta": 0.01739
+        }
+      }
+    },
+    "新北市|永和區": {
+      "county": "新北市",
+      "township": "永和區",
+      "admin_key": "新北市|永和區",
+      "pvi": -0.127676,
+      "pvi_label": "B+13",
+      "bucket": "深藍",
+      "white_share_avg": 0.234503,
+      "cycles": {
+        "2024": {
+          "green": 42484,
+          "kmt": 59413,
+          "white": 31211,
+          "total_valid": 133094,
+          "green_share_two_party": 0.416931,
+          "white_share_all": 0.234503,
+          "delta": -0.127676
+        }
+      }
+    },
+    "新北市|汐止區": {
+      "county": "新北市",
+      "township": "汐止區",
+      "admin_key": "新北市|汐止區",
+      "pvi": -0.05627,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.262597,
+      "cycles": {
+        "2024": {
+          "green": 46604,
+          "kmt": 48830,
+          "white": 33985,
+          "total_valid": 129419,
+          "green_share_two_party": 0.488337,
+          "white_share_all": 0.262597,
+          "delta": -0.05627
+        }
+      }
+    },
+    "新北市|泰山區": {
+      "county": "新北市",
+      "township": "泰山區",
+      "admin_key": "新北市|泰山區",
+      "pvi": 0.007112,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.279903,
+      "cycles": {
+        "2024": {
+          "green": 18391,
+          "kmt": 14943,
+          "white": 12957,
+          "total_valid": 46291,
+          "green_share_two_party": 0.551719,
+          "white_share_all": 0.279903,
+          "delta": 0.007112
+        }
+      }
+    },
+    "新北市|淡水區": {
+      "county": "新北市",
+      "township": "淡水區",
+      "admin_key": "新北市|淡水區",
+      "pvi": -0.054338,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.259997,
+      "cycles": {
+        "2024": {
+          "green": 42169,
+          "kmt": 43843,
+          "white": 30220,
+          "total_valid": 116232,
+          "green_share_two_party": 0.490269,
+          "white_share_all": 0.259997,
+          "delta": -0.054338
+        }
+      }
+    },
+    "新北市|深坑區": {
+      "county": "新北市",
+      "township": "深坑區",
+      "admin_key": "新北市|深坑區",
+      "pvi": -0.045235,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.243386,
+      "cycles": {
+        "2024": {
+          "green": 5570,
+          "kmt": 5584,
+          "white": 3588,
+          "total_valid": 14742,
+          "green_share_two_party": 0.499372,
+          "white_share_all": 0.243386,
+          "delta": -0.045235
+        }
+      }
+    },
+    "新北市|烏來區": {
+      "county": "新北市",
+      "township": "烏來區",
+      "admin_key": "新北市|烏來區",
+      "pvi": -0.150805,
+      "pvi_label": "B+15",
+      "bucket": "深藍",
+      "white_share_avg": 0.245078,
+      "cycles": {
+        "2024": {
+          "green": 1042,
+          "kmt": 1604,
+          "white": 859,
+          "total_valid": 3505,
+          "green_share_two_party": 0.393802,
+          "white_share_all": 0.245078,
+          "delta": -0.150805
+        }
+      }
+    },
+    "新北市|瑞芳區": {
+      "county": "新北市",
+      "township": "瑞芳區",
+      "admin_key": "新北市|瑞芳區",
+      "pvi": -0.068495,
+      "pvi_label": "B+7",
+      "bucket": "偏藍",
+      "white_share_avg": 0.246512,
+      "cycles": {
+        "2024": {
+          "green": 7793,
+          "kmt": 8575,
+          "white": 5354,
+          "total_valid": 21719,
+          "green_share_two_party": 0.476112,
+          "white_share_all": 0.246512,
+          "delta": -0.068495
+        }
+      }
+    },
+    "新北市|石碇區": {
+      "county": "新北市",
+      "township": "石碇區",
+      "admin_key": "新北市|石碇區",
+      "pvi": 0.049409,
+      "pvi_label": "G+5",
+      "bucket": "偏綠",
+      "white_share_avg": 0.188099,
+      "cycles": {
+        "2024": {
+          "green": 2164,
+          "kmt": 1479,
+          "white": 844,
+          "total_valid": 4487,
+          "green_share_two_party": 0.594016,
+          "white_share_all": 0.188099,
+          "delta": 0.049409
+        }
+      }
+    },
+    "新北市|石門區": {
+      "county": "新北市",
+      "township": "石門區",
+      "admin_key": "新北市|石門區",
+      "pvi": -0.051445,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.231886,
+      "cycles": {
+        "2024": {
+          "green": 2452,
+          "kmt": 2520,
+          "white": 1501,
+          "total_valid": 6473,
+          "green_share_two_party": 0.493162,
+          "white_share_all": 0.231886,
+          "delta": -0.051445
+        }
+      }
+    },
+    "新北市|萬里區": {
+      "county": "新北市",
+      "township": "萬里區",
+      "admin_key": "新北市|萬里區",
+      "pvi": 0.040289,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.194168,
+      "cycles": {
+        "2024": {
+          "green": 5739,
+          "kmt": 4073,
+          "white": 2364,
+          "total_valid": 12175,
+          "green_share_two_party": 0.584896,
+          "white_share_all": 0.194168,
+          "delta": 0.040289
+        }
+      }
+    },
+    "新北市|蘆洲區": {
+      "county": "新北市",
+      "township": "蘆洲區",
+      "admin_key": "新北市|蘆洲區",
+      "pvi": 0.069388,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.2843,
+      "cycles": {
+        "2024": {
+          "green": 52534,
+          "kmt": 33027,
+          "white": 33983,
+          "total_valid": 119532,
+          "green_share_two_party": 0.613995,
+          "white_share_all": 0.2843,
+          "delta": 0.069388
+        }
+      }
+    },
+    "新北市|貢寮區": {
+      "county": "新北市",
+      "township": "貢寮區",
+      "admin_key": "新北市|貢寮區",
+      "pvi": 0.104972,
+      "pvi_label": "G+10",
+      "bucket": "深綠",
+      "white_share_avg": 0.168178,
+      "cycles": {
+        "2024": {
+          "green": 3396,
+          "kmt": 1832,
+          "white": 1057,
+          "total_valid": 6285,
+          "green_share_two_party": 0.649579,
+          "white_share_all": 0.168178,
+          "delta": 0.104972
+        }
+      }
+    },
+    "新北市|金山區": {
+      "county": "新北市",
+      "township": "金山區",
+      "admin_key": "新北市|金山區",
+      "pvi": 0.044037,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.223794,
+      "cycles": {
+        "2024": {
+          "green": 5588,
+          "kmt": 3905,
+          "white": 2737,
+          "total_valid": 12230,
+          "green_share_two_party": 0.588644,
+          "white_share_all": 0.223794,
+          "delta": 0.044037
+        }
+      }
+    },
+    "新北市|雙溪區": {
+      "county": "新北市",
+      "township": "雙溪區",
+      "admin_key": "新北市|雙溪區",
+      "pvi": -0.041076,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share_avg": 0.18815,
+      "cycles": {
+        "2024": {
+          "green": 1925,
+          "kmt": 1898,
+          "white": 886,
+          "total_valid": 4709,
+          "green_share_two_party": 0.503531,
+          "white_share_all": 0.18815,
+          "delta": -0.041076
+        }
+      }
+    },
+    "新北市|鶯歌區": {
+      "county": "新北市",
+      "township": "鶯歌區",
+      "admin_key": "新北市|鶯歌區",
+      "pvi": 0.017734,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.287808,
+      "cycles": {
+        "2024": {
+          "green": 21040,
+          "kmt": 16375,
+          "white": 15120,
+          "total_valid": 52535,
+          "green_share_two_party": 0.562341,
+          "white_share_all": 0.287808,
+          "delta": 0.017734
+        }
+      }
+    },
+    "新竹市|北區": {
+      "county": "新竹市",
+      "township": "北區",
+      "admin_key": "新竹市|北區",
+      "pvi": -0.006507,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.334603,
+      "cycles": {
+        "2024": {
+          "green": 32900,
+          "kmt": 28241,
+          "white": 30750,
+          "total_valid": 91900,
+          "green_share_two_party": 0.5381,
+          "white_share_all": 0.334603,
+          "delta": -0.006507
+        }
+      }
+    },
+    "新竹市|東區": {
+      "county": "新竹市",
+      "township": "東區",
+      "admin_key": "新竹市|東區",
+      "pvi": -0.038455,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share_avg": 0.349704,
+      "cycles": {
+        "2024": {
+          "green": 41714,
+          "kmt": 40700,
+          "white": 44326,
+          "total_valid": 126753,
+          "green_share_two_party": 0.506152,
+          "white_share_all": 0.349704,
+          "delta": -0.038455
+        }
+      }
+    },
+    "新竹市|香山區": {
+      "county": "新竹市",
+      "township": "香山區",
+      "admin_key": "新竹市|香山區",
+      "pvi": 0.029934,
+      "pvi_label": "G+3",
+      "bucket": "中間",
+      "white_share_avg": 0.341503,
+      "cycles": {
+        "2024": {
+          "green": 18063,
+          "kmt": 13376,
+          "white": 16302,
+          "total_valid": 47736,
+          "green_share_two_party": 0.574541,
+          "white_share_all": 0.341503,
+          "delta": 0.029934
+        }
+      }
+    },
+    "新竹縣|五峰鄉": {
+      "county": "新竹縣",
+      "township": "五峰鄉",
+      "admin_key": "新竹縣|五峰鄉",
+      "pvi": -0.325475,
+      "pvi_label": "B+33",
+      "bucket": "深藍",
+      "white_share_avg": 0.235544,
+      "cycles": {
+        "2024": {
+          "green": 394,
+          "kmt": 1404,
+          "white": 554,
+          "total_valid": 2352,
+          "green_share_two_party": 0.219132,
+          "white_share_all": 0.235544,
+          "delta": -0.325475
+        }
+      }
+    },
+    "新竹縣|北埔鄉": {
+      "county": "新竹縣",
+      "township": "北埔鄉",
+      "admin_key": "新竹縣|北埔鄉",
+      "pvi": -0.208076,
+      "pvi_label": "B+21",
+      "bucket": "深藍",
+      "white_share_avg": 0.299421,
+      "cycles": {
+        "2024": {
+          "green": 1263,
+          "kmt": 2490,
+          "white": 1604,
+          "total_valid": 5357,
+          "green_share_two_party": 0.336531,
+          "white_share_all": 0.299421,
+          "delta": -0.208076
+        }
+      }
+    },
+    "新竹縣|寶山鄉": {
+      "county": "新竹縣",
+      "township": "寶山鄉",
+      "admin_key": "新竹縣|寶山鄉",
+      "pvi": -0.136022,
+      "pvi_label": "B+14",
+      "bucket": "深藍",
+      "white_share_avg": 0.325975,
+      "cycles": {
+        "2024": {
+          "green": 2570,
+          "kmt": 3720,
+          "white": 3042,
+          "total_valid": 9332,
+          "green_share_two_party": 0.408585,
+          "white_share_all": 0.325975,
+          "delta": -0.136022
+        }
+      }
+    },
+    "新竹縣|尖石鄉": {
+      "county": "新竹縣",
+      "township": "尖石鄉",
+      "admin_key": "新竹縣|尖石鄉",
+      "pvi": -0.302905,
+      "pvi_label": "B+30",
+      "bucket": "深藍",
+      "white_share_avg": 0.285517,
+      "cycles": {
+        "2024": {
+          "green": 750,
+          "kmt": 2353,
+          "white": 1240,
+          "total_valid": 4343,
+          "green_share_two_party": 0.241702,
+          "white_share_all": 0.285517,
+          "delta": -0.302905
+        }
+      }
+    },
+    "新竹縣|峨眉鄉": {
+      "county": "新竹縣",
+      "township": "峨眉鄉",
+      "admin_key": "新竹縣|峨眉鄉",
+      "pvi": -0.143351,
+      "pvi_label": "B+14",
+      "bucket": "深藍",
+      "white_share_avg": 0.247563,
+      "cycles": {
+        "2024": {
+          "green": 1022,
+          "kmt": 1525,
+          "white": 838,
+          "total_valid": 3385,
+          "green_share_two_party": 0.401256,
+          "white_share_all": 0.247563,
+          "delta": -0.143351
+        }
+      }
+    },
+    "新竹縣|新埔鎮": {
+      "county": "新竹縣",
+      "township": "新埔鎮",
+      "admin_key": "新竹縣|新埔鎮",
+      "pvi": -0.099298,
+      "pvi_label": "B+10",
+      "bucket": "深藍",
+      "white_share_avg": 0.326122,
+      "cycles": {
+        "2024": {
+          "green": 6298,
+          "kmt": 7845,
+          "white": 6844,
+          "total_valid": 20986,
+          "green_share_two_party": 0.445309,
+          "white_share_all": 0.326122,
+          "delta": -0.099298
+        }
+      }
+    },
+    "新竹縣|新豐鄉": {
+      "county": "新竹縣",
+      "township": "新豐鄉",
+      "admin_key": "新竹縣|新豐鄉",
+      "pvi": -0.104408,
+      "pvi_label": "B+10",
+      "bucket": "深藍",
+      "white_share_avg": 0.372807,
+      "cycles": {
+        "2024": {
+          "green": 9286,
+          "kmt": 11809,
+          "white": 12539,
+          "total_valid": 33634,
+          "green_share_two_party": 0.440199,
+          "white_share_all": 0.372807,
+          "delta": -0.104408
+        }
+      }
+    },
+    "新竹縣|橫山鄉": {
+      "county": "新竹縣",
+      "township": "橫山鄉",
+      "admin_key": "新竹縣|橫山鄉",
+      "pvi": -0.219185,
+      "pvi_label": "B+22",
+      "bucket": "深藍",
+      "white_share_avg": 0.286923,
+      "cycles": {
+        "2024": {
+          "green": 1755,
+          "kmt": 3638,
+          "white": 2170,
+          "total_valid": 7563,
+          "green_share_two_party": 0.325422,
+          "white_share_all": 0.286923,
+          "delta": -0.219185
+        }
+      }
+    },
+    "新竹縣|湖口鄉": {
+      "county": "新竹縣",
+      "township": "湖口鄉",
+      "admin_key": "新竹縣|湖口鄉",
+      "pvi": -0.153313,
+      "pvi_label": "B+15",
+      "bucket": "深藍",
+      "white_share_avg": 0.36171,
+      "cycles": {
+        "2024": {
+          "green": 11893,
+          "kmt": 18501,
+          "white": 17221,
+          "total_valid": 47610,
+          "green_share_two_party": 0.391294,
+          "white_share_all": 0.36171,
+          "delta": -0.153313
+        }
+      }
+    },
+    "新竹縣|竹北市": {
+      "county": "新竹縣",
+      "township": "竹北市",
+      "admin_key": "新竹縣|竹北市",
+      "pvi": -0.042091,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share_avg": 0.383296,
+      "cycles": {
+        "2024": {
+          "green": 37154,
+          "kmt": 36782,
+          "white": 45953,
+          "total_valid": 119889,
+          "green_share_two_party": 0.502516,
+          "white_share_all": 0.383296,
+          "delta": -0.042091
+        }
+      }
+    },
+    "新竹縣|竹東鎮": {
+      "county": "新竹縣",
+      "township": "竹東鎮",
+      "admin_key": "新竹縣|竹東鎮",
+      "pvi": -0.186831,
+      "pvi_label": "B+19",
+      "bucket": "深藍",
+      "white_share_avg": 0.356308,
+      "cycles": {
+        "2024": {
+          "green": 12998,
+          "kmt": 23332,
+          "white": 20110,
+          "total_valid": 56440,
+          "green_share_two_party": 0.357776,
+          "white_share_all": 0.356308,
+          "delta": -0.186831
+        }
+      }
+    },
+    "新竹縣|芎林鄉": {
+      "county": "新竹縣",
+      "township": "芎林鄉",
+      "admin_key": "新竹縣|芎林鄉",
+      "pvi": -0.168182,
+      "pvi_label": "B+17",
+      "bucket": "深藍",
+      "white_share_avg": 0.33323,
+      "cycles": {
+        "2024": {
+          "green": 3235,
+          "kmt": 5359,
+          "white": 4295,
+          "total_valid": 12889,
+          "green_share_two_party": 0.376425,
+          "white_share_all": 0.33323,
+          "delta": -0.168182
+        }
+      }
+    },
+    "新竹縣|關西鎮": {
+      "county": "新竹縣",
+      "township": "關西鎮",
+      "admin_key": "新竹縣|關西鎮",
+      "pvi": -0.152022,
+      "pvi_label": "B+15",
+      "bucket": "深藍",
+      "white_share_avg": 0.277011,
+      "cycles": {
+        "2024": {
+          "green": 4691,
+          "kmt": 7258,
+          "white": 4579,
+          "total_valid": 16530,
+          "green_share_two_party": 0.392585,
+          "white_share_all": 0.277011,
+          "delta": -0.152022
+        }
+      }
+    },
+    "桃園市|中壢區": {
+      "county": "桃園市",
+      "township": "中壢區",
+      "admin_key": "桃園市|中壢區",
+      "pvi": -0.073057,
+      "pvi_label": "B+7",
+      "bucket": "偏藍",
+      "white_share_avg": 0.309299,
+      "cycles": {
+        "2024": {
+          "green": 82930,
+          "kmt": 92937,
+          "white": 78754,
+          "total_valid": 254621,
+          "green_share_two_party": 0.47155,
+          "white_share_all": 0.309299,
+          "delta": -0.073057
+        }
+      }
+    },
+    "桃園市|八德區": {
+      "county": "桃園市",
+      "township": "八德區",
+      "admin_key": "桃園市|八德區",
+      "pvi": -0.050011,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.306701,
+      "cycles": {
+        "2024": {
+          "green": 42424,
+          "kmt": 43351,
+          "white": 37945,
+          "total_valid": 123720,
+          "green_share_two_party": 0.494596,
+          "white_share_all": 0.306701,
+          "delta": -0.050011
+        }
+      }
+    },
+    "桃園市|大園區": {
+      "county": "桃園市",
+      "township": "大園區",
+      "admin_key": "桃園市|大園區",
+      "pvi": 0.041166,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.306909,
+      "cycles": {
+        "2024": {
+          "green": 20051,
+          "kmt": 14179,
+          "white": 15157,
+          "total_valid": 49386,
+          "green_share_two_party": 0.585773,
+          "white_share_all": 0.306909,
+          "delta": 0.041166
+        }
+      }
+    },
+    "桃園市|大溪區": {
+      "county": "桃園市",
+      "township": "大溪區",
+      "admin_key": "桃園市|大溪區",
+      "pvi": 0.009395,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.274291,
+      "cycles": {
+        "2024": {
+          "green": 22231,
+          "kmt": 17897,
+          "white": 15165,
+          "total_valid": 55288,
+          "green_share_two_party": 0.554002,
+          "white_share_all": 0.274291,
+          "delta": 0.009395
+        }
+      }
+    },
+    "桃園市|平鎮區": {
+      "county": "桃園市",
+      "township": "平鎮區",
+      "admin_key": "桃園市|平鎮區",
+      "pvi": -0.060675,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.315601,
+      "cycles": {
+        "2024": {
+          "green": 45025,
+          "kmt": 48015,
+          "white": 42904,
+          "total_valid": 135944,
+          "green_share_two_party": 0.483932,
+          "white_share_all": 0.315601,
+          "delta": -0.060675
+        }
+      }
+    },
+    "桃園市|復興區": {
+      "county": "桃園市",
+      "township": "復興區",
+      "admin_key": "桃園市|復興區",
+      "pvi": -0.236617,
+      "pvi_label": "B+24",
+      "bucket": "深藍",
+      "white_share_avg": 0.263524,
+      "cycles": {
+        "2024": {
+          "green": 1434,
+          "kmt": 3222,
+          "white": 1666,
+          "total_valid": 6322,
+          "green_share_two_party": 0.30799,
+          "white_share_all": 0.263524,
+          "delta": -0.236617
+        }
+      }
+    },
+    "桃園市|新屋區": {
+      "county": "桃園市",
+      "township": "新屋區",
+      "admin_key": "桃園市|新屋區",
+      "pvi": 0.022726,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.282586,
+      "cycles": {
+        "2024": {
+          "green": 12268,
+          "kmt": 9356,
+          "white": 8518,
+          "total_valid": 30143,
+          "green_share_two_party": 0.567333,
+          "white_share_all": 0.282586,
+          "delta": 0.022726
+        }
+      }
+    },
+    "桃園市|桃園區": {
+      "county": "桃園市",
+      "township": "桃園區",
+      "admin_key": "桃園市|桃園區",
+      "pvi": -0.022204,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.299199,
+      "cycles": {
+        "2024": {
+          "green": 100082,
+          "kmt": 91498,
+          "white": 81793,
+          "total_valid": 273373,
+          "green_share_two_party": 0.522403,
+          "white_share_all": 0.299199,
+          "delta": -0.022204
+        }
+      }
+    },
+    "桃園市|楊梅區": {
+      "county": "桃園市",
+      "township": "楊梅區",
+      "admin_key": "桃園市|楊梅區",
+      "pvi": -0.074835,
+      "pvi_label": "B+7",
+      "bucket": "偏藍",
+      "white_share_avg": 0.328405,
+      "cycles": {
+        "2024": {
+          "green": 32753,
+          "kmt": 36968,
+          "white": 34093,
+          "total_valid": 103814,
+          "green_share_two_party": 0.469772,
+          "white_share_all": 0.328405,
+          "delta": -0.074835
+        }
+      }
+    },
+    "桃園市|蘆竹區": {
+      "county": "桃園市",
+      "township": "蘆竹區",
+      "admin_key": "桃園市|蘆竹區",
+      "pvi": 0.025821,
+      "pvi_label": "G+3",
+      "bucket": "中間",
+      "white_share_avg": 0.300003,
+      "cycles": {
+        "2024": {
+          "green": 38764,
+          "kmt": 29192,
+          "white": 29124,
+          "total_valid": 97079,
+          "green_share_two_party": 0.570428,
+          "white_share_all": 0.300003,
+          "delta": 0.025821
+        }
+      }
+    },
+    "桃園市|觀音區": {
+      "county": "桃園市",
+      "township": "觀音區",
+      "admin_key": "桃園市|觀音區",
+      "pvi": 0.05674,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.315097,
+      "cycles": {
+        "2024": {
+          "green": 17320,
+          "kmt": 11482,
+          "white": 13253,
+          "total_valid": 42060,
+          "green_share_two_party": 0.601347,
+          "white_share_all": 0.315097,
+          "delta": 0.05674
+        }
+      }
+    },
+    "桃園市|龍潭區": {
+      "county": "桃園市",
+      "township": "龍潭區",
+      "admin_key": "桃園市|龍潭區",
+      "pvi": -0.103643,
+      "pvi_label": "B+10",
+      "bucket": "深藍",
+      "white_share_avg": 0.302896,
+      "cycles": {
+        "2024": {
+          "green": 22946,
+          "kmt": 29090,
+          "white": 22610,
+          "total_valid": 74646,
+          "green_share_two_party": 0.440964,
+          "white_share_all": 0.302896,
+          "delta": -0.103643
+        }
+      }
+    },
+    "桃園市|龜山區": {
+      "county": "桃園市",
+      "township": "龜山區",
+      "admin_key": "桃園市|龜山區",
+      "pvi": -0.012645,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.311698,
+      "cycles": {
+        "2024": {
+          "green": 38230,
+          "kmt": 33636,
+          "white": 32540,
+          "total_valid": 104396,
+          "green_share_two_party": 0.531962,
+          "white_share_all": 0.311698,
+          "delta": -0.012645
+        }
+      }
+    },
+    "澎湖縣|七美鄉": {
+      "county": "澎湖縣",
+      "township": "七美鄉",
+      "admin_key": "澎湖縣|七美鄉",
+      "pvi": -0.082062,
+      "pvi_label": "B+8",
+      "bucket": "深藍",
+      "white_share_avg": 0.224885,
+      "cycles": {
+        "2024": {
+          "green": 389,
+          "kmt": 452,
+          "white": 244,
+          "total_valid": 1085,
+          "green_share_two_party": 0.462545,
+          "white_share_all": 0.224885,
+          "delta": -0.082062
+        }
+      }
+    },
+    "澎湖縣|望安鄉": {
+      "county": "澎湖縣",
+      "township": "望安鄉",
+      "admin_key": "澎湖縣|望安鄉",
+      "pvi": 0.074016,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.183201,
+      "cycles": {
+        "2024": {
+          "green": 764,
+          "kmt": 471,
+          "white": 277,
+          "total_valid": 1512,
+          "green_share_two_party": 0.618623,
+          "white_share_all": 0.183201,
+          "delta": 0.074016
+        }
+      }
+    },
+    "澎湖縣|湖西鄉": {
+      "county": "澎湖縣",
+      "township": "湖西鄉",
+      "admin_key": "澎湖縣|湖西鄉",
+      "pvi": 0.040176,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.25,
+      "cycles": {
+        "2024": {
+          "green": 3428,
+          "kmt": 2434,
+          "white": 1954,
+          "total_valid": 7816,
+          "green_share_two_party": 0.584783,
+          "white_share_all": 0.25,
+          "delta": 0.040176
+        }
+      }
+    },
+    "澎湖縣|白沙鄉": {
+      "county": "澎湖縣",
+      "township": "白沙鄉",
+      "admin_key": "澎湖縣|白沙鄉",
+      "pvi": -0.045682,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.201423,
+      "cycles": {
+        "2024": {
+          "green": 1624,
+          "kmt": 1631,
+          "white": 821,
+          "total_valid": 4076,
+          "green_share_two_party": 0.498925,
+          "white_share_all": 0.201423,
+          "delta": -0.045682
+        }
+      }
+    },
+    "澎湖縣|西嶼鄉": {
+      "county": "澎湖縣",
+      "township": "西嶼鄉",
+      "admin_key": "澎湖縣|西嶼鄉",
+      "pvi": -0.001913,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.209768,
+      "cycles": {
+        "2024": {
+          "green": 1519,
+          "kmt": 1280,
+          "white": 743,
+          "total_valid": 3542,
+          "green_share_two_party": 0.542694,
+          "white_share_all": 0.209768,
+          "delta": -0.001913
+        }
+      }
+    },
+    "澎湖縣|馬公市": {
+      "county": "澎湖縣",
+      "township": "馬公市",
+      "admin_key": "澎湖縣|馬公市",
+      "pvi": -0.055091,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.261185,
+      "cycles": {
+        "2024": {
+          "green": 11299,
+          "kmt": 11783,
+          "white": 8161,
+          "total_valid": 31246,
+          "green_share_two_party": 0.489516,
+          "white_share_all": 0.261185,
+          "delta": -0.055091
+        }
+      }
+    },
+    "臺中市|中區": {
+      "county": "臺中市",
+      "township": "中區",
+      "admin_key": "臺中市|中區",
+      "pvi": 0.017203,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.242113,
+      "cycles": {
+        "2024": {
+          "green": 4022,
+          "kmt": 3137,
+          "white": 2287,
+          "total_valid": 9446,
+          "green_share_two_party": 0.56181,
+          "white_share_all": 0.242113,
+          "delta": 0.017203
+        }
+      }
+    },
+    "臺中市|北區": {
+      "county": "臺中市",
+      "township": "北區",
+      "admin_key": "臺中市|北區",
+      "pvi": -0.030406,
+      "pvi_label": "B+3",
+      "bucket": "偏藍",
+      "white_share_avg": 0.278096,
+      "cycles": {
+        "2024": {
+          "green": 32570,
+          "kmt": 30771,
+          "white": 24401,
+          "total_valid": 87743,
+          "green_share_two_party": 0.514201,
+          "white_share_all": 0.278096,
+          "delta": -0.030406
+        }
+      }
+    },
+    "臺中市|北屯區": {
+      "county": "臺中市",
+      "township": "北屯區",
+      "admin_key": "臺中市|北屯區",
+      "pvi": -0.032557,
+      "pvi_label": "B+3",
+      "bucket": "偏藍",
+      "white_share_avg": 0.307099,
+      "cycles": {
+        "2024": {
+          "green": 64399,
+          "kmt": 61368,
+          "white": 55741,
+          "total_valid": 181508,
+          "green_share_two_party": 0.51205,
+          "white_share_all": 0.307099,
+          "delta": -0.032557
+        }
+      }
+    },
+    "臺中市|南區": {
+      "county": "臺中市",
+      "township": "南區",
+      "admin_key": "臺中市|南區",
+      "pvi": -0.004429,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.304304,
+      "cycles": {
+        "2024": {
+          "green": 29477,
+          "kmt": 25092,
+          "white": 23869,
+          "total_valid": 78438,
+          "green_share_two_party": 0.540178,
+          "white_share_all": 0.304304,
+          "delta": -0.004429
+        }
+      }
+    },
+    "臺中市|南屯區": {
+      "county": "臺中市",
+      "township": "南屯區",
+      "admin_key": "臺中市|南屯區",
+      "pvi": -0.009221,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.300503,
+      "cycles": {
+        "2024": {
+          "green": 40321,
+          "kmt": 34991,
+          "white": 32354,
+          "total_valid": 107666,
+          "green_share_two_party": 0.535386,
+          "white_share_all": 0.300503,
+          "delta": -0.009221
+        }
+      }
+    },
+    "臺中市|后里區": {
+      "county": "臺中市",
+      "township": "后里區",
+      "admin_key": "臺中市|后里區",
+      "pvi": -0.028196,
+      "pvi_label": "B+3",
+      "bucket": "中間",
+      "white_share_avg": 0.305814,
+      "cycles": {
+        "2024": {
+          "green": 11659,
+          "kmt": 10918,
+          "white": 9946,
+          "total_valid": 32523,
+          "green_share_two_party": 0.516411,
+          "white_share_all": 0.305814,
+          "delta": -0.028196
+        }
+      }
+    },
+    "臺中市|和平區": {
+      "county": "臺中市",
+      "township": "和平區",
+      "admin_key": "臺中市|和平區",
+      "pvi": -0.235701,
+      "pvi_label": "B+24",
+      "bucket": "深藍",
+      "white_share_avg": 0.24226,
+      "cycles": {
+        "2024": {
+          "green": 1429,
+          "kmt": 3197,
+          "white": 1479,
+          "total_valid": 6105,
+          "green_share_two_party": 0.308906,
+          "white_share_all": 0.24226,
+          "delta": -0.235701
+        }
+      }
+    },
+    "臺中市|外埔區": {
+      "county": "臺中市",
+      "township": "外埔區",
+      "admin_key": "臺中市|外埔區",
+      "pvi": -0.049339,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.321199,
+      "cycles": {
+        "2024": {
+          "green": 6437,
+          "kmt": 6560,
+          "white": 6150,
+          "total_valid": 19147,
+          "green_share_two_party": 0.495268,
+          "white_share_all": 0.321199,
+          "delta": -0.049339
+        }
+      }
+    },
+    "臺中市|大安區": {
+      "county": "臺中市",
+      "township": "大安區",
+      "admin_key": "臺中市|大安區",
+      "pvi": 0.011407,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.308831,
+      "cycles": {
+        "2024": {
+          "green": 4308,
+          "kmt": 3440,
+          "white": 3462,
+          "total_valid": 11210,
+          "green_share_two_party": 0.556014,
+          "white_share_all": 0.308831,
+          "delta": 0.011407
+        }
+      }
+    },
+    "臺中市|大甲區": {
+      "county": "臺中市",
+      "township": "大甲區",
+      "admin_key": "臺中市|大甲區",
+      "pvi": 0.00487,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.310803,
+      "cycles": {
+        "2024": {
+          "green": 16753,
+          "kmt": 13736,
+          "white": 13749,
+          "total_valid": 44237,
+          "green_share_two_party": 0.549477,
+          "white_share_all": 0.310803,
+          "delta": 0.00487
+        }
+      }
+    },
+    "臺中市|大肚區": {
+      "county": "臺中市",
+      "township": "大肚區",
+      "admin_key": "臺中市|大肚區",
+      "pvi": -0.018869,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.294689,
+      "cycles": {
+        "2024": {
+          "green": 12838,
+          "kmt": 11581,
+          "white": 10203,
+          "total_valid": 34623,
+          "green_share_two_party": 0.525738,
+          "white_share_all": 0.294689,
+          "delta": -0.018869
+        }
+      }
+    },
+    "臺中市|大里區": {
+      "county": "臺中市",
+      "township": "大里區",
+      "admin_key": "臺中市|大里區",
+      "pvi": 0.019016,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.3138,
+      "cycles": {
+        "2024": {
+          "green": 48568,
+          "kmt": 37603,
+          "white": 39412,
+          "total_valid": 125596,
+          "green_share_two_party": 0.563623,
+          "white_share_all": 0.3138,
+          "delta": 0.019016
+        }
+      }
+    },
+    "臺中市|大雅區": {
+      "county": "臺中市",
+      "township": "大雅區",
+      "admin_key": "臺中市|大雅區",
+      "pvi": -0.017233,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.314903,
+      "cycles": {
+        "2024": {
+          "green": 20479,
+          "kmt": 18353,
+          "white": 17849,
+          "total_valid": 56681,
+          "green_share_two_party": 0.527374,
+          "white_share_all": 0.314903,
+          "delta": -0.017233
+        }
+      }
+    },
+    "臺中市|太平區": {
+      "county": "臺中市",
+      "township": "太平區",
+      "admin_key": "臺中市|太平區",
+      "pvi": -0.000784,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.313199,
+      "cycles": {
+        "2024": {
+          "green": 43024,
+          "kmt": 36090,
+          "white": 36078,
+          "total_valid": 115192,
+          "green_share_two_party": 0.543823,
+          "white_share_all": 0.313199,
+          "delta": -0.000784
+        }
+      }
+    },
+    "臺中市|新社區": {
+      "county": "臺中市",
+      "township": "新社區",
+      "admin_key": "臺中市|新社區",
+      "pvi": -0.026082,
+      "pvi_label": "B+3",
+      "bucket": "中間",
+      "white_share_avg": 0.254786,
+      "cycles": {
+        "2024": {
+          "green": 5570,
+          "kmt": 5172,
+          "white": 3673,
+          "total_valid": 14416,
+          "green_share_two_party": 0.518525,
+          "white_share_all": 0.254786,
+          "delta": -0.026082
+        }
+      }
+    },
+    "臺中市|東勢區": {
+      "county": "臺中市",
+      "township": "東勢區",
+      "admin_key": "臺中市|東勢區",
+      "pvi": -0.082758,
+      "pvi_label": "B+8",
+      "bucket": "深藍",
+      "white_share_avg": 0.254115,
+      "cycles": {
+        "2024": {
+          "green": 10193,
+          "kmt": 11877,
+          "white": 7519,
+          "total_valid": 29589,
+          "green_share_two_party": 0.461849,
+          "white_share_all": 0.254115,
+          "delta": -0.082758
+        }
+      }
+    },
+    "臺中市|東區": {
+      "county": "臺中市",
+      "township": "東區",
+      "admin_key": "臺中市|東區",
+      "pvi": 0.021483,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.28651,
+      "cycles": {
+        "2024": {
+          "green": 19285,
+          "kmt": 14782,
+          "white": 13680,
+          "total_valid": 47747,
+          "green_share_two_party": 0.56609,
+          "white_share_all": 0.28651,
+          "delta": 0.021483
+        }
+      }
+    },
+    "臺中市|梧棲區": {
+      "county": "臺中市",
+      "township": "梧棲區",
+      "admin_key": "臺中市|梧棲區",
+      "pvi": 0.019458,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.322398,
+      "cycles": {
+        "2024": {
+          "green": 13515,
+          "kmt": 10445,
+          "white": 11400,
+          "total_valid": 35360,
+          "green_share_two_party": 0.564065,
+          "white_share_all": 0.322398,
+          "delta": 0.019458
+        }
+      }
+    },
+    "臺中市|沙鹿區": {
+      "county": "臺中市",
+      "township": "沙鹿區",
+      "admin_key": "臺中市|沙鹿區",
+      "pvi": -0.012849,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.326195,
+      "cycles": {
+        "2024": {
+          "green": 20930,
+          "kmt": 18430,
+          "white": 19055,
+          "total_valid": 58416,
+          "green_share_two_party": 0.531758,
+          "white_share_all": 0.326195,
+          "delta": -0.012849
+        }
+      }
+    },
+    "臺中市|清水區": {
+      "county": "臺中市",
+      "township": "清水區",
+      "admin_key": "臺中市|清水區",
+      "pvi": 0.035002,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.301594,
+      "cycles": {
+        "2024": {
+          "green": 21711,
+          "kmt": 15747,
+          "white": 16176,
+          "total_valid": 53635,
+          "green_share_two_party": 0.579609,
+          "white_share_all": 0.301594,
+          "delta": 0.035002
+        }
+      }
+    },
+    "臺中市|潭子區": {
+      "county": "臺中市",
+      "township": "潭子區",
+      "admin_key": "臺中市|潭子區",
+      "pvi": -0.001041,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.3081,
+      "cycles": {
+        "2024": {
+          "green": 24935,
+          "kmt": 20938,
+          "white": 20427,
+          "total_valid": 66300,
+          "green_share_two_party": 0.543566,
+          "white_share_all": 0.3081,
+          "delta": -0.001041
+        }
+      }
+    },
+    "臺中市|烏日區": {
+      "county": "臺中市",
+      "township": "烏日區",
+      "admin_key": "臺中市|烏日區",
+      "pvi": 0.005145,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.307501,
+      "cycles": {
+        "2024": {
+          "green": 18702,
+          "kmt": 15317,
+          "white": 15106,
+          "total_valid": 49125,
+          "green_share_two_party": 0.549752,
+          "white_share_all": 0.307501,
+          "delta": 0.005145
+        }
+      }
+    },
+    "臺中市|石岡區": {
+      "county": "臺中市",
+      "township": "石岡區",
+      "admin_key": "臺中市|石岡區",
+      "pvi": -0.056828,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.257598,
+      "cycles": {
+        "2024": {
+          "green": 3253,
+          "kmt": 3416,
+          "white": 2314,
+          "total_valid": 8983,
+          "green_share_two_party": 0.487779,
+          "white_share_all": 0.257598,
+          "delta": -0.056828
+        }
+      }
+    },
+    "臺中市|神岡區": {
+      "county": "臺中市",
+      "township": "神岡區",
+      "admin_key": "臺中市|神岡區",
+      "pvi": 0.049706,
+      "pvi_label": "G+5",
+      "bucket": "偏綠",
+      "white_share_avg": 0.295497,
+      "cycles": {
+        "2024": {
+          "green": 16636,
+          "kmt": 11356,
+          "white": 11741,
+          "total_valid": 39733,
+          "green_share_two_party": 0.594313,
+          "white_share_all": 0.295497,
+          "delta": 0.049706
+        }
+      }
+    },
+    "臺中市|西區": {
+      "county": "臺中市",
+      "township": "西區",
+      "admin_key": "臺中市|西區",
+      "pvi": 0.005516,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.265806,
+      "cycles": {
+        "2024": {
+          "green": 27636,
+          "kmt": 22600,
+          "white": 18187,
+          "total_valid": 68422,
+          "green_share_two_party": 0.550123,
+          "white_share_all": 0.265806,
+          "delta": 0.005516
+        }
+      }
+    },
+    "臺中市|西屯區": {
+      "county": "臺中市",
+      "township": "西屯區",
+      "admin_key": "臺中市|西屯區",
+      "pvi": -0.02914,
+      "pvi_label": "B+3",
+      "bucket": "中間",
+      "white_share_avg": 0.301599,
+      "cycles": {
+        "2024": {
+          "green": 49608,
+          "kmt": 46631,
+          "white": 41560,
+          "total_valid": 137799,
+          "green_share_two_party": 0.515467,
+          "white_share_all": 0.301599,
+          "delta": -0.02914
+        }
+      }
+    },
+    "臺中市|豐原區": {
+      "county": "臺中市",
+      "township": "豐原區",
+      "admin_key": "臺中市|豐原區",
+      "pvi": 0.024299,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.286596,
+      "cycles": {
+        "2024": {
+          "green": 40654,
+          "kmt": 30806,
+          "white": 28712,
+          "total_valid": 100183,
+          "green_share_two_party": 0.568906,
+          "white_share_all": 0.286596,
+          "delta": 0.024299
+        }
+      }
+    },
+    "臺中市|霧峰區": {
+      "county": "臺中市",
+      "township": "霧峰區",
+      "admin_key": "臺中市|霧峰區",
+      "pvi": -0.006614,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.282603,
+      "cycles": {
+        "2024": {
+          "green": 15470,
+          "kmt": 13285,
+          "white": 11329,
+          "total_valid": 40088,
+          "green_share_two_party": 0.537993,
+          "white_share_all": 0.282603,
+          "delta": -0.006614
+        }
+      }
+    },
+    "臺中市|龍井區": {
+      "county": "臺中市",
+      "township": "龍井區",
+      "admin_key": "臺中市|龍井區",
+      "pvi": -0.008857,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.320392,
+      "cycles": {
+        "2024": {
+          "green": 17219,
+          "kmt": 14921,
+          "white": 15152,
+          "total_valid": 47292,
+          "green_share_two_party": 0.53575,
+          "white_share_all": 0.320392,
+          "delta": -0.008857
+        }
+      }
+    },
+    "臺北市|中山區": {
+      "county": "臺北市",
+      "township": "中山區",
+      "admin_key": "臺北市|中山區",
+      "pvi": -0.01615,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.2268,
+      "cycles": {
+        "2024": {
+          "green": 54448,
+          "kmt": 48584,
+          "white": 30222,
+          "total_valid": 133254,
+          "green_share_two_party": 0.528457,
+          "white_share_all": 0.2268,
+          "delta": -0.01615
+        }
+      }
+    },
+    "臺北市|中正區": {
+      "county": "臺北市",
+      "township": "中正區",
+      "admin_key": "臺北市|中正區",
+      "pvi": -0.063581,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.241205,
+      "cycles": {
+        "2024": {
+          "green": 32196,
+          "kmt": 34736,
+          "white": 21276,
+          "total_valid": 88207,
+          "green_share_two_party": 0.481026,
+          "white_share_all": 0.241205,
+          "delta": -0.063581
+        }
+      }
+    },
+    "臺北市|信義區": {
+      "county": "臺北市",
+      "township": "信義區",
+      "admin_key": "臺北市|信義區",
+      "pvi": -0.076898,
+      "pvi_label": "B+8",
+      "bucket": "偏藍",
+      "white_share_avg": 0.232097,
+      "cycles": {
+        "2024": {
+          "green": 46639,
+          "kmt": 53079,
+          "white": 30136,
+          "total_valid": 129842,
+          "green_share_two_party": 0.467709,
+          "white_share_all": 0.232097,
+          "delta": -0.076898
+        }
+      }
+    },
+    "臺北市|內湖區": {
+      "county": "臺北市",
+      "township": "內湖區",
+      "admin_key": "臺北市|內湖區",
+      "pvi": -0.058276,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.261198,
+      "cycles": {
+        "2024": {
+          "green": 61339,
+          "kmt": 64787,
+          "white": 44591,
+          "total_valid": 170717,
+          "green_share_two_party": 0.486331,
+          "white_share_all": 0.261198,
+          "delta": -0.058276
+        }
+      }
+    },
+    "臺北市|北投區": {
+      "county": "臺北市",
+      "township": "北投區",
+      "admin_key": "臺北市|北投區",
+      "pvi": -0.002531,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.241802,
+      "cycles": {
+        "2024": {
+          "green": 61150,
+          "kmt": 51657,
+          "white": 35976,
+          "total_valid": 148783,
+          "green_share_two_party": 0.542076,
+          "white_share_all": 0.241802,
+          "delta": -0.002531
+        }
+      }
+    },
+    "臺北市|南港區": {
+      "county": "臺北市",
+      "township": "南港區",
+      "admin_key": "臺北市|南港區",
+      "pvi": -0.048482,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.265306,
+      "cycles": {
+        "2024": {
+          "green": 26118,
+          "kmt": 26526,
+          "white": 19010,
+          "total_valid": 71653,
+          "green_share_two_party": 0.496125,
+          "white_share_all": 0.265306,
+          "delta": -0.048482
+        }
+      }
+    },
+    "臺北市|士林區": {
+      "county": "臺北市",
+      "township": "士林區",
+      "admin_key": "臺北市|士林區",
+      "pvi": 0.015725,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.2275,
+      "cycles": {
+        "2024": {
+          "green": 71866,
+          "kmt": 56390,
+          "white": 37776,
+          "total_valid": 166048,
+          "green_share_two_party": 0.560332,
+          "white_share_all": 0.2275,
+          "delta": 0.015725
+        }
+      }
+    },
+    "臺北市|大同區": {
+      "county": "臺北市",
+      "township": "大同區",
+      "admin_key": "臺北市|大同區",
+      "pvi": 0.071518,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.2494,
+      "cycles": {
+        "2024": {
+          "green": 34267,
+          "kmt": 21350,
+          "white": 18482,
+          "total_valid": 74106,
+          "green_share_two_party": 0.616125,
+          "white_share_all": 0.2494,
+          "delta": 0.071518
+        }
+      }
+    },
+    "臺北市|大安區": {
+      "county": "臺北市",
+      "township": "大安區",
+      "admin_key": "臺北市|大安區",
+      "pvi": -0.083644,
+      "pvi_label": "B+8",
+      "bucket": "深藍",
+      "white_share_avg": 0.209701,
+      "cycles": {
+        "2024": {
+          "green": 62384,
+          "kmt": 72950,
+          "white": 35910,
+          "total_valid": 171244,
+          "green_share_two_party": 0.460963,
+          "white_share_all": 0.209701,
+          "delta": -0.083644
+        }
+      }
+    },
+    "臺北市|文山區": {
+      "county": "臺北市",
+      "township": "文山區",
+      "admin_key": "臺北市|文山區",
+      "pvi": -0.129135,
+      "pvi_label": "B+13",
+      "bucket": "深藍",
+      "white_share_avg": 0.247597,
+      "cycles": {
+        "2024": {
+          "green": 50349,
+          "kmt": 70836,
+          "white": 39879,
+          "total_valid": 161064,
+          "green_share_two_party": 0.415472,
+          "white_share_all": 0.247597,
+          "delta": -0.129135
+        }
+      }
+    },
+    "臺北市|松山區": {
+      "county": "臺北市",
+      "township": "松山區",
+      "admin_key": "臺北市|松山區",
+      "pvi": -0.064729,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.222396,
+      "cycles": {
+        "2024": {
+          "green": 43785,
+          "kmt": 47457,
+          "white": 26092,
+          "total_valid": 117322,
+          "green_share_two_party": 0.479878,
+          "white_share_all": 0.222396,
+          "delta": -0.064729
+        }
+      }
+    },
+    "臺北市|萬華區": {
+      "county": "臺北市",
+      "township": "萬華區",
+      "admin_key": "臺北市|萬華區",
+      "pvi": -0.017454,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.250503,
+      "cycles": {
+        "2024": {
+          "green": 43371,
+          "kmt": 38903,
+          "white": 27498,
+          "total_valid": 109771,
+          "green_share_two_party": 0.527153,
+          "white_share_all": 0.250503,
+          "delta": -0.017454
+        }
+      }
+    },
+    "臺南市|七股區": {
+      "county": "臺南市",
+      "township": "七股區",
+      "admin_key": "臺南市|七股區",
+      "pvi": 0.19551,
+      "pvi_label": "G+20",
+      "bucket": "深綠",
+      "white_share_avg": 0.197029,
+      "cycles": {
+        "2024": {
+          "green": 7601,
+          "kmt": 2669,
+          "white": 2520,
+          "total_valid": 12790,
+          "green_share_two_party": 0.740117,
+          "white_share_all": 0.197029,
+          "delta": 0.19551
+        }
+      }
+    },
+    "臺南市|下營區": {
+      "county": "臺南市",
+      "township": "下營區",
+      "admin_key": "臺南市|下營區",
+      "pvi": 0.140549,
+      "pvi_label": "G+14",
+      "bucket": "深綠",
+      "white_share_avg": 0.211825,
+      "cycles": {
+        "2024": {
+          "green": 7288,
+          "kmt": 3349,
+          "white": 2859,
+          "total_valid": 13497,
+          "green_share_two_party": 0.685156,
+          "white_share_all": 0.211825,
+          "delta": 0.140549
+        }
+      }
+    },
+    "臺南市|中西區": {
+      "county": "臺南市",
+      "township": "中西區",
+      "admin_key": "臺南市|中西區",
+      "pvi": 0.11227,
+      "pvi_label": "G+11",
+      "bucket": "深綠",
+      "white_share_avg": 0.213408,
+      "cycles": {
+        "2024": {
+          "green": 23507,
+          "kmt": 12279,
+          "white": 9709,
+          "total_valid": 45495,
+          "green_share_two_party": 0.656877,
+          "white_share_all": 0.213408,
+          "delta": 0.11227
+        }
+      }
+    },
+    "臺南市|仁德區": {
+      "county": "臺南市",
+      "township": "仁德區",
+      "admin_key": "臺南市|仁德區",
+      "pvi": 0.111292,
+      "pvi_label": "G+11",
+      "bucket": "深綠",
+      "white_share_avg": 0.241293,
+      "cycles": {
+        "2024": {
+          "green": 24021,
+          "kmt": 12602,
+          "white": 11646,
+          "total_valid": 48265,
+          "green_share_two_party": 0.655899,
+          "white_share_all": 0.241293,
+          "delta": 0.111292
+        }
+      }
+    },
+    "臺南市|佳里區": {
+      "county": "臺南市",
+      "township": "佳里區",
+      "admin_key": "臺南市|佳里區",
+      "pvi": 0.154628,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.228013,
+      "cycles": {
+        "2024": {
+          "green": 19015,
+          "kmt": 8179,
+          "white": 8032,
+          "total_valid": 35226,
+          "green_share_two_party": 0.699235,
+          "white_share_all": 0.228013,
+          "delta": 0.154628
+        }
+      }
+    },
+    "臺南市|六甲區": {
+      "county": "臺南市",
+      "township": "六甲區",
+      "admin_key": "臺南市|六甲區",
+      "pvi": 0.166447,
+      "pvi_label": "G+17",
+      "bucket": "深綠",
+      "white_share_avg": 0.22667,
+      "cycles": {
+        "2024": {
+          "green": 6883,
+          "kmt": 2797,
+          "white": 2837,
+          "total_valid": 12516,
+          "green_share_two_party": 0.711054,
+          "white_share_all": 0.22667,
+          "delta": 0.166447
+        }
+      }
+    },
+    "臺南市|北區": {
+      "county": "臺南市",
+      "township": "北區",
+      "admin_key": "臺南市|北區",
+      "pvi": 0.074843,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.233998,
+      "cycles": {
+        "2024": {
+          "green": 36835,
+          "kmt": 22629,
+          "white": 18165,
+          "total_valid": 77629,
+          "green_share_two_party": 0.61945,
+          "white_share_all": 0.233998,
+          "delta": 0.074843
+        }
+      }
+    },
+    "臺南市|北門區": {
+      "county": "臺南市",
+      "township": "北門區",
+      "admin_key": "臺南市|北門區",
+      "pvi": 0.143374,
+      "pvi_label": "G+14",
+      "bucket": "深綠",
+      "white_share_avg": 0.184701,
+      "cycles": {
+        "2024": {
+          "green": 3131,
+          "kmt": 1420,
+          "white": 1031,
+          "total_valid": 5582,
+          "green_share_two_party": 0.687981,
+          "white_share_all": 0.184701,
+          "delta": 0.143374
+        }
+      }
+    },
+    "臺南市|南化區": {
+      "county": "臺南市",
+      "township": "南化區",
+      "admin_key": "臺南市|南化區",
+      "pvi": 0.019245,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.187044,
+      "cycles": {
+        "2024": {
+          "green": 2137,
+          "kmt": 1653,
+          "white": 872,
+          "total_valid": 4662,
+          "green_share_two_party": 0.563852,
+          "white_share_all": 0.187044,
+          "delta": 0.019245
+        }
+      }
+    },
+    "臺南市|南區": {
+      "county": "臺南市",
+      "township": "南區",
+      "admin_key": "臺南市|南區",
+      "pvi": 0.130391,
+      "pvi_label": "G+13",
+      "bucket": "深綠",
+      "white_share_avg": 0.216004,
+      "cycles": {
+        "2024": {
+          "green": 40512,
+          "kmt": 19506,
+          "white": 16536,
+          "total_valid": 76554,
+          "green_share_two_party": 0.674998,
+          "white_share_all": 0.216004,
+          "delta": 0.130391
+        }
+      }
+    },
+    "臺南市|善化區": {
+      "county": "臺南市",
+      "township": "善化區",
+      "admin_key": "臺南市|善化區",
+      "pvi": 0.164944,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.275901,
+      "cycles": {
+        "2024": {
+          "green": 15542,
+          "kmt": 6362,
+          "white": 8346,
+          "total_valid": 30250,
+          "green_share_two_party": 0.709551,
+          "white_share_all": 0.275901,
+          "delta": 0.164944
+        }
+      }
+    },
+    "臺南市|大內區": {
+      "county": "臺南市",
+      "township": "大內區",
+      "admin_key": "臺南市|大內區",
+      "pvi": 0.160275,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.182999,
+      "cycles": {
+        "2024": {
+          "green": 3191,
+          "kmt": 1336,
+          "white": 1014,
+          "total_valid": 5541,
+          "green_share_two_party": 0.704882,
+          "white_share_all": 0.182999,
+          "delta": 0.160275
+        }
+      }
+    },
+    "臺南市|學甲區": {
+      "county": "臺南市",
+      "township": "學甲區",
+      "admin_key": "臺南市|學甲區",
+      "pvi": 0.185313,
+      "pvi_label": "G+19",
+      "bucket": "深綠",
+      "white_share_avg": 0.20651,
+      "cycles": {
+        "2024": {
+          "green": 8524,
+          "kmt": 3154,
+          "white": 3039,
+          "total_valid": 14716,
+          "green_share_two_party": 0.72992,
+          "white_share_all": 0.20651,
+          "delta": 0.185313
+        }
+      }
+    },
+    "臺南市|安南區": {
+      "county": "臺南市",
+      "township": "安南區",
+      "admin_key": "臺南市|安南區",
+      "pvi": 0.160195,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.257101,
+      "cycles": {
+        "2024": {
+          "green": 61864,
+          "kmt": 25911,
+          "white": 30377,
+          "total_valid": 118152,
+          "green_share_two_party": 0.704802,
+          "white_share_all": 0.257101,
+          "delta": 0.160195
+        }
+      }
+    },
+    "臺南市|安定區": {
+      "county": "臺南市",
+      "township": "安定區",
+      "admin_key": "臺南市|安定區",
+      "pvi": 0.176739,
+      "pvi_label": "G+18",
+      "bucket": "深綠",
+      "white_share_avg": 0.243175,
+      "cycles": {
+        "2024": {
+          "green": 10158,
+          "kmt": 3924,
+          "white": 4525,
+          "total_valid": 18608,
+          "green_share_two_party": 0.721346,
+          "white_share_all": 0.243175,
+          "delta": 0.176739
+        }
+      }
+    },
+    "臺南市|安平區": {
+      "county": "臺南市",
+      "township": "安平區",
+      "admin_key": "臺南市|安平區",
+      "pvi": 0.088594,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.243211,
+      "cycles": {
+        "2024": {
+          "green": 19640,
+          "kmt": 11377,
+          "white": 9968,
+          "total_valid": 40985,
+          "green_share_two_party": 0.633201,
+          "white_share_all": 0.243211,
+          "delta": 0.088594
+        }
+      }
+    },
+    "臺南市|官田區": {
+      "county": "臺南市",
+      "township": "官田區",
+      "admin_key": "臺南市|官田區",
+      "pvi": 0.195554,
+      "pvi_label": "G+20",
+      "bucket": "深綠",
+      "white_share_avg": 0.213928,
+      "cycles": {
+        "2024": {
+          "green": 7560,
+          "kmt": 2654,
+          "white": 2780,
+          "total_valid": 12995,
+          "green_share_two_party": 0.740161,
+          "white_share_all": 0.213928,
+          "delta": 0.195554
+        }
+      }
+    },
+    "臺南市|將軍區": {
+      "county": "臺南市",
+      "township": "將軍區",
+      "admin_key": "臺南市|將軍區",
+      "pvi": 0.205897,
+      "pvi_label": "G+21",
+      "bucket": "深綠",
+      "white_share_avg": 0.168204,
+      "cycles": {
+        "2024": {
+          "green": 6699,
+          "kmt": 2227,
+          "white": 1805,
+          "total_valid": 10731,
+          "green_share_two_party": 0.750504,
+          "white_share_all": 0.168204,
+          "delta": 0.205897
+        }
+      }
+    },
+    "臺南市|山上區": {
+      "county": "臺南市",
+      "township": "山上區",
+      "admin_key": "臺南市|山上區",
+      "pvi": 0.135025,
+      "pvi_label": "G+14",
+      "bucket": "深綠",
+      "white_share_avg": 0.223963,
+      "cycles": {
+        "2024": {
+          "green": 2289,
+          "kmt": 1079,
+          "white": 972,
+          "total_valid": 4340,
+          "green_share_two_party": 0.679632,
+          "white_share_all": 0.223963,
+          "delta": 0.135025
+        }
+      }
+    },
+    "臺南市|左鎮區": {
+      "county": "臺南市",
+      "township": "左鎮區",
+      "admin_key": "臺南市|左鎮區",
+      "pvi": 0.126285,
+      "pvi_label": "G+13",
+      "bucket": "深綠",
+      "white_share_avg": 0.147762,
+      "cycles": {
+        "2024": {
+          "green": 1482,
+          "kmt": 727,
+          "white": 383,
+          "total_valid": 2592,
+          "green_share_two_party": 0.670892,
+          "white_share_all": 0.147762,
+          "delta": 0.126285
+        }
+      }
+    },
+    "臺南市|後壁區": {
+      "county": "臺南市",
+      "township": "後壁區",
+      "admin_key": "臺南市|後壁區",
+      "pvi": 0.156212,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.196902,
+      "cycles": {
+        "2024": {
+          "green": 7449,
+          "kmt": 3180,
+          "white": 2606,
+          "total_valid": 13235,
+          "green_share_two_party": 0.700819,
+          "white_share_all": 0.196902,
+          "delta": 0.156212
+        }
+      }
+    },
+    "臺南市|新化區": {
+      "county": "臺南市",
+      "township": "新化區",
+      "admin_key": "臺南市|新化區",
+      "pvi": 0.106755,
+      "pvi_label": "G+11",
+      "bucket": "深綠",
+      "white_share_avg": 0.233901,
+      "cycles": {
+        "2024": {
+          "green": 13321,
+          "kmt": 7130,
+          "white": 6244,
+          "total_valid": 26695,
+          "green_share_two_party": 0.651362,
+          "white_share_all": 0.233901,
+          "delta": 0.106755
+        }
+      }
+    },
+    "臺南市|新市區": {
+      "county": "臺南市",
+      "township": "新市區",
+      "admin_key": "臺南市|新市區",
+      "pvi": 0.161639,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.266391,
+      "cycles": {
+        "2024": {
+          "green": 11759,
+          "kmt": 4891,
+          "white": 6046,
+          "total_valid": 22696,
+          "green_share_two_party": 0.706246,
+          "white_share_all": 0.266391,
+          "delta": 0.161639
+        }
+      }
+    },
+    "臺南市|新營區": {
+      "county": "臺南市",
+      "township": "新營區",
+      "admin_key": "臺南市|新營區",
+      "pvi": 0.060799,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.247193,
+      "cycles": {
+        "2024": {
+          "green": 19933,
+          "kmt": 12992,
+          "white": 10810,
+          "total_valid": 43731,
+          "green_share_two_party": 0.605406,
+          "white_share_all": 0.247193,
+          "delta": 0.060799
+        }
+      }
+    },
+    "臺南市|東區": {
+      "county": "臺南市",
+      "township": "東區",
+      "admin_key": "臺南市|東區",
+      "pvi": 0.047761,
+      "pvi_label": "G+5",
+      "bucket": "偏綠",
+      "white_share_avg": 0.231899,
+      "cycles": {
+        "2024": {
+          "green": 49583,
+          "kmt": 34120,
+          "white": 25271,
+          "total_valid": 108974,
+          "green_share_two_party": 0.592368,
+          "white_share_all": 0.231899,
+          "delta": 0.047761
+        }
+      }
+    },
+    "臺南市|東山區": {
+      "county": "臺南市",
+      "township": "東山區",
+      "admin_key": "臺南市|東山區",
+      "pvi": 0.124145,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.184986,
+      "cycles": {
+        "2024": {
+          "green": 5772,
+          "kmt": 2859,
+          "white": 1959,
+          "total_valid": 10590,
+          "green_share_two_party": 0.668752,
+          "white_share_all": 0.184986,
+          "delta": 0.124145
+        }
+      }
+    },
+    "臺南市|柳營區": {
+      "county": "臺南市",
+      "township": "柳營區",
+      "admin_key": "臺南市|柳營區",
+      "pvi": 0.153097,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.231816,
+      "cycles": {
+        "2024": {
+          "green": 6654,
+          "kmt": 2883,
+          "white": 2878,
+          "total_valid": 12415,
+          "green_share_two_party": 0.697704,
+          "white_share_all": 0.231816,
+          "delta": 0.153097
+        }
+      }
+    },
+    "臺南市|楠西區": {
+      "county": "臺南市",
+      "township": "楠西區",
+      "admin_key": "臺南市|楠西區",
+      "pvi": -0.046874,
+      "pvi_label": "B+5",
+      "bucket": "偏藍",
+      "white_share_avg": 0.193107,
+      "cycles": {
+        "2024": {
+          "green": 2086,
+          "kmt": 2105,
+          "white": 1003,
+          "total_valid": 5194,
+          "green_share_two_party": 0.497733,
+          "white_share_all": 0.193107,
+          "delta": -0.046874
+        }
+      }
+    },
+    "臺南市|歸仁區": {
+      "county": "臺南市",
+      "township": "歸仁區",
+      "admin_key": "臺南市|歸仁區",
+      "pvi": 0.152353,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.2363,
+      "cycles": {
+        "2024": {
+          "green": 22493,
+          "kmt": 9780,
+          "white": 9987,
+          "total_valid": 42264,
+          "green_share_two_party": 0.69696,
+          "white_share_all": 0.2363,
+          "delta": 0.152353
+        }
+      }
+    },
+    "臺南市|永康區": {
+      "county": "臺南市",
+      "township": "永康區",
+      "admin_key": "臺南市|永康區",
+      "pvi": 0.0939,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.261397,
+      "cycles": {
+        "2024": {
+          "green": 66187,
+          "kmt": 37472,
+          "white": 36686,
+          "total_valid": 140346,
+          "green_share_two_party": 0.638507,
+          "white_share_all": 0.261397,
+          "delta": 0.0939
+        }
+      }
+    },
+    "臺南市|玉井區": {
+      "county": "臺南市",
+      "township": "玉井區",
+      "admin_key": "臺南市|玉井區",
+      "pvi": 0.006759,
+      "pvi_label": "G+1",
+      "bucket": "中間",
+      "white_share_avg": 0.209732,
+      "cycles": {
+        "2024": {
+          "green": 3349,
+          "kmt": 2725,
+          "white": 1612,
+          "total_valid": 7686,
+          "green_share_two_party": 0.551366,
+          "white_share_all": 0.209732,
+          "delta": 0.006759
+        }
+      }
+    },
+    "臺南市|白河區": {
+      "county": "臺南市",
+      "township": "白河區",
+      "admin_key": "臺南市|白河區",
+      "pvi": 0.155117,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.189378,
+      "cycles": {
+        "2024": {
+          "green": 8608,
+          "kmt": 3694,
+          "white": 2874,
+          "total_valid": 15176,
+          "green_share_two_party": 0.699724,
+          "white_share_all": 0.189378,
+          "delta": 0.155117
+        }
+      }
+    },
+    "臺南市|西港區": {
+      "county": "臺南市",
+      "township": "西港區",
+      "admin_key": "臺南市|西港區",
+      "pvi": 0.201632,
+      "pvi_label": "G+20",
+      "bucket": "深綠",
+      "white_share_avg": 0.218499,
+      "cycles": {
+        "2024": {
+          "green": 8928,
+          "kmt": 3036,
+          "white": 3345,
+          "total_valid": 15309,
+          "green_share_two_party": 0.746239,
+          "white_share_all": 0.218499,
+          "delta": 0.201632
+        }
+      }
+    },
+    "臺南市|關廟區": {
+      "county": "臺南市",
+      "township": "關廟區",
+      "admin_key": "臺南市|關廟區",
+      "pvi": 0.148586,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.212894,
+      "cycles": {
+        "2024": {
+          "green": 11620,
+          "kmt": 5143,
+          "white": 4534,
+          "total_valid": 21297,
+          "green_share_two_party": 0.693193,
+          "white_share_all": 0.212894,
+          "delta": 0.148586
+        }
+      }
+    },
+    "臺南市|鹽水區": {
+      "county": "臺南市",
+      "township": "鹽水區",
+      "admin_key": "臺南市|鹽水區",
+      "pvi": 0.164806,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.215713,
+      "cycles": {
+        "2024": {
+          "green": 7883,
+          "kmt": 3229,
+          "white": 3056,
+          "total_valid": 14167,
+          "green_share_two_party": 0.709413,
+          "white_share_all": 0.215713,
+          "delta": 0.164806
+        }
+      }
+    },
+    "臺南市|麻豆區": {
+      "county": "臺南市",
+      "township": "麻豆區",
+      "admin_key": "臺南市|麻豆區",
+      "pvi": 0.21648,
+      "pvi_label": "G+22",
+      "bucket": "深綠",
+      "white_share_avg": 0.216997,
+      "cycles": {
+        "2024": {
+          "green": 16081,
+          "kmt": 5048,
+          "white": 5855,
+          "total_valid": 26982,
+          "green_share_two_party": 0.761087,
+          "white_share_all": 0.216997,
+          "delta": 0.21648
+        }
+      }
+    },
+    "臺南市|龍崎區": {
+      "county": "臺南市",
+      "township": "龍崎區",
+      "admin_key": "臺南市|龍崎區",
+      "pvi": 0.079389,
+      "pvi_label": "G+8",
+      "bucket": "偏綠",
+      "white_share_avg": 0.15414,
+      "cycles": {
+        "2024": {
+          "green": 1243,
+          "kmt": 749,
+          "white": 363,
+          "total_valid": 2355,
+          "green_share_two_party": 0.623996,
+          "white_share_all": 0.15414,
+          "delta": 0.079389
+        }
+      }
+    },
+    "臺東縣|卑南鄉": {
+      "county": "臺東縣",
+      "township": "卑南鄉",
+      "admin_key": "臺東縣|卑南鄉",
+      "pvi": -0.158169,
+      "pvi_label": "B+16",
+      "bucket": "深藍",
+      "white_share_avg": 0.223764,
+      "cycles": {
+        "2024": {
+          "green": 2724,
+          "kmt": 4325,
+          "white": 2032,
+          "total_valid": 9081,
+          "green_share_two_party": 0.386438,
+          "white_share_all": 0.223764,
+          "delta": -0.158169
+        }
+      }
+    },
+    "臺東縣|大武鄉": {
+      "county": "臺東縣",
+      "township": "大武鄉",
+      "admin_key": "臺東縣|大武鄉",
+      "pvi": -0.256871,
+      "pvi_label": "B+26",
+      "bucket": "深藍",
+      "white_share_avg": 0.216845,
+      "cycles": {
+        "2024": {
+          "green": 610,
+          "kmt": 1510,
+          "white": 587,
+          "total_valid": 2707,
+          "green_share_two_party": 0.287736,
+          "white_share_all": 0.216845,
+          "delta": -0.256871
+        }
+      }
+    },
+    "臺東縣|太麻里鄉": {
+      "county": "臺東縣",
+      "township": "太麻里鄉",
+      "admin_key": "臺東縣|太麻里鄉",
+      "pvi": -0.189473,
+      "pvi_label": "B+19",
+      "bucket": "深藍",
+      "white_share_avg": 0.200428,
+      "cycles": {
+        "2024": {
+          "green": 1591,
+          "kmt": 2889,
+          "white": 1123,
+          "total_valid": 5603,
+          "green_share_two_party": 0.355134,
+          "white_share_all": 0.200428,
+          "delta": -0.189473
+        }
+      }
+    },
+    "臺東縣|延平鄉": {
+      "county": "臺東縣",
+      "township": "延平鄉",
+      "admin_key": "臺東縣|延平鄉",
+      "pvi": -0.376993,
+      "pvi_label": "B+38",
+      "bucket": "深藍",
+      "white_share_avg": 0.227223,
+      "cycles": {
+        "2024": {
+          "green": 236,
+          "kmt": 1172,
+          "white": 414,
+          "total_valid": 1822,
+          "green_share_two_party": 0.167614,
+          "white_share_all": 0.227223,
+          "delta": -0.376993
+        }
+      }
+    },
+    "臺東縣|成功鎮": {
+      "county": "臺東縣",
+      "township": "成功鎮",
+      "admin_key": "臺東縣|成功鎮",
+      "pvi": -0.260396,
+      "pvi_label": "B+26",
+      "bucket": "深藍",
+      "white_share_avg": 0.1944,
+      "cycles": {
+        "2024": {
+          "green": 1431,
+          "kmt": 3604,
+          "white": 1215,
+          "total_valid": 6250,
+          "green_share_two_party": 0.284211,
+          "white_share_all": 0.1944,
+          "delta": -0.260396
+        }
+      }
+    },
+    "臺東縣|東河鄉": {
+      "county": "臺東縣",
+      "township": "東河鄉",
+      "admin_key": "臺東縣|東河鄉",
+      "pvi": -0.22342,
+      "pvi_label": "B+22",
+      "bucket": "深藍",
+      "white_share_avg": 0.195381,
+      "cycles": {
+        "2024": {
+          "green": 996,
+          "kmt": 2105,
+          "white": 753,
+          "total_valid": 3854,
+          "green_share_two_party": 0.321187,
+          "white_share_all": 0.195381,
+          "delta": -0.22342
+        }
+      }
+    },
+    "臺東縣|池上鄉": {
+      "county": "臺東縣",
+      "township": "池上鄉",
+      "admin_key": "臺東縣|池上鄉",
+      "pvi": -0.148594,
+      "pvi_label": "B+15",
+      "bucket": "深藍",
+      "white_share_avg": 0.230573,
+      "cycles": {
+        "2024": {
+          "green": 1192,
+          "kmt": 1818,
+          "white": 902,
+          "total_valid": 3912,
+          "green_share_two_party": 0.396013,
+          "white_share_all": 0.230573,
+          "delta": -0.148594
+        }
+      }
+    },
+    "臺東縣|海端鄉": {
+      "county": "臺東縣",
+      "township": "海端鄉",
+      "admin_key": "臺東縣|海端鄉",
+      "pvi": -0.396433,
+      "pvi_label": "B+40",
+      "bucket": "深藍",
+      "white_share_avg": 0.223978,
+      "cycles": {
+        "2024": {
+          "green": 211,
+          "kmt": 1213,
+          "white": 411,
+          "total_valid": 1835,
+          "green_share_two_party": 0.148174,
+          "white_share_all": 0.223978,
+          "delta": -0.396433
+        }
+      }
+    },
+    "臺東縣|綠島鄉": {
+      "county": "臺東縣",
+      "township": "綠島鄉",
+      "admin_key": "臺東縣|綠島鄉",
+      "pvi": -0.272107,
+      "pvi_label": "B+27",
+      "bucket": "深藍",
+      "white_share_avg": 0.317794,
+      "cycles": {
+        "2024": {
+          "green": 327,
+          "kmt": 873,
+          "white": 559,
+          "total_valid": 1759,
+          "green_share_two_party": 0.2725,
+          "white_share_all": 0.317794,
+          "delta": -0.272107
+        }
+      }
+    },
+    "臺東縣|臺東市": {
+      "county": "臺東縣",
+      "township": "臺東市",
+      "admin_key": "臺東縣|臺東市",
+      "pvi": -0.144319,
+      "pvi_label": "B+14",
+      "bucket": "深藍",
+      "white_share_avg": 0.250305,
+      "cycles": {
+        "2024": {
+          "green": 16949,
+          "kmt": 25393,
+          "white": 14137,
+          "total_valid": 56479,
+          "green_share_two_party": 0.400288,
+          "white_share_all": 0.250305,
+          "delta": -0.144319
+        }
+      }
+    },
+    "臺東縣|蘭嶼鄉": {
+      "county": "臺東縣",
+      "township": "蘭嶼鄉",
+      "admin_key": "臺東縣|蘭嶼鄉",
+      "pvi": -0.215426,
+      "pvi_label": "B+22",
+      "bucket": "深藍",
+      "white_share_avg": 0.260039,
+      "cycles": {
+        "2024": {
+          "green": 370,
+          "kmt": 754,
+          "white": 395,
+          "total_valid": 1519,
+          "green_share_two_party": 0.329181,
+          "white_share_all": 0.260039,
+          "delta": -0.215426
+        }
+      }
+    },
+    "臺東縣|達仁鄉": {
+      "county": "臺東縣",
+      "township": "達仁鄉",
+      "admin_key": "臺東縣|達仁鄉",
+      "pvi": -0.403982,
+      "pvi_label": "B+40",
+      "bucket": "深藍",
+      "white_share_avg": 0.203894,
+      "cycles": {
+        "2024": {
+          "green": 207,
+          "kmt": 1265,
+          "white": 377,
+          "total_valid": 1849,
+          "green_share_two_party": 0.140625,
+          "white_share_all": 0.203894,
+          "delta": -0.403982
+        }
+      }
+    },
+    "臺東縣|金峰鄉": {
+      "county": "臺東縣",
+      "township": "金峰鄉",
+      "admin_key": "臺東縣|金峰鄉",
+      "pvi": -0.439245,
+      "pvi_label": "B+44",
+      "bucket": "深藍",
+      "white_share_avg": 0.235462,
+      "cycles": {
+        "2024": {
+          "green": 169,
+          "kmt": 1435,
+          "white": 494,
+          "total_valid": 2098,
+          "green_share_two_party": 0.105362,
+          "white_share_all": 0.235462,
+          "delta": -0.439245
+        }
+      }
+    },
+    "臺東縣|長濱鄉": {
+      "county": "臺東縣",
+      "township": "長濱鄉",
+      "admin_key": "臺東縣|長濱鄉",
+      "pvi": -0.265746,
+      "pvi_label": "B+27",
+      "bucket": "深藍",
+      "white_share_avg": 0.153016,
+      "cycles": {
+        "2024": {
+          "green": 744,
+          "kmt": 1924,
+          "white": 482,
+          "total_valid": 3150,
+          "green_share_two_party": 0.278861,
+          "white_share_all": 0.153016,
+          "delta": -0.265746
+        }
+      }
+    },
+    "臺東縣|關山鎮": {
+      "county": "臺東縣",
+      "township": "關山鎮",
+      "admin_key": "臺東縣|關山鎮",
+      "pvi": -0.200085,
+      "pvi_label": "B+20",
+      "bucket": "深藍",
+      "white_share_avg": 0.2218,
+      "cycles": {
+        "2024": {
+          "green": 1129,
+          "kmt": 2148,
+          "white": 934,
+          "total_valid": 4211,
+          "green_share_two_party": 0.344522,
+          "white_share_all": 0.2218,
+          "delta": -0.200085
+        }
+      }
+    },
+    "臺東縣|鹿野鄉": {
+      "county": "臺東縣",
+      "township": "鹿野鄉",
+      "admin_key": "臺東縣|鹿野鄉",
+      "pvi": -0.134917,
+      "pvi_label": "B+13",
+      "bucket": "深藍",
+      "white_share_avg": 0.204092,
+      "cycles": {
+        "2024": {
+          "green": 1243,
+          "kmt": 1791,
+          "white": 778,
+          "total_valid": 3812,
+          "green_share_two_party": 0.40969,
+          "white_share_all": 0.204092,
+          "delta": -0.134917
+        }
+      }
+    },
+    "花蓮縣|光復鄉": {
+      "county": "花蓮縣",
+      "township": "光復鄉",
+      "admin_key": "花蓮縣|光復鄉",
+      "pvi": -0.268955,
+      "pvi_label": "B+27",
+      "bucket": "深藍",
+      "white_share_avg": 0.184349,
+      "cycles": {
+        "2024": {
+          "green": 1405,
+          "kmt": 3692,
+          "white": 1152,
+          "total_valid": 6249,
+          "green_share_two_party": 0.275652,
+          "white_share_all": 0.184349,
+          "delta": -0.268955
+        }
+      }
+    },
+    "花蓮縣|卓溪鄉": {
+      "county": "花蓮縣",
+      "township": "卓溪鄉",
+      "admin_key": "花蓮縣|卓溪鄉",
+      "pvi": -0.420255,
+      "pvi_label": "B+42",
+      "bucket": "深藍",
+      "white_share_avg": 0.228,
+      "cycles": {
+        "2024": {
+          "green": 264,
+          "kmt": 1859,
+          "white": 627,
+          "total_valid": 2750,
+          "green_share_two_party": 0.124352,
+          "white_share_all": 0.228,
+          "delta": -0.420255
+        }
+      }
+    },
+    "花蓮縣|吉安鄉": {
+      "county": "花蓮縣",
+      "township": "吉安鄉",
+      "admin_key": "花蓮縣|吉安鄉",
+      "pvi": -0.196119,
+      "pvi_label": "B+20",
+      "bucket": "深藍",
+      "white_share_avg": 0.258797,
+      "cycles": {
+        "2024": {
+          "green": 12494,
+          "kmt": 23358,
+          "white": 12518,
+          "total_valid": 48370,
+          "green_share_two_party": 0.348488,
+          "white_share_all": 0.258797,
+          "delta": -0.196119
+        }
+      }
+    },
+    "花蓮縣|壽豐鄉": {
+      "county": "花蓮縣",
+      "township": "壽豐鄉",
+      "admin_key": "花蓮縣|壽豐鄉",
+      "pvi": -0.188913,
+      "pvi_label": "B+19",
+      "bucket": "深藍",
+      "white_share_avg": 0.237732,
+      "cycles": {
+        "2024": {
+          "green": 2630,
+          "kmt": 4764,
+          "white": 2306,
+          "total_valid": 9700,
+          "green_share_two_party": 0.355694,
+          "white_share_all": 0.237732,
+          "delta": -0.188913
+        }
+      }
+    },
+    "花蓮縣|富里鄉": {
+      "county": "花蓮縣",
+      "township": "富里鄉",
+      "admin_key": "花蓮縣|富里鄉",
+      "pvi": -0.224309,
+      "pvi_label": "B+22",
+      "bucket": "深藍",
+      "white_share_avg": 0.19919,
+      "cycles": {
+        "2024": {
+          "green": 1204,
+          "kmt": 2555,
+          "white": 935,
+          "total_valid": 4694,
+          "green_share_two_party": 0.320298,
+          "white_share_all": 0.19919,
+          "delta": -0.224309
+        }
+      }
+    },
+    "花蓮縣|新城鄉": {
+      "county": "花蓮縣",
+      "township": "新城鄉",
+      "admin_key": "花蓮縣|新城鄉",
+      "pvi": -0.216269,
+      "pvi_label": "B+22",
+      "bucket": "深藍",
+      "white_share_avg": 0.2818,
+      "cycles": {
+        "2024": {
+          "green": 2651,
+          "kmt": 5423,
+          "white": 3168,
+          "total_valid": 11242,
+          "green_share_two_party": 0.328338,
+          "white_share_all": 0.2818,
+          "delta": -0.216269
+        }
+      }
+    },
+    "花蓮縣|玉里鎮": {
+      "county": "花蓮縣",
+      "township": "玉里鎮",
+      "admin_key": "花蓮縣|玉里鎮",
+      "pvi": -0.232774,
+      "pvi_label": "B+23",
+      "bucket": "深藍",
+      "white_share_avg": 0.217315,
+      "cycles": {
+        "2024": {
+          "green": 2630,
+          "kmt": 5804,
+          "white": 2342,
+          "total_valid": 10777,
+          "green_share_two_party": 0.311833,
+          "white_share_all": 0.217315,
+          "delta": -0.232774
+        }
+      }
+    },
+    "花蓮縣|瑞穗鄉": {
+      "county": "花蓮縣",
+      "township": "瑞穗鄉",
+      "admin_key": "花蓮縣|瑞穗鄉",
+      "pvi": -0.251609,
+      "pvi_label": "B+25",
+      "bucket": "深藍",
+      "white_share_avg": 0.191437,
+      "cycles": {
+        "2024": {
+          "green": 1339,
+          "kmt": 3231,
+          "white": 1082,
+          "total_valid": 5652,
+          "green_share_two_party": 0.292998,
+          "white_share_all": 0.191437,
+          "delta": -0.251609
+        }
+      }
+    },
+    "花蓮縣|秀林鄉": {
+      "county": "花蓮縣",
+      "township": "秀林鄉",
+      "admin_key": "花蓮縣|秀林鄉",
+      "pvi": -0.33705,
+      "pvi_label": "B+34",
+      "bucket": "深藍",
+      "white_share_avg": 0.291111,
+      "cycles": {
+        "2024": {
+          "green": 1258,
+          "kmt": 4803,
+          "white": 2489,
+          "total_valid": 8550,
+          "green_share_two_party": 0.207557,
+          "white_share_all": 0.291111,
+          "delta": -0.33705
+        }
+      }
+    },
+    "花蓮縣|花蓮市": {
+      "county": "花蓮縣",
+      "township": "花蓮市",
+      "admin_key": "花蓮縣|花蓮市",
+      "pvi": -0.17843,
+      "pvi_label": "B+18",
+      "bucket": "深藍",
+      "white_share_avg": 0.256004,
+      "cycles": {
+        "2024": {
+          "green": 15018,
+          "kmt": 25995,
+          "white": 14114,
+          "total_valid": 55132,
+          "green_share_two_party": 0.366177,
+          "white_share_all": 0.256004,
+          "delta": -0.17843
+        }
+      }
+    },
+    "花蓮縣|萬榮鄉": {
+      "county": "花蓮縣",
+      "township": "萬榮鄉",
+      "admin_key": "花蓮縣|萬榮鄉",
+      "pvi": -0.3877,
+      "pvi_label": "B+39",
+      "bucket": "深藍",
+      "white_share_avg": 0.25209,
+      "cycles": {
+        "2024": {
+          "green": 351,
+          "kmt": 1886,
+          "white": 754,
+          "total_valid": 2991,
+          "green_share_two_party": 0.156907,
+          "white_share_all": 0.25209,
+          "delta": -0.3877
+        }
+      }
+    },
+    "花蓮縣|豐濱鄉": {
+      "county": "花蓮縣",
+      "township": "豐濱鄉",
+      "admin_key": "花蓮縣|豐濱鄉",
+      "pvi": -0.313342,
+      "pvi_label": "B+31",
+      "bucket": "深藍",
+      "white_share_avg": 0.158206,
+      "cycles": {
+        "2024": {
+          "green": 395,
+          "kmt": 1313,
+          "white": 321,
+          "total_valid": 2029,
+          "green_share_two_party": 0.231265,
+          "white_share_all": 0.158206,
+          "delta": -0.313342
+        }
+      }
+    },
+    "花蓮縣|鳳林鎮": {
+      "county": "花蓮縣",
+      "township": "鳳林鎮",
+      "admin_key": "花蓮縣|鳳林鎮",
+      "pvi": -0.227432,
+      "pvi_label": "B+23",
+      "bucket": "深藍",
+      "white_share_avg": 0.205115,
+      "cycles": {
+        "2024": {
+          "green": 1518,
+          "kmt": 3268,
+          "white": 1235,
+          "total_valid": 6021,
+          "green_share_two_party": 0.317175,
+          "white_share_all": 0.205115,
+          "delta": -0.227432
+        }
+      }
+    },
+    "苗栗縣|三灣鄉": {
+      "county": "苗栗縣",
+      "township": "三灣鄉",
+      "admin_key": "苗栗縣|三灣鄉",
+      "pvi": -0.220844,
+      "pvi_label": "B+22",
+      "bucket": "深藍",
+      "white_share_avg": 0.244973,
+      "cycles": {
+        "2024": {
+          "green": 936,
+          "kmt": 1955,
+          "white": 938,
+          "total_valid": 3829,
+          "green_share_two_party": 0.323763,
+          "white_share_all": 0.244973,
+          "delta": -0.220844
+        }
+      }
+    },
+    "苗栗縣|三義鄉": {
+      "county": "苗栗縣",
+      "township": "三義鄉",
+      "admin_key": "苗栗縣|三義鄉",
+      "pvi": -0.20047,
+      "pvi_label": "B+20",
+      "bucket": "深藍",
+      "white_share_avg": 0.284416,
+      "cycles": {
+        "2024": {
+          "green": 2304,
+          "kmt": 4391,
+          "white": 2661,
+          "total_valid": 9356,
+          "green_share_two_party": 0.344137,
+          "white_share_all": 0.284416,
+          "delta": -0.20047
+        }
+      }
+    },
+    "苗栗縣|公館鄉": {
+      "county": "苗栗縣",
+      "township": "公館鄉",
+      "admin_key": "苗栗縣|公館鄉",
+      "pvi": -0.184259,
+      "pvi_label": "B+18",
+      "bucket": "深藍",
+      "white_share_avg": 0.30162,
+      "cycles": {
+        "2024": {
+          "green": 4802,
+          "kmt": 8524,
+          "white": 5754,
+          "total_valid": 19077,
+          "green_share_two_party": 0.360348,
+          "white_share_all": 0.30162,
+          "delta": -0.184259
+        }
+      }
+    },
+    "苗栗縣|卓蘭鎮": {
+      "county": "苗栗縣",
+      "township": "卓蘭鎮",
+      "admin_key": "苗栗縣|卓蘭鎮",
+      "pvi": -0.033712,
+      "pvi_label": "B+3",
+      "bucket": "偏藍",
+      "white_share_avg": 0.236192,
+      "cycles": {
+        "2024": {
+          "green": 3681,
+          "kmt": 3524,
+          "white": 2228,
+          "total_valid": 9433,
+          "green_share_two_party": 0.510895,
+          "white_share_all": 0.236192,
+          "delta": -0.033712
+        }
+      }
+    },
+    "苗栗縣|南庄鄉": {
+      "county": "苗栗縣",
+      "township": "南庄鄉",
+      "admin_key": "苗栗縣|南庄鄉",
+      "pvi": -0.245919,
+      "pvi_label": "B+25",
+      "bucket": "深藍",
+      "white_share_avg": 0.241117,
+      "cycles": {
+        "2024": {
+          "green": 1161,
+          "kmt": 2726,
+          "white": 1235,
+          "total_valid": 5122,
+          "green_share_two_party": 0.298688,
+          "white_share_all": 0.241117,
+          "delta": -0.245919
+        }
+      }
+    },
+    "苗栗縣|大湖鄉": {
+      "county": "苗栗縣",
+      "township": "大湖鄉",
+      "admin_key": "苗栗縣|大湖鄉",
+      "pvi": -0.202181,
+      "pvi_label": "B+20",
+      "bucket": "深藍",
+      "white_share_avg": 0.233108,
+      "cycles": {
+        "2024": {
+          "green": 2021,
+          "kmt": 3881,
+          "white": 1794,
+          "total_valid": 7696,
+          "green_share_two_party": 0.342426,
+          "white_share_all": 0.233108,
+          "delta": -0.202181
+        }
+      }
+    },
+    "苗栗縣|後龍鎮": {
+      "county": "苗栗縣",
+      "township": "後龍鎮",
+      "admin_key": "苗栗縣|後龍鎮",
+      "pvi": -0.058516,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.28142,
+      "cycles": {
+        "2024": {
+          "green": 6937,
+          "kmt": 7334,
+          "white": 5589,
+          "total_valid": 19860,
+          "green_share_two_party": 0.486091,
+          "white_share_all": 0.28142,
+          "delta": -0.058516
+        }
+      }
+    },
+    "苗栗縣|泰安鄉": {
+      "county": "苗栗縣",
+      "township": "泰安鄉",
+      "admin_key": "苗栗縣|泰安鄉",
+      "pvi": -0.363727,
+      "pvi_label": "B+36",
+      "bucket": "深藍",
+      "white_share_avg": 0.214715,
+      "cycles": {
+        "2024": {
+          "green": 473,
+          "kmt": 2142,
+          "white": 715,
+          "total_valid": 3330,
+          "green_share_two_party": 0.18088,
+          "white_share_all": 0.214715,
+          "delta": -0.363727
+        }
+      }
+    },
+    "苗栗縣|獅潭鄉": {
+      "county": "苗栗縣",
+      "township": "獅潭鄉",
+      "admin_key": "苗栗縣|獅潭鄉",
+      "pvi": -0.232228,
+      "pvi_label": "B+23",
+      "bucket": "深藍",
+      "white_share_avg": 0.207055,
+      "cycles": {
+        "2024": {
+          "green": 646,
+          "kmt": 1422,
+          "white": 540,
+          "total_valid": 2608,
+          "green_share_two_party": 0.312379,
+          "white_share_all": 0.207055,
+          "delta": -0.232228
+        }
+      }
+    },
+    "苗栗縣|竹南鎮": {
+      "county": "苗栗縣",
+      "township": "竹南鎮",
+      "admin_key": "苗栗縣|竹南鎮",
+      "pvi": -0.059303,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share_avg": 0.340008,
+      "cycles": {
+        "2024": {
+          "green": 16412,
+          "kmt": 17406,
+          "white": 17422,
+          "total_valid": 51240,
+          "green_share_two_party": 0.485304,
+          "white_share_all": 0.340008,
+          "delta": -0.059303
+        }
+      }
+    },
+    "苗栗縣|苑裡鎮": {
+      "county": "苗栗縣",
+      "township": "苑裡鎮",
+      "admin_key": "苗栗縣|苑裡鎮",
+      "pvi": 0.043836,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.291008,
+      "cycles": {
+        "2024": {
+          "green": 11191,
+          "kmt": 7827,
+          "white": 7806,
+          "total_valid": 26824,
+          "green_share_two_party": 0.588443,
+          "white_share_all": 0.291008,
+          "delta": 0.043836
+        }
+      }
+    },
+    "苗栗縣|苗栗市": {
+      "county": "苗栗縣",
+      "township": "苗栗市",
+      "admin_key": "苗栗縣|苗栗市",
+      "pvi": -0.214731,
+      "pvi_label": "B+21",
+      "bucket": "深藍",
+      "white_share_avg": 0.297009,
+      "cycles": {
+        "2024": {
+          "green": 12117,
+          "kmt": 24615,
+          "white": 15519,
+          "total_valid": 52251,
+          "green_share_two_party": 0.329876,
+          "white_share_all": 0.297009,
+          "delta": -0.214731
+        }
+      }
+    },
+    "苗栗縣|西湖鄉": {
+      "county": "苗栗縣",
+      "township": "西湖鄉",
+      "admin_key": "苗栗縣|西湖鄉",
+      "pvi": -0.249318,
+      "pvi_label": "B+25",
+      "bucket": "深藍",
+      "white_share_avg": 0.241952,
+      "cycles": {
+        "2024": {
+          "green": 890,
+          "kmt": 2124,
+          "white": 962,
+          "total_valid": 3976,
+          "green_share_two_party": 0.295289,
+          "white_share_all": 0.241952,
+          "delta": -0.249318
+        }
+      }
+    },
+    "苗栗縣|通霄鎮": {
+      "county": "苗栗縣",
+      "township": "通霄鎮",
+      "admin_key": "苗栗縣|通霄鎮",
+      "pvi": -0.001006,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.256976,
+      "cycles": {
+        "2024": {
+          "green": 7730,
+          "kmt": 6490,
+          "white": 4918,
+          "total_valid": 19138,
+          "green_share_two_party": 0.543601,
+          "white_share_all": 0.256976,
+          "delta": -0.001006
+        }
+      }
+    },
+    "苗栗縣|造橋鄉": {
+      "county": "苗栗縣",
+      "township": "造橋鄉",
+      "admin_key": "苗栗縣|造橋鄉",
+      "pvi": -0.167666,
+      "pvi_label": "B+17",
+      "bucket": "深藍",
+      "white_share_avg": 0.278734,
+      "cycles": {
+        "2024": {
+          "green": 1942,
+          "kmt": 3210,
+          "white": 1991,
+          "total_valid": 7143,
+          "green_share_two_party": 0.376941,
+          "white_share_all": 0.278734,
+          "delta": -0.167666
+        }
+      }
+    },
+    "苗栗縣|銅鑼鄉": {
+      "county": "苗栗縣",
+      "township": "銅鑼鄉",
+      "admin_key": "苗栗縣|銅鑼鄉",
+      "pvi": -0.219119,
+      "pvi_label": "B+22",
+      "bucket": "深藍",
+      "white_share_avg": 0.265606,
+      "cycles": {
+        "2024": {
+          "green": 2420,
+          "kmt": 5015,
+          "white": 2689,
+          "total_valid": 10124,
+          "green_share_two_party": 0.325488,
+          "white_share_all": 0.265606,
+          "delta": -0.219119
+        }
+      }
+    },
+    "苗栗縣|頭份市": {
+      "county": "苗栗縣",
+      "township": "頭份市",
+      "admin_key": "苗栗縣|頭份市",
+      "pvi": -0.179784,
+      "pvi_label": "B+18",
+      "bucket": "深藍",
+      "white_share_avg": 0.345698,
+      "cycles": {
+        "2024": {
+          "green": 14640,
+          "kmt": 25489,
+          "white": 21202,
+          "total_valid": 61331,
+          "green_share_two_party": 0.364823,
+          "white_share_all": 0.345698,
+          "delta": -0.179784
+        }
+      }
+    },
+    "苗栗縣|頭屋鄉": {
+      "county": "苗栗縣",
+      "township": "頭屋鄉",
+      "admin_key": "苗栗縣|頭屋鄉",
+      "pvi": -0.223171,
+      "pvi_label": "B+22",
+      "bucket": "深藍",
+      "white_share_avg": 0.264896,
+      "cycles": {
+        "2024": {
+          "green": 1495,
+          "kmt": 3156,
+          "white": 1676,
+          "total_valid": 6327,
+          "green_share_two_party": 0.321436,
+          "white_share_all": 0.264896,
+          "delta": -0.223171
+        }
+      }
+    },
+    "連江縣|北竿鄉": {
+      "county": "連江縣",
+      "township": "北竿鄉",
+      "admin_key": "連江縣|北竿鄉",
+      "pvi": -0.398976,
+      "pvi_label": "B+40",
+      "bucket": "深藍",
+      "white_share_avg": 0.261355,
+      "cycles": {
+        "2024": {
+          "green": 135,
+          "kmt": 792,
+          "white": 328,
+          "total_valid": 1255,
+          "green_share_two_party": 0.145631,
+          "white_share_all": 0.261355,
+          "delta": -0.398976
+        }
+      }
+    },
+    "連江縣|南竿鄉": {
+      "county": "連江縣",
+      "township": "南竿鄉",
+      "admin_key": "連江縣|南竿鄉",
+      "pvi": -0.400648,
+      "pvi_label": "B+40",
+      "bucket": "深藍",
+      "white_share_avg": 0.254789,
+      "cycles": {
+        "2024": {
+          "green": 392,
+          "kmt": 2331,
+          "white": 931,
+          "total_valid": 3654,
+          "green_share_two_party": 0.143959,
+          "white_share_all": 0.254789,
+          "delta": -0.400648
+        }
+      }
+    },
+    "連江縣|東引鄉": {
+      "county": "連江縣",
+      "township": "東引鄉",
+      "admin_key": "連江縣|東引鄉",
+      "pvi": -0.392433,
+      "pvi_label": "B+39",
+      "bucket": "深藍",
+      "white_share_avg": 0.361111,
+      "cycles": {
+        "2024": {
+          "green": 63,
+          "kmt": 351,
+          "white": 234,
+          "total_valid": 648,
+          "green_share_two_party": 0.152174,
+          "white_share_all": 0.361111,
+          "delta": -0.392433
+        }
+      }
+    },
+    "連江縣|莒光鄉": {
+      "county": "連江縣",
+      "township": "莒光鄉",
+      "admin_key": "連江縣|莒光鄉",
+      "pvi": -0.413976,
+      "pvi_label": "B+41",
+      "bucket": "深藍",
+      "white_share_avg": 0.262458,
+      "cycles": {
+        "2024": {
+          "green": 58,
+          "kmt": 386,
+          "white": 158,
+          "total_valid": 602,
+          "green_share_two_party": 0.130631,
+          "white_share_all": 0.262458,
+          "delta": -0.413976
+        }
+      }
+    },
+    "金門縣|烈嶼鄉": {
+      "county": "金門縣",
+      "township": "烈嶼鄉",
+      "admin_key": "金門縣|烈嶼鄉",
+      "pvi": -0.427819,
+      "pvi_label": "B+43",
+      "bucket": "深藍",
+      "white_share_avg": 0.244631,
+      "cycles": {
+        "2024": {
+          "green": 304,
+          "kmt": 2299,
+          "white": 843,
+          "total_valid": 3446,
+          "green_share_two_party": 0.116788,
+          "white_share_all": 0.244631,
+          "delta": -0.427819
+        }
+      }
+    },
+    "金門縣|烏坵鄉": {
+      "county": "金門縣",
+      "township": "烏坵鄉",
+      "admin_key": "金門縣|烏坵鄉",
+      "pvi": -0.395671,
+      "pvi_label": "B+40",
+      "bucket": "深藍",
+      "white_share_avg": 0.189655,
+      "cycles": {
+        "2024": {
+          "green": 14,
+          "kmt": 80,
+          "white": 22,
+          "total_valid": 116,
+          "green_share_two_party": 0.148936,
+          "white_share_all": 0.189655,
+          "delta": -0.395671
+        }
+      }
+    },
+    "金門縣|金城鎮": {
+      "county": "金門縣",
+      "township": "金城鎮",
+      "admin_key": "金門縣|金城鎮",
+      "pvi": -0.406442,
+      "pvi_label": "B+41",
+      "bucket": "深藍",
+      "white_share_avg": 0.27031,
+      "cycles": {
+        "2024": {
+          "green": 1426,
+          "kmt": 8895,
+          "white": 3823,
+          "total_valid": 14143,
+          "green_share_two_party": 0.138165,
+          "white_share_all": 0.27031,
+          "delta": -0.406442
+        }
+      }
+    },
+    "金門縣|金寧鄉": {
+      "county": "金門縣",
+      "township": "金寧鄉",
+      "admin_key": "金門縣|金寧鄉",
+      "pvi": -0.370711,
+      "pvi_label": "B+37",
+      "bucket": "深藍",
+      "white_share_avg": 0.331937,
+      "cycles": {
+        "2024": {
+          "green": 1303,
+          "kmt": 6190,
+          "white": 3723,
+          "total_valid": 11216,
+          "green_share_two_party": 0.173896,
+          "white_share_all": 0.331937,
+          "delta": -0.370711
+        }
+      }
+    },
+    "金門縣|金沙鎮": {
+      "county": "金門縣",
+      "township": "金沙鎮",
+      "admin_key": "金門縣|金沙鎮",
+      "pvi": -0.442909,
+      "pvi_label": "B+44",
+      "bucket": "深藍",
+      "white_share_avg": 0.244799,
+      "cycles": {
+        "2024": {
+          "green": 491,
+          "kmt": 4337,
+          "white": 1565,
+          "total_valid": 6393,
+          "green_share_two_party": 0.101698,
+          "white_share_all": 0.244799,
+          "delta": -0.442909
+        }
+      }
+    },
+    "金門縣|金湖鎮": {
+      "county": "金門縣",
+      "township": "金湖鎮",
+      "admin_key": "金門縣|金湖鎮",
+      "pvi": -0.401987,
+      "pvi_label": "B+40",
+      "bucket": "深藍",
+      "white_share_avg": 0.297339,
+      "cycles": {
+        "2024": {
+          "green": 1032,
+          "kmt": 6204,
+          "white": 3062,
+          "total_valid": 10298,
+          "green_share_two_party": 0.14262,
+          "white_share_all": 0.297339,
+          "delta": -0.401987
+        }
+      }
+    },
+    "雲林縣|二崙鄉": {
+      "county": "雲林縣",
+      "township": "二崙鄉",
+      "admin_key": "雲林縣|二崙鄉",
+      "pvi": 0.154825,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.225132,
+      "cycles": {
+        "2024": {
+          "green": 7884,
+          "kmt": 3388,
+          "white": 3275,
+          "total_valid": 14547,
+          "green_share_two_party": 0.699432,
+          "white_share_all": 0.225132,
+          "delta": 0.154825
+        }
+      }
+    },
+    "雲林縣|元長鄉": {
+      "county": "雲林縣",
+      "township": "元長鄉",
+      "admin_key": "雲林縣|元長鄉",
+      "pvi": 0.097696,
+      "pvi_label": "G+10",
+      "bucket": "深綠",
+      "white_share_avg": 0.223671,
+      "cycles": {
+        "2024": {
+          "green": 6538,
+          "kmt": 3641,
+          "white": 2933,
+          "total_valid": 13113,
+          "green_share_two_party": 0.642303,
+          "white_share_all": 0.223671,
+          "delta": 0.097696
+        }
+      }
+    },
+    "雲林縣|北港鎮": {
+      "county": "雲林縣",
+      "township": "北港鎮",
+      "admin_key": "雲林縣|北港鎮",
+      "pvi": 0.101494,
+      "pvi_label": "G+10",
+      "bucket": "深綠",
+      "white_share_avg": 0.241996,
+      "cycles": {
+        "2024": {
+          "green": 10954,
+          "kmt": 6000,
+          "white": 5412,
+          "total_valid": 22364,
+          "green_share_two_party": 0.646101,
+          "white_share_all": 0.241996,
+          "delta": 0.101494
+        }
+      }
+    },
+    "雲林縣|口湖鄉": {
+      "county": "雲林縣",
+      "township": "口湖鄉",
+      "admin_key": "雲林縣|口湖鄉",
+      "pvi": 0.123178,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.218033,
+      "cycles": {
+        "2024": {
+          "green": 6967,
+          "kmt": 3466,
+          "white": 2909,
+          "total_valid": 13342,
+          "green_share_two_party": 0.667785,
+          "white_share_all": 0.218033,
+          "delta": 0.123178
+        }
+      }
+    },
+    "雲林縣|古坑鄉": {
+      "county": "雲林縣",
+      "township": "古坑鄉",
+      "admin_key": "雲林縣|古坑鄉",
+      "pvi": 0.061858,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.251083,
+      "cycles": {
+        "2024": {
+          "green": 8180,
+          "kmt": 5308,
+          "white": 4522,
+          "total_valid": 18010,
+          "green_share_two_party": 0.606465,
+          "white_share_all": 0.251083,
+          "delta": 0.061858
+        }
+      }
+    },
+    "雲林縣|四湖鄉": {
+      "county": "雲林縣",
+      "township": "四湖鄉",
+      "admin_key": "雲林縣|四湖鄉",
+      "pvi": 0.066847,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.217698,
+      "cycles": {
+        "2024": {
+          "green": 5157,
+          "kmt": 3277,
+          "white": 2347,
+          "total_valid": 10781,
+          "green_share_two_party": 0.611454,
+          "white_share_all": 0.217698,
+          "delta": 0.066847
+        }
+      }
+    },
+    "雲林縣|土庫鎮": {
+      "county": "雲林縣",
+      "township": "土庫鎮",
+      "admin_key": "雲林縣|土庫鎮",
+      "pvi": 0.073025,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.265177,
+      "cycles": {
+        "2024": {
+          "green": 7335,
+          "kmt": 4541,
+          "white": 4285,
+          "total_valid": 16159,
+          "green_share_two_party": 0.617632,
+          "white_share_all": 0.265177,
+          "delta": 0.073025
+        }
+      }
+    },
+    "雲林縣|大埤鄉": {
+      "county": "雲林縣",
+      "township": "大埤鄉",
+      "admin_key": "雲林縣|大埤鄉",
+      "pvi": 0.078115,
+      "pvi_label": "G+8",
+      "bucket": "偏綠",
+      "white_share_avg": 0.245231,
+      "cycles": {
+        "2024": {
+          "green": 5125,
+          "kmt": 3105,
+          "white": 2674,
+          "total_valid": 10904,
+          "green_share_two_party": 0.622722,
+          "white_share_all": 0.245231,
+          "delta": 0.078115
+        }
+      }
+    },
+    "雲林縣|崙背鄉": {
+      "county": "雲林縣",
+      "township": "崙背鄉",
+      "admin_key": "雲林縣|崙背鄉",
+      "pvi": 0.086471,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.245462,
+      "cycles": {
+        "2024": {
+          "green": 6165,
+          "kmt": 3604,
+          "white": 3178,
+          "total_valid": 12947,
+          "green_share_two_party": 0.631078,
+          "white_share_all": 0.245462,
+          "delta": 0.086471
+        }
+      }
+    },
+    "雲林縣|斗六市": {
+      "county": "雲林縣",
+      "township": "斗六市",
+      "admin_key": "雲林縣|斗六市",
+      "pvi": -0.011226,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.282599,
+      "cycles": {
+        "2024": {
+          "green": 24583,
+          "kmt": 21506,
+          "white": 18153,
+          "total_valid": 64236,
+          "green_share_two_party": 0.533381,
+          "white_share_all": 0.282599,
+          "delta": -0.011226
+        }
+      }
+    },
+    "雲林縣|斗南鎮": {
+      "county": "雲林縣",
+      "township": "斗南鎮",
+      "admin_key": "雲林縣|斗南鎮",
+      "pvi": 0.044504,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.260399,
+      "cycles": {
+        "2024": {
+          "green": 11480,
+          "kmt": 8007,
+          "white": 6861,
+          "total_valid": 26348,
+          "green_share_two_party": 0.589111,
+          "white_share_all": 0.260399,
+          "delta": 0.044504
+        }
+      }
+    },
+    "雲林縣|東勢鄉": {
+      "county": "雲林縣",
+      "township": "東勢鄉",
+      "admin_key": "雲林縣|東勢鄉",
+      "pvi": 0.06281,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.226715,
+      "cycles": {
+        "2024": {
+          "green": 3636,
+          "kmt": 2350,
+          "white": 1755,
+          "total_valid": 7741,
+          "green_share_two_party": 0.607417,
+          "white_share_all": 0.226715,
+          "delta": 0.06281
+        }
+      }
+    },
+    "雲林縣|林內鄉": {
+      "county": "雲林縣",
+      "township": "林內鄉",
+      "admin_key": "雲林縣|林內鄉",
+      "pvi": 0.039257,
+      "pvi_label": "G+4",
+      "bucket": "偏綠",
+      "white_share_avg": 0.274257,
+      "cycles": {
+        "2024": {
+          "green": 4306,
+          "kmt": 3069,
+          "white": 2787,
+          "total_valid": 10162,
+          "green_share_two_party": 0.583864,
+          "white_share_all": 0.274257,
+          "delta": 0.039257
+        }
+      }
+    },
+    "雲林縣|水林鄉": {
+      "county": "雲林縣",
+      "township": "水林鄉",
+      "admin_key": "雲林縣|水林鄉",
+      "pvi": 0.170454,
+      "pvi_label": "G+17",
+      "bucket": "深綠",
+      "white_share_avg": 0.197667,
+      "cycles": {
+        "2024": {
+          "green": 7378,
+          "kmt": 2940,
+          "white": 2542,
+          "total_valid": 12860,
+          "green_share_two_party": 0.715061,
+          "white_share_all": 0.197667,
+          "delta": 0.170454
+        }
+      }
+    },
+    "雲林縣|臺西鄉": {
+      "county": "雲林縣",
+      "township": "臺西鄉",
+      "admin_key": "雲林縣|臺西鄉",
+      "pvi": -0.016586,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share_avg": 0.262209,
+      "cycles": {
+        "2024": {
+          "green": 4579,
+          "kmt": 4093,
+          "white": 3082,
+          "total_valid": 11754,
+          "green_share_two_party": 0.528021,
+          "white_share_all": 0.262209,
+          "delta": -0.016586
+        }
+      }
+    },
+    "雲林縣|莿桐鄉": {
+      "county": "雲林縣",
+      "township": "莿桐鄉",
+      "admin_key": "雲林縣|莿桐鄉",
+      "pvi": 0.11939,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.249113,
+      "cycles": {
+        "2024": {
+          "green": 8290,
+          "kmt": 4195,
+          "white": 4142,
+          "total_valid": 16627,
+          "green_share_two_party": 0.663997,
+          "white_share_all": 0.249113,
+          "delta": 0.11939
+        }
+      }
+    },
+    "雲林縣|虎尾鎮": {
+      "county": "雲林縣",
+      "township": "虎尾鎮",
+      "admin_key": "雲林縣|虎尾鎮",
+      "pvi": 0.003331,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.2844,
+      "cycles": {
+        "2024": {
+          "green": 16328,
+          "kmt": 13471,
+          "white": 11843,
+          "total_valid": 41642,
+          "green_share_two_party": 0.547938,
+          "white_share_all": 0.2844,
+          "delta": 0.003331
+        }
+      }
+    },
+    "雲林縣|褒忠鄉": {
+      "county": "雲林縣",
+      "township": "褒忠鄉",
+      "admin_key": "雲林縣|褒忠鄉",
+      "pvi": 0.072862,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.251984,
+      "cycles": {
+        "2024": {
+          "green": 3259,
+          "kmt": 2019,
+          "white": 1778,
+          "total_valid": 7056,
+          "green_share_two_party": 0.617469,
+          "white_share_all": 0.251984,
+          "delta": 0.072862
+        }
+      }
+    },
+    "雲林縣|西螺鎮": {
+      "county": "雲林縣",
+      "township": "西螺鎮",
+      "admin_key": "雲林縣|西螺鎮",
+      "pvi": 0.127493,
+      "pvi_label": "G+13",
+      "bucket": "深綠",
+      "white_share_avg": 0.264203,
+      "cycles": {
+        "2024": {
+          "green": 12659,
+          "kmt": 6176,
+          "white": 6762,
+          "total_valid": 25594,
+          "green_share_two_party": 0.6721,
+          "white_share_all": 0.264203,
+          "delta": 0.127493
+        }
+      }
+    },
+    "雲林縣|麥寮鄉": {
+      "county": "雲林縣",
+      "township": "麥寮鄉",
+      "admin_key": "雲林縣|麥寮鄉",
+      "pvi": -0.006202,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share_avg": 0.337099,
+      "cycles": {
+        "2024": {
+          "green": 8720,
+          "kmt": 7476,
+          "white": 8236,
+          "total_valid": 24432,
+          "green_share_two_party": 0.538405,
+          "white_share_all": 0.337099,
+          "delta": -0.006202
+        }
+      }
+    },
+    "高雄市|三民區": {
+      "county": "高雄市",
+      "township": "三民區",
+      "admin_key": "高雄市|三民區",
+      "pvi": 0.090205,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.215302,
+      "cycles": {
+        "2024": {
+          "green": 100132,
+          "kmt": 57603,
+          "white": 43273,
+          "total_valid": 200987,
+          "green_share_two_party": 0.634812,
+          "white_share_all": 0.215302,
+          "delta": 0.090205
+        }
+      }
+    },
+    "高雄市|仁武區": {
+      "county": "高雄市",
+      "township": "仁武區",
+      "admin_key": "高雄市|仁武區",
+      "pvi": 0.118429,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.247105,
+      "cycles": {
+        "2024": {
+          "green": 28974,
+          "kmt": 14725,
+          "white": 14342,
+          "total_valid": 58040,
+          "green_share_two_party": 0.663036,
+          "white_share_all": 0.247105,
+          "delta": 0.118429
+        }
+      }
+    },
+    "高雄市|內門區": {
+      "county": "高雄市",
+      "township": "內門區",
+      "admin_key": "高雄市|內門區",
+      "pvi": 0.066521,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.178224,
+      "cycles": {
+        "2024": {
+          "green": 3976,
+          "kmt": 2530,
+          "white": 1411,
+          "total_valid": 7917,
+          "green_share_two_party": 0.611128,
+          "white_share_all": 0.178224,
+          "delta": 0.066521
+        }
+      }
+    },
+    "高雄市|六龜區": {
+      "county": "高雄市",
+      "township": "六龜區",
+      "admin_key": "高雄市|六龜區",
+      "pvi": 0.045778,
+      "pvi_label": "G+5",
+      "bucket": "偏綠",
+      "white_share_avg": 0.172312,
+      "cycles": {
+        "2024": {
+          "green": 2972,
+          "kmt": 2062,
+          "white": 1048,
+          "total_valid": 6082,
+          "green_share_two_party": 0.590385,
+          "white_share_all": 0.172312,
+          "delta": 0.045778
+        }
+      }
+    },
+    "高雄市|前金區": {
+      "county": "高雄市",
+      "township": "前金區",
+      "admin_key": "高雄市|前金區",
+      "pvi": 0.067418,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.195607,
+      "cycles": {
+        "2024": {
+          "green": 8449,
+          "kmt": 5356,
+          "white": 3357,
+          "total_valid": 17162,
+          "green_share_two_party": 0.612025,
+          "white_share_all": 0.195607,
+          "delta": 0.067418
+        }
+      }
+    },
+    "高雄市|前鎮區": {
+      "county": "高雄市",
+      "township": "前鎮區",
+      "admin_key": "高雄市|前鎮區",
+      "pvi": 0.091259,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.207698,
+      "cycles": {
+        "2024": {
+          "green": 55513,
+          "kmt": 31790,
+          "white": 22886,
+          "total_valid": 110189,
+          "green_share_two_party": 0.635866,
+          "white_share_all": 0.207698,
+          "delta": 0.091259
+        }
+      }
+    },
+    "高雄市|大寮區": {
+      "county": "高雄市",
+      "township": "大寮區",
+      "admin_key": "高雄市|大寮區",
+      "pvi": 0.109703,
+      "pvi_label": "G+11",
+      "bucket": "深綠",
+      "white_share_avg": 0.228494,
+      "cycles": {
+        "2024": {
+          "green": 33642,
+          "kmt": 17774,
+          "white": 15228,
+          "total_valid": 66645,
+          "green_share_two_party": 0.65431,
+          "white_share_all": 0.228494,
+          "delta": 0.109703
+        }
+      }
+    },
+    "高雄市|大樹區": {
+      "county": "高雄市",
+      "township": "大樹區",
+      "admin_key": "高雄市|大樹區",
+      "pvi": 0.147938,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.198613,
+      "cycles": {
+        "2024": {
+          "green": 13684,
+          "kmt": 6075,
+          "white": 4897,
+          "total_valid": 24656,
+          "green_share_two_party": 0.692545,
+          "white_share_all": 0.198613,
+          "delta": 0.147938
+        }
+      }
+    },
+    "高雄市|大社區": {
+      "county": "高雄市",
+      "township": "大社區",
+      "admin_key": "高雄市|大社區",
+      "pvi": 0.14986,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.227608,
+      "cycles": {
+        "2024": {
+          "green": 11133,
+          "kmt": 4898,
+          "white": 4724,
+          "total_valid": 20755,
+          "green_share_two_party": 0.694467,
+          "white_share_all": 0.227608,
+          "delta": 0.14986
+        }
+      }
+    },
+    "高雄市|小港區": {
+      "county": "高雄市",
+      "township": "小港區",
+      "admin_key": "高雄市|小港區",
+      "pvi": 0.114141,
+      "pvi_label": "G+11",
+      "bucket": "深綠",
+      "white_share_avg": 0.229599,
+      "cycles": {
+        "2024": {
+          "green": 45673,
+          "kmt": 23660,
+          "white": 20663,
+          "total_valid": 89996,
+          "green_share_two_party": 0.658748,
+          "white_share_all": 0.229599,
+          "delta": 0.114141
+        }
+      }
+    },
+    "高雄市|岡山區": {
+      "county": "高雄市",
+      "township": "岡山區",
+      "admin_key": "高雄市|岡山區",
+      "pvi": 0.064401,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.231697,
+      "cycles": {
+        "2024": {
+          "green": 26881,
+          "kmt": 17258,
+          "white": 13311,
+          "total_valid": 57450,
+          "green_share_two_party": 0.609008,
+          "white_share_all": 0.231697,
+          "delta": 0.064401
+        }
+      }
+    },
+    "高雄市|左營區": {
+      "county": "高雄市",
+      "township": "左營區",
+      "admin_key": "高雄市|左營區",
+      "pvi": 0.003004,
+      "pvi_label": "EVEN",
+      "bucket": "中間",
+      "white_share_avg": 0.228198,
+      "cycles": {
+        "2024": {
+          "green": 48796,
+          "kmt": 40311,
+          "white": 26343,
+          "total_valid": 115439,
+          "green_share_two_party": 0.547611,
+          "white_share_all": 0.228198,
+          "delta": 0.003004
+        }
+      }
+    },
+    "高雄市|彌陀區": {
+      "county": "高雄市",
+      "township": "彌陀區",
+      "admin_key": "高雄市|彌陀區",
+      "pvi": 0.089207,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.209992,
+      "cycles": {
+        "2024": {
+          "green": 5672,
+          "kmt": 3277,
+          "white": 2379,
+          "total_valid": 11329,
+          "green_share_two_party": 0.633814,
+          "white_share_all": 0.209992,
+          "delta": 0.089207
+        }
+      }
+    },
+    "高雄市|新興區": {
+      "county": "高雄市",
+      "township": "新興區",
+      "admin_key": "高雄市|新興區",
+      "pvi": 0.067739,
+      "pvi_label": "G+7",
+      "bucket": "偏綠",
+      "white_share_avg": 0.190508,
+      "cycles": {
+        "2024": {
+          "green": 15008,
+          "kmt": 9501,
+          "white": 5768,
+          "total_valid": 30277,
+          "green_share_two_party": 0.612346,
+          "white_share_all": 0.190508,
+          "delta": 0.067739
+        }
+      }
+    },
+    "高雄市|旗山區": {
+      "county": "高雄市",
+      "township": "旗山區",
+      "admin_key": "高雄市|旗山區",
+      "pvi": 0.0843,
+      "pvi_label": "G+8",
+      "bucket": "深綠",
+      "white_share_avg": 0.195096,
+      "cycles": {
+        "2024": {
+          "green": 10321,
+          "kmt": 6090,
+          "white": 3978,
+          "total_valid": 20390,
+          "green_share_two_party": 0.628907,
+          "white_share_all": 0.195096,
+          "delta": 0.0843
+        }
+      }
+    },
+    "高雄市|旗津區": {
+      "county": "高雄市",
+      "township": "旗津區",
+      "admin_key": "高雄市|旗津區",
+      "pvi": 0.173534,
+      "pvi_label": "G+17",
+      "bucket": "深綠",
+      "white_share_avg": 0.204099,
+      "cycles": {
+        "2024": {
+          "green": 8701,
+          "kmt": 3415,
+          "white": 3107,
+          "total_valid": 15223,
+          "green_share_two_party": 0.718141,
+          "white_share_all": 0.204099,
+          "delta": 0.173534
+        }
+      }
+    },
+    "高雄市|杉林區": {
+      "county": "高雄市",
+      "township": "杉林區",
+      "admin_key": "高雄市|杉林區",
+      "pvi": 0.023565,
+      "pvi_label": "G+2",
+      "bucket": "中間",
+      "white_share_avg": 0.160779,
+      "cycles": {
+        "2024": {
+          "green": 2767,
+          "kmt": 2103,
+          "white": 933,
+          "total_valid": 5803,
+          "green_share_two_party": 0.568172,
+          "white_share_all": 0.160779,
+          "delta": 0.023565
+        }
+      }
+    },
+    "高雄市|林園區": {
+      "county": "高雄市",
+      "township": "林園區",
+      "admin_key": "高雄市|林園區",
+      "pvi": 0.155886,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.2177,
+      "cycles": {
+        "2024": {
+          "green": 21585,
+          "kmt": 9229,
+          "white": 8575,
+          "total_valid": 39389,
+          "green_share_two_party": 0.700493,
+          "white_share_all": 0.2177,
+          "delta": 0.155886
+        }
+      }
+    },
+    "高雄市|桃源區": {
+      "county": "高雄市",
+      "township": "桃源區",
+      "admin_key": "高雄市|桃源區",
+      "pvi": -0.321802,
+      "pvi_label": "B+32",
+      "bucket": "深藍",
+      "white_share_avg": 0.244554,
+      "cycles": {
+        "2024": {
+          "green": 340,
+          "kmt": 1186,
+          "white": 494,
+          "total_valid": 2020,
+          "green_share_two_party": 0.222805,
+          "white_share_all": 0.244554,
+          "delta": -0.321802
+        }
+      }
+    },
+    "高雄市|梓官區": {
+      "county": "高雄市",
+      "township": "梓官區",
+      "admin_key": "高雄市|梓官區",
+      "pvi": 0.158877,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.203405,
+      "cycles": {
+        "2024": {
+          "green": 12114,
+          "kmt": 5106,
+          "white": 4397,
+          "total_valid": 21617,
+          "green_share_two_party": 0.703484,
+          "white_share_all": 0.203405,
+          "delta": 0.158877
+        }
+      }
+    },
+    "高雄市|楠梓區": {
+      "county": "高雄市",
+      "township": "楠梓區",
+      "admin_key": "高雄市|楠梓區",
+      "pvi": 0.064714,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.242504,
+      "cycles": {
+        "2024": {
+          "green": 51314,
+          "kmt": 32901,
+          "white": 26964,
+          "total_valid": 111190,
+          "green_share_two_party": 0.609321,
+          "white_share_all": 0.242504,
+          "delta": 0.064714
+        }
+      }
+    },
+    "高雄市|橋頭區": {
+      "county": "高雄市",
+      "township": "橋頭區",
+      "admin_key": "高雄市|橋頭區",
+      "pvi": 0.157949,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.231113,
+      "cycles": {
+        "2024": {
+          "green": 14401,
+          "kmt": 6097,
+          "white": 6161,
+          "total_valid": 26658,
+          "green_share_two_party": 0.702556,
+          "white_share_all": 0.231113,
+          "delta": 0.157949
+        }
+      }
+    },
+    "高雄市|永安區": {
+      "county": "高雄市",
+      "township": "永安區",
+      "admin_key": "高雄市|永安區",
+      "pvi": 0.126083,
+      "pvi_label": "G+13",
+      "bucket": "深綠",
+      "white_share_avg": 0.233088,
+      "cycles": {
+        "2024": {
+          "green": 4334,
+          "kmt": 2128,
+          "white": 1964,
+          "total_valid": 8426,
+          "green_share_two_party": 0.67069,
+          "white_share_all": 0.233088,
+          "delta": 0.126083
+        }
+      }
+    },
+    "高雄市|湖內區": {
+      "county": "高雄市",
+      "township": "湖內區",
+      "admin_key": "高雄市|湖內區",
+      "pvi": 0.138691,
+      "pvi_label": "G+14",
+      "bucket": "深綠",
+      "white_share_avg": 0.225794,
+      "cycles": {
+        "2024": {
+          "green": 9463,
+          "kmt": 4386,
+          "white": 4039,
+          "total_valid": 17888,
+          "green_share_two_party": 0.683298,
+          "white_share_all": 0.225794,
+          "delta": 0.138691
+        }
+      }
+    },
+    "高雄市|燕巢區": {
+      "county": "高雄市",
+      "township": "燕巢區",
+      "admin_key": "高雄市|燕巢區",
+      "pvi": 0.121915,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share_avg": 0.216092,
+      "cycles": {
+        "2024": {
+          "green": 9234,
+          "kmt": 4620,
+          "white": 3819,
+          "total_valid": 17673,
+          "green_share_two_party": 0.666522,
+          "white_share_all": 0.216092,
+          "delta": 0.121915
+        }
+      }
+    },
+    "高雄市|田寮區": {
+      "county": "高雄市",
+      "township": "田寮區",
+      "admin_key": "高雄市|田寮區",
+      "pvi": 0.153316,
+      "pvi_label": "G+15",
+      "bucket": "深綠",
+      "white_share_avg": 0.151322,
+      "cycles": {
+        "2024": {
+          "green": 2419,
+          "kmt": 1047,
+          "white": 618,
+          "total_valid": 4084,
+          "green_share_two_party": 0.697923,
+          "white_share_all": 0.151322,
+          "delta": 0.153316
+        }
+      }
+    },
+    "高雄市|甲仙區": {
+      "county": "高雄市",
+      "township": "甲仙區",
+      "admin_key": "高雄市|甲仙區",
+      "pvi": -0.025762,
+      "pvi_label": "B+3",
+      "bucket": "中間",
+      "white_share_avg": 0.172803,
+      "cycles": {
+        "2024": {
+          "green": 1294,
+          "kmt": 1200,
+          "white": 521,
+          "total_valid": 3015,
+          "green_share_two_party": 0.518845,
+          "white_share_all": 0.172803,
+          "delta": -0.025762
+        }
+      }
+    },
+    "高雄市|美濃區": {
+      "county": "高雄市",
+      "township": "美濃區",
+      "admin_key": "高雄市|美濃區",
+      "pvi": -0.031378,
+      "pvi_label": "B+3",
+      "bucket": "偏藍",
+      "white_share_avg": 0.183179,
+      "cycles": {
+        "2024": {
+          "green": 9156,
+          "kmt": 8684,
+          "white": 4001,
+          "total_valid": 21842,
+          "green_share_two_party": 0.513229,
+          "white_share_all": 0.183179,
+          "delta": -0.031378
+        }
+      }
+    },
+    "高雄市|苓雅區": {
+      "county": "高雄市",
+      "township": "苓雅區",
+      "admin_key": "高雄市|苓雅區",
+      "pvi": 0.059292,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.199197,
+      "cycles": {
+        "2024": {
+          "green": 48667,
+          "kmt": 31921,
+          "white": 20046,
+          "total_valid": 100634,
+          "green_share_two_party": 0.603899,
+          "white_share_all": 0.199197,
+          "delta": 0.059292
+        }
+      }
+    },
+    "高雄市|茂林區": {
+      "county": "高雄市",
+      "township": "茂林區",
+      "admin_key": "高雄市|茂林區",
+      "pvi": -0.328455,
+      "pvi_label": "B+33",
+      "bucket": "深藍",
+      "white_share_avg": 0.269097,
+      "cycles": {
+        "2024": {
+          "green": 182,
+          "kmt": 660,
+          "white": 310,
+          "total_valid": 1152,
+          "green_share_two_party": 0.216152,
+          "white_share_all": 0.269097,
+          "delta": -0.328455
+        }
+      }
+    },
+    "高雄市|茄萣區": {
+      "county": "高雄市",
+      "township": "茄萣區",
+      "admin_key": "高雄市|茄萣區",
+      "pvi": 0.144548,
+      "pvi_label": "G+14",
+      "bucket": "深綠",
+      "white_share_avg": 0.20442,
+      "cycles": {
+        "2024": {
+          "green": 9551,
+          "kmt": 4308,
+          "white": 3561,
+          "total_valid": 17420,
+          "green_share_two_party": 0.689155,
+          "white_share_all": 0.20442,
+          "delta": 0.144548
+        }
+      }
+    },
+    "高雄市|路竹區": {
+      "county": "高雄市",
+      "township": "路竹區",
+      "admin_key": "高雄市|路竹區",
+      "pvi": 0.108395,
+      "pvi_label": "G+11",
+      "bucket": "深綠",
+      "white_share_avg": 0.234912,
+      "cycles": {
+        "2024": {
+          "green": 15149,
+          "kmt": 8050,
+          "white": 7123,
+          "total_valid": 30322,
+          "green_share_two_party": 0.653002,
+          "white_share_all": 0.234912,
+          "delta": 0.108395
+        }
+      }
+    },
+    "高雄市|那瑪夏區": {
+      "county": "高雄市",
+      "township": "那瑪夏區",
+      "admin_key": "高雄市|那瑪夏區",
+      "pvi": -0.313581,
+      "pvi_label": "B+31",
+      "bucket": "深藍",
+      "white_share_avg": 0.190958,
+      "cycles": {
+        "2024": {
+          "green": 277,
+          "kmt": 922,
+          "white": 283,
+          "total_valid": 1482,
+          "green_share_two_party": 0.231026,
+          "white_share_all": 0.190958,
+          "delta": -0.313581
+        }
+      }
+    },
+    "高雄市|阿蓮區": {
+      "county": "高雄市",
+      "township": "阿蓮區",
+      "admin_key": "高雄市|阿蓮區",
+      "pvi": 0.159738,
+      "pvi_label": "G+16",
+      "bucket": "深綠",
+      "white_share_avg": 0.208807,
+      "cycles": {
+        "2024": {
+          "green": 9110,
+          "kmt": 3824,
+          "white": 3414,
+          "total_valid": 16350,
+          "green_share_two_party": 0.704345,
+          "white_share_all": 0.208807,
+          "delta": 0.159738
+        }
+      }
+    },
+    "高雄市|鳥松區": {
+      "county": "高雄市",
+      "township": "鳥松區",
+      "admin_key": "高雄市|鳥松區",
+      "pvi": 0.091326,
+      "pvi_label": "G+9",
+      "bucket": "深綠",
+      "white_share_avg": 0.203211,
+      "cycles": {
+        "2024": {
+          "green": 14360,
+          "kmt": 8221,
+          "white": 5759,
+          "total_valid": 28340,
+          "green_share_two_party": 0.635933,
+          "white_share_all": 0.203211,
+          "delta": 0.091326
+        }
+      }
+    },
+    "高雄市|鳳山區": {
+      "county": "高雄市",
+      "township": "鳳山區",
+      "admin_key": "高雄市|鳳山區",
+      "pvi": 0.058789,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share_avg": 0.228698,
+      "cycles": {
+        "2024": {
+          "green": 98998,
+          "kmt": 65070,
+          "white": 48648,
+          "total_valid": 212717,
+          "green_share_two_party": 0.603396,
+          "white_share_all": 0.228698,
+          "delta": 0.058789
+        }
+      }
+    },
+    "高雄市|鹽埕區": {
+      "county": "高雄市",
+      "township": "鹽埕區",
+      "admin_key": "高雄市|鹽埕區",
+      "pvi": 0.112306,
+      "pvi_label": "G+11",
+      "bucket": "深綠",
+      "white_share_avg": 0.177529,
+      "cycles": {
+        "2024": {
+          "green": 7835,
+          "kmt": 4092,
+          "white": 2574,
+          "total_valid": 14499,
+          "green_share_two_party": 0.656913,
+          "white_share_all": 0.177529,
+          "delta": 0.112306
+        }
+      }
+    },
+    "高雄市|鼓山區": {
+      "county": "高雄市",
+      "township": "鼓山區",
+      "admin_key": "高雄市|鼓山區",
+      "pvi": 0.047652,
+      "pvi_label": "G+5",
+      "bucket": "偏綠",
+      "white_share_avg": 0.209904,
+      "cycles": {
+        "2024": {
+          "green": 38331,
+          "kmt": 26389,
+          "white": 17192,
+          "total_valid": 81904,
+          "green_share_two_party": 0.592259,
+          "white_share_all": 0.209904,
+          "delta": 0.047652
+        }
+      }
+    }
+  },
+  "counties": {
+    "南投縣": {
+      "county": "南投縣",
+      "township_count": 13,
+      "pvi": -0.05846,
+      "pvi_label": "B+6",
+      "bucket": "偏藍",
+      "white_share": 0.260554,
+      "totals": {
+        "green": 103282,
+        "kmt": 109168,
+        "white": 74856,
+        "total_valid": 287296,
+        "green_share_two_party": 0.486147
+      }
+    },
+    "嘉義市": {
+      "county": "嘉義市",
+      "township_count": 2,
+      "pvi": 0.03483,
+      "pvi_label": "G+3",
+      "bucket": "偏綠",
+      "white_share": 0.253381,
+      "totals": {
+        "green": 68205,
+        "kmt": 49504,
+        "white": 39947,
+        "total_valid": 157656,
+        "green_share_two_party": 0.579437
+      }
+    },
+    "嘉義縣": {
+      "county": "嘉義縣",
+      "township_count": 18,
+      "pvi": 0.075036,
+      "pvi_label": "G+8",
+      "bucket": "偏綠",
+      "white_share": 0.230342,
+      "totals": {
+        "green": 139517,
+        "kmt": 85640,
+        "white": 67383,
+        "total_valid": 292534,
+        "green_share_two_party": 0.619643
+      }
+    },
+    "基隆市": {
+      "county": "基隆市",
+      "township_count": 7,
+      "pvi": -0.070858,
+      "pvi_label": "B+7",
+      "bucket": "偏藍",
+      "white_share": 0.265997,
+      "totals": {
+        "green": 76076,
+        "kmt": 84507,
+        "white": 58195,
+        "total_valid": 218781,
+        "green_share_two_party": 0.473749
+      }
+    },
+    "宜蘭縣": {
+      "county": "宜蘭縣",
+      "township_count": 12,
+      "pvi": 0.062206,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share": 0.262712,
+      "totals": {
+        "green": 119516,
+        "kmt": 77441,
+        "white": 70178,
+        "total_valid": 267129,
+        "green_share_two_party": 0.606813
+      }
+    },
+    "屏東縣": {
+      "county": "屏東縣",
+      "township_count": 33,
+      "pvi": 0.061758,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share": 0.216479,
+      "totals": {
+        "green": 226108,
+        "kmt": 146783,
+        "white": 103028,
+        "total_valid": 475927,
+        "green_share_two_party": 0.606365
+      }
+    },
+    "彰化縣": {
+      "county": "彰化縣",
+      "township_count": 26,
+      "pvi": -0.008178,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share": 0.28962,
+      "totals": {
+        "green": 282515,
+        "kmt": 244144,
+        "white": 214715,
+        "total_valid": 741368,
+        "green_share_two_party": 0.536429
+      }
+    },
+    "新北市": {
+      "county": "新北市",
+      "township_count": 29,
+      "pvi": -0.021376,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share": 0.262408,
+      "totals": {
+        "green": 948801,
+        "kmt": 864548,
+        "white": 645124,
+        "total_valid": 2458480,
+        "green_share_two_party": 0.523231
+      }
+    },
+    "新竹市": {
+      "county": "新竹市",
+      "township_count": 3,
+      "pvi": -0.015006,
+      "pvi_label": "B+2",
+      "bucket": "中間",
+      "white_share": 0.343025,
+      "totals": {
+        "green": 92677,
+        "kmt": 82317,
+        "white": 91378,
+        "total_valid": 266389,
+        "green_share_two_party": 0.529601
+      }
+    },
+    "新竹縣": {
+      "county": "新竹縣",
+      "township_count": 13,
+      "pvi": -0.11917,
+      "pvi_label": "B+12",
+      "bucket": "深藍",
+      "white_share": 0.355526,
+      "totals": {
+        "green": 93309,
+        "kmt": 126016,
+        "white": 120989,
+        "total_valid": 340310,
+        "green_share_two_party": 0.425437
+      }
+    },
+    "桃園市": {
+      "county": "桃園市",
+      "township_count": 13,
+      "pvi": -0.036266,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share": 0.306133,
+      "totals": {
+        "green": 476458,
+        "kmt": 460823,
+        "white": 413522,
+        "total_valid": 1350792,
+        "green_share_two_party": 0.508341
+      }
+    },
+    "澎湖縣": {
+      "county": "澎湖縣",
+      "township_count": 6,
+      "pvi": -0.031498,
+      "pvi_label": "B+3",
+      "bucket": "偏藍",
+      "white_share": 0.24758,
+      "totals": {
+        "green": 19023,
+        "kmt": 18051,
+        "white": 12200,
+        "total_valid": 49277,
+        "green_share_two_party": 0.513109
+      }
+    },
+    "臺中市": {
+      "county": "臺中市",
+      "township_count": 29,
+      "pvi": -0.007325,
+      "pvi_label": "B+1",
+      "bucket": "中間",
+      "white_share": 0.300498,
+      "totals": {
+        "green": 641601,
+        "kmt": 552560,
+        "white": 513011,
+        "total_valid": 1707203,
+        "green_share_two_party": 0.537282
+      }
+    },
+    "臺北市": {
+      "county": "臺北市",
+      "township_count": 12,
+      "pvi": -0.044327,
+      "pvi_label": "B+4",
+      "bucket": "偏藍",
+      "white_share": 0.237902,
+      "totals": {
+        "green": 587912,
+        "kmt": 587255,
+        "white": 366848,
+        "total_valid": 1542011,
+        "green_share_two_party": 0.50028
+      }
+    },
+    "臺南市": {
+      "county": "臺南市",
+      "township_count": 37,
+      "pvi": 0.120928,
+      "pvi_label": "G+12",
+      "bucket": "深綠",
+      "white_share": 0.234365,
+      "totals": {
+        "green": 570828,
+        "kmt": 286870,
+        "white": 262545,
+        "total_valid": 1120238,
+        "green_share_two_party": 0.665535
+      }
+    },
+    "臺東縣": {
+      "county": "臺東縣",
+      "township_count": 16,
+      "pvi": -0.187408,
+      "pvi_label": "B+19",
+      "bucket": "深藍",
+      "white_share": 0.232788,
+      "totals": {
+        "green": 30129,
+        "kmt": 54219,
+        "white": 25593,
+        "total_valid": 109941,
+        "green_share_two_party": 0.357199
+      }
+    },
+    "花蓮縣": {
+      "county": "花蓮縣",
+      "township_count": 13,
+      "pvi": -0.215436,
+      "pvi_label": "B+22",
+      "bucket": "深藍",
+      "white_share": 0.247151,
+      "totals": {
+        "green": 43157,
+        "kmt": 87951,
+        "white": 43043,
+        "total_valid": 174157,
+        "green_share_two_party": 0.329171
+      }
+    },
+    "苗栗縣": {
+      "county": "苗栗縣",
+      "township_count": 18,
+      "pvi": -0.13301,
+      "pvi_label": "B+13",
+      "bucket": "深藍",
+      "white_share": 0.300124,
+      "totals": {
+        "green": 91798,
+        "kmt": 131231,
+        "white": 95639,
+        "total_valid": 318665,
+        "green_share_two_party": 0.411597
+      }
+    },
+    "連江縣": {
+      "county": "連江縣",
+      "township_count": 4,
+      "pvi": -0.400863,
+      "pvi_label": "B+40",
+      "bucket": "深藍",
+      "white_share": 0.268063,
+      "totals": {
+        "green": 648,
+        "kmt": 3860,
+        "white": 1651,
+        "total_valid": 6159,
+        "green_share_two_party": 0.143744
+      }
+    },
+    "金門縣": {
+      "county": "金門縣",
+      "township_count": 6,
+      "pvi": -0.404315,
+      "pvi_label": "B+40",
+      "bucket": "深藍",
+      "white_share": 0.285846,
+      "totals": {
+        "green": 4570,
+        "kmt": 28005,
+        "white": 13038,
+        "total_valid": 45612,
+        "green_share_two_party": 0.140292
+      }
+    },
+    "雲林縣": {
+      "county": "雲林縣",
+      "township_count": 20,
+      "pvi": 0.058345,
+      "pvi_label": "G+6",
+      "bucket": "偏綠",
+      "white_share": 0.261353,
+      "totals": {
+        "green": 169523,
+        "kmt": 111632,
+        "white": 99476,
+        "total_valid": 380619,
+        "green_share_two_party": 0.602952
+      }
+    },
+    "高雄市": {
+      "county": "高雄市",
+      "township_count": 38,
+      "pvi": 0.081261,
+      "pvi_label": "G+8",
+      "bucket": "深綠",
+      "white_share": 0.218766,
+      "totals": {
+        "green": 800408,
+        "kmt": 478469,
+        "white": 358111,
+        "total_valid": 1636962,
+        "green_share_two_party": 0.625868
+      }
+    }
+  }
+}

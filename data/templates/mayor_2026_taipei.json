@@ -1,0 +1,433 @@
+{
+  "name": "2026 Taipei Mayor Election",
+  "name_zh": "2026 台北市長選舉",
+  "region": "臺北市",
+  "region_code": "臺北市",
+  "country": "TW",
+  "locale": "zh-TW",
+  "target_count": 150,
+  "metadata": {
+    "source": {
+      "geo": "g0v / ronnywang twgeojson (MOI segis 2011)",
+      "demographics": "主計總處 110 年 人口及住宅普查 + 戶政司 2024 月報 + 客委會 2021 族群調查",
+      "elections": "中選會 2024 總統大選鄉鎮級開票資料",
+      "leaning": "Blue-Green PVI computed from 2024 two-party share"
+    },
+    "population_total": 2472943,
+    "township_count": 12,
+    "county_count": 1,
+    "bucket_counts": {
+      "深綠": 0,
+      "偏綠": 1,
+      "中間": 4,
+      "偏藍": 5,
+      "深藍": 2
+    }
+  },
+  "dimensions": {
+    "gender": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "男",
+          "weight": 0.4966
+        },
+        {
+          "value": "女",
+          "weight": 0.5034
+        }
+      ]
+    },
+    "age": {
+      "type": "range",
+      "bins": [
+        {
+          "range": "未滿18歲",
+          "weight": 0.0
+        },
+        {
+          "range": "18-24",
+          "weight": 0.1056
+        },
+        {
+          "range": "25-34",
+          "weight": 0.1543
+        },
+        {
+          "range": "35-44",
+          "weight": 0.1781
+        },
+        {
+          "range": "45-54",
+          "weight": 0.173
+        },
+        {
+          "range": "55-64",
+          "weight": 0.1667
+        },
+        {
+          "range": "65+",
+          "weight": 0.2223
+        }
+      ]
+    },
+    "education": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "國小以下",
+          "weight": 0.141
+        },
+        {
+          "value": "國中",
+          "weight": 0.129
+        },
+        {
+          "value": "高中職",
+          "weight": 0.322
+        },
+        {
+          "value": "專科大學",
+          "weight": 0.348
+        },
+        {
+          "value": "研究所",
+          "weight": 0.06
+        }
+      ]
+    },
+    "employment": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "就業",
+          "weight": 0.5562
+        },
+        {
+          "value": "失業",
+          "weight": 0.0212
+        },
+        {
+          "value": "非勞動力",
+          "weight": 0.4226
+        }
+      ]
+    },
+    "tenure": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "自有住宅",
+          "weight": 0.848
+        },
+        {
+          "value": "租屋",
+          "weight": 0.1135
+        },
+        {
+          "value": "其他",
+          "weight": 0.0385
+        }
+      ]
+    },
+    "household_type": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "家庭戶",
+          "weight": 0.73
+        },
+        {
+          "value": "非家庭戶",
+          "weight": 0.27
+        }
+      ]
+    },
+    "household_income": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "3萬以下",
+          "weight": 0.12
+        },
+        {
+          "value": "3-5萬",
+          "weight": 0.2
+        },
+        {
+          "value": "5-8萬",
+          "weight": 0.28
+        },
+        {
+          "value": "8-12萬",
+          "weight": 0.22
+        },
+        {
+          "value": "12-20萬",
+          "weight": 0.13
+        },
+        {
+          "value": "20萬以上",
+          "weight": 0.05
+        }
+      ]
+    },
+    "ethnicity": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "閩南",
+          "weight": 0.58
+        },
+        {
+          "value": "客家",
+          "weight": 0.13
+        },
+        {
+          "value": "外省",
+          "weight": 0.24
+        },
+        {
+          "value": "原住民",
+          "weight": 0.01
+        },
+        {
+          "value": "新住民",
+          "weight": 0.03
+        },
+        {
+          "value": "其他",
+          "weight": 0.01
+        }
+      ]
+    },
+    "party_lean": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "深綠",
+          "weight": 0.0
+        },
+        {
+          "value": "偏綠",
+          "weight": 0.0481
+        },
+        {
+          "value": "中間",
+          "weight": 0.3643
+        },
+        {
+          "value": "偏藍",
+          "weight": 0.3716
+        },
+        {
+          "value": "深藍",
+          "weight": 0.216
+        }
+      ]
+    },
+    "media_habit": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "電視新聞",
+          "weight": 0.28
+        },
+        {
+          "value": "網路新聞",
+          "weight": 0.32
+        },
+        {
+          "value": "社群媒體",
+          "weight": 0.22
+        },
+        {
+          "value": "報紙",
+          "weight": 0.05
+        },
+        {
+          "value": "PTT/論壇",
+          "weight": 0.08
+        },
+        {
+          "value": "廣播",
+          "weight": 0.05
+        }
+      ]
+    },
+    "township": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "臺北市|北投區",
+          "weight": 0.0965
+        },
+        {
+          "value": "臺北市|士林區",
+          "weight": 0.1075
+        },
+        {
+          "value": "臺北市|大同區",
+          "weight": 0.0481
+        },
+        {
+          "value": "臺北市|中山區",
+          "weight": 0.0877
+        },
+        {
+          "value": "臺北市|松山區",
+          "weight": 0.0754
+        },
+        {
+          "value": "臺北市|內湖區",
+          "weight": 0.1084
+        },
+        {
+          "value": "臺北市|南港區",
+          "weight": 0.046
+        },
+        {
+          "value": "臺北市|萬華區",
+          "weight": 0.0725
+        },
+        {
+          "value": "臺北市|中正區",
+          "weight": 0.0573
+        },
+        {
+          "value": "臺北市|大安區",
+          "weight": 0.1126
+        },
+        {
+          "value": "臺北市|信義區",
+          "weight": 0.0845
+        },
+        {
+          "value": "臺北市|文山區",
+          "weight": 0.1035
+        }
+      ]
+    }
+  },
+  "election": {
+    "type": "mayoral",
+    "scope": "county",
+    "cycle": 2026,
+    "is_generic": false,
+    "candidates": [
+      {
+        "id": "chiang_mayor",
+        "name": "蔣萬安",
+        "name_en": "Chiang Wan-an",
+        "party": "KMT",
+        "party_label": "國民黨",
+        "is_incumbent": true,
+        "color": "#000095",
+        "description": "國民黨籍，時任台北市長尋求連任，主打市政穩健、基層建設；支持者為北市傳統藍營、中高齡。"
+      },
+      {
+        "id": "shen",
+        "name": "沈伯洋",
+        "name_en": "Puma Shen",
+        "party": "DPP",
+        "party_label": "民進黨",
+        "is_incumbent": false,
+        "color": "#1B9431",
+        "description": "民進黨籍，時任不分區立委，黑熊學院創辦人，國防與反認知戰專業；支持者偏向年輕、進步派、網路族群。"
+      }
+    ],
+    "party_palette": {
+      "KMT": [
+        "#000095",
+        "#3358D4",
+        "#07124E"
+      ],
+      "DPP": [
+        "#1B9431",
+        "#63B83A",
+        "#1A5C2F"
+      ]
+    },
+    "party_detection": {
+      "KMT": [
+        "國民黨",
+        "中國國民黨",
+        "國民",
+        "藍營",
+        "藍色",
+        "KMT"
+      ],
+      "DPP": [
+        "民進黨",
+        "民主進步黨",
+        "民進",
+        "綠營",
+        "綠色",
+        "DPP"
+      ]
+    },
+    "party_base_scores": {
+      "KMT": 50,
+      "DPP": 50
+    },
+    "default_macro_context": {
+      "en": "2026 Taipei mayoral race: incumbent Chiang Wan-an (KMT) vs challenger Puma Shen (DPP).",
+      "zh-TW": "2026 台北市長選舉：國民黨蔣萬安尋求連任，民進黨由沈伯洋挑戰。藍白合使本選區僅兩強對決。"
+    },
+    "default_search_keywords": {
+      "local": [
+        "臺北市",
+        "臺北"
+      ],
+      "national": [
+        "2026",
+        "九合一",
+        "市長",
+        "地方選舉"
+      ]
+    },
+    "default_calibration_params": {
+      "news_impact": 2.2,
+      "serendipity_rate": 0.05,
+      "articles_per_agent": 3,
+      "forget_rate": 0.1,
+      "delta_cap_mult": 1.0,
+      "satisfaction_decay": 0.04,
+      "anxiety_decay": 0.05,
+      "base_undecided": 0.12,
+      "max_undecided": 0.25,
+      "party_align_bonus": 15,
+      "incumbency_bonus": 12,
+      "individuality_multiplier": 1.0,
+      "neutral_ratio": 0.3,
+      "news_mix_candidate": 0.25,
+      "news_mix_national": 0.25,
+      "news_mix_local": 0.45,
+      "news_mix_international": 0.05,
+      "shift_sat_low_threshold": 25,
+      "shift_anx_high_threshold": 75,
+      "shift_consecutive_days_req": 5,
+      "negativity_dampen": 0.7,
+      "positivity_boost": 1.3
+    },
+    "default_kol": {
+      "enabled": true,
+      "ratio": 0.06,
+      "reach": 0.3
+    },
+    "default_poll_groups": [
+      {
+        "id": "likely_voters",
+        "name_zh": "可能投票者",
+        "name_en": "Likely Voters",
+        "weight": 1.0
+      }
+    ],
+    "default_sampling_modality": "mixed_73",
+    "default_evolution_window": [
+      "2026-11-21",
+      "2026-11-28"
+    ],
+    "use_electoral_college": false
+  }
+}

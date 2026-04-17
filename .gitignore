@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+
+# Environment & secrets
+.env
+ap/shared/settings.json
+
+# Application runtime data (docker bind-mount targets; regenerated at startup)
+# Keep empty dirs with .gitkeep if the services need them pre-existing.
+ap/data/chroma_cache/
+ap/data/election-db/
+ap/data/evolution/
+ap/data/outputs/
+ap/data/projects/
+ap/data/uploads/
+
+# Data caches (raw/ dirs are fetch-script caches, can be rebuilt)
+data/*/raw/
+# Intentionally NOT ignoring data/tw_election.db — it's small (~225KB) and
+# the canonical SQLite snapshot; other dev machines need it after clone.
+
+# Outputs
+outputs/*.db
+outputs/*.csv
+outputs/*.json
+uploads/*
+!uploads/.gitkeep
+!outputs/.gitkeep
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Superpowers brainstorm sessions
+.superpowers/
+
+# Claude local settings
+.claude/
+start_claude_danger.sh

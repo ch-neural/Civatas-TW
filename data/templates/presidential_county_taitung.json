@@ -1,0 +1,474 @@
+{
+  "name": "2024 臺東縣 Presidential",
+  "name_zh": "2024 臺東縣 總統大選",
+  "region": "臺東縣",
+  "region_code": "臺東縣",
+  "country": "TW",
+  "locale": "zh-TW",
+  "target_count": 100,
+  "metadata": {
+    "source": {
+      "geo": "g0v / ronnywang twgeojson (MOI segis 2011)",
+      "demographics": "主計總處 110 年 人口及住宅普查 + 戶政司 2024 月報 + 客委會 2021 族群調查",
+      "elections": "中選會 2024 總統大選鄉鎮級開票資料",
+      "leaning": "Blue-Green PVI computed from 2024 two-party share"
+    },
+    "population_total": 211166,
+    "township_count": 16,
+    "county_count": 1,
+    "bucket_counts": {
+      "深綠": 0,
+      "偏綠": 0,
+      "中間": 0,
+      "偏藍": 0,
+      "深藍": 16
+    },
+    "parent_template": "presidential_2024.json"
+  },
+  "dimensions": {
+    "gender": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "男",
+          "weight": 0.4966
+        },
+        {
+          "value": "女",
+          "weight": 0.5034
+        }
+      ]
+    },
+    "age": {
+      "type": "range",
+      "bins": [
+        {
+          "range": "未滿18歲",
+          "weight": 0.0
+        },
+        {
+          "range": "18-24",
+          "weight": 0.1056
+        },
+        {
+          "range": "25-34",
+          "weight": 0.1543
+        },
+        {
+          "range": "35-44",
+          "weight": 0.1781
+        },
+        {
+          "range": "45-54",
+          "weight": 0.173
+        },
+        {
+          "range": "55-64",
+          "weight": 0.1667
+        },
+        {
+          "range": "65+",
+          "weight": 0.2223
+        }
+      ]
+    },
+    "education": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "國小以下",
+          "weight": 0.141
+        },
+        {
+          "value": "國中",
+          "weight": 0.129
+        },
+        {
+          "value": "高中職",
+          "weight": 0.322
+        },
+        {
+          "value": "專科大學",
+          "weight": 0.348
+        },
+        {
+          "value": "研究所",
+          "weight": 0.06
+        }
+      ]
+    },
+    "employment": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "就業",
+          "weight": 0.5562
+        },
+        {
+          "value": "失業",
+          "weight": 0.0212
+        },
+        {
+          "value": "非勞動力",
+          "weight": 0.4226
+        }
+      ]
+    },
+    "tenure": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "自有住宅",
+          "weight": 0.848
+        },
+        {
+          "value": "租屋",
+          "weight": 0.1135
+        },
+        {
+          "value": "其他",
+          "weight": 0.0385
+        }
+      ]
+    },
+    "household_type": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "家庭戶",
+          "weight": 0.73
+        },
+        {
+          "value": "非家庭戶",
+          "weight": 0.27
+        }
+      ]
+    },
+    "household_income": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "3萬以下",
+          "weight": 0.12
+        },
+        {
+          "value": "3-5萬",
+          "weight": 0.2
+        },
+        {
+          "value": "5-8萬",
+          "weight": 0.28
+        },
+        {
+          "value": "8-12萬",
+          "weight": 0.22
+        },
+        {
+          "value": "12-20萬",
+          "weight": 0.13
+        },
+        {
+          "value": "20萬以上",
+          "weight": 0.05
+        }
+      ]
+    },
+    "ethnicity": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "閩南",
+          "weight": 0.45
+        },
+        {
+          "value": "客家",
+          "weight": 0.09
+        },
+        {
+          "value": "外省",
+          "weight": 0.06
+        },
+        {
+          "value": "原住民",
+          "weight": 0.37
+        },
+        {
+          "value": "新住民",
+          "weight": 0.02
+        },
+        {
+          "value": "其他",
+          "weight": 0.01
+        }
+      ]
+    },
+    "party_lean": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "深綠",
+          "weight": 0.0
+        },
+        {
+          "value": "偏綠",
+          "weight": 0.0
+        },
+        {
+          "value": "中間",
+          "weight": 0.0
+        },
+        {
+          "value": "偏藍",
+          "weight": 0.0
+        },
+        {
+          "value": "深藍",
+          "weight": 1.0
+        }
+      ]
+    },
+    "media_habit": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "電視新聞",
+          "weight": 0.28
+        },
+        {
+          "value": "網路新聞",
+          "weight": 0.32
+        },
+        {
+          "value": "社群媒體",
+          "weight": 0.22
+        },
+        {
+          "value": "報紙",
+          "weight": 0.05
+        },
+        {
+          "value": "PTT/論壇",
+          "weight": 0.08
+        },
+        {
+          "value": "廣播",
+          "weight": 0.05
+        }
+      ]
+    },
+    "township": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "臺東縣|臺東市",
+          "weight": 0.4761
+        },
+        {
+          "value": "臺東縣|成功鎮",
+          "weight": 0.0645
+        },
+        {
+          "value": "臺東縣|關山鎮",
+          "weight": 0.0385
+        },
+        {
+          "value": "臺東縣|卑南鄉",
+          "weight": 0.0813
+        },
+        {
+          "value": "臺東縣|鹿野鄉",
+          "weight": 0.0361
+        },
+        {
+          "value": "臺東縣|池上鄉",
+          "weight": 0.0384
+        },
+        {
+          "value": "臺東縣|東河鄉",
+          "weight": 0.0399
+        },
+        {
+          "value": "臺東縣|長濱鄉",
+          "weight": 0.0335
+        },
+        {
+          "value": "臺東縣|太麻里鄉",
+          "weight": 0.0522
+        },
+        {
+          "value": "臺東縣|大武鄉",
+          "weight": 0.0267
+        },
+        {
+          "value": "臺東縣|綠島鄉",
+          "weight": 0.0214
+        },
+        {
+          "value": "臺東縣|海端鄉",
+          "weight": 0.0183
+        },
+        {
+          "value": "臺東縣|延平鄉",
+          "weight": 0.016
+        },
+        {
+          "value": "臺東縣|金峰鄉",
+          "weight": 0.0168
+        },
+        {
+          "value": "臺東縣|達仁鄉",
+          "weight": 0.0164
+        },
+        {
+          "value": "臺東縣|蘭嶼鄉",
+          "weight": 0.0239
+        }
+      ]
+    }
+  },
+  "election": {
+    "type": "presidential",
+    "scope": "county",
+    "cycle": 2024,
+    "is_generic": false,
+    "candidates": [
+      {
+        "id": "lai",
+        "name": "賴清德",
+        "name_en": "William Lai",
+        "party": "DPP",
+        "party_label": "民進黨",
+        "is_incumbent": false,
+        "color": "#1B9431",
+        "description": "民進黨籍，時任副總統，主張延續蔡英文政府路線、深化對美日合作與對中強硬；支持者偏向本土、年輕世代、南部地區。"
+      },
+      {
+        "id": "hou",
+        "name": "侯友宜",
+        "name_en": "Hou Yu-ih",
+        "party": "KMT",
+        "party_label": "國民黨",
+        "is_incumbent": false,
+        "color": "#000095",
+        "description": "國民黨籍，時任新北市長，主張兩岸和平、維持現狀、擁核；支持者偏向中高齡、北部藍營、傳統公務員族群。"
+      },
+      {
+        "id": "ko",
+        "name": "柯文哲",
+        "name_en": "Ko Wen-je",
+        "party": "TPP",
+        "party_label": "民眾黨",
+        "is_incumbent": false,
+        "color": "#28C8C8",
+        "description": "民眾黨籍，前台北市長，主張務實中間、藍綠皆批、科技治理；支持者偏向年輕、中產、科技業、對藍綠失望的中間選民。"
+      }
+    ],
+    "party_palette": {
+      "TPP": [
+        "#28C8C8",
+        "#79E0E0",
+        "#1A8A8A"
+      ],
+      "KMT": [
+        "#000095",
+        "#3358D4",
+        "#07124E"
+      ],
+      "DPP": [
+        "#1B9431",
+        "#63B83A",
+        "#1A5C2F"
+      ]
+    },
+    "party_detection": {
+      "TPP": [
+        "民眾黨",
+        "台灣民眾黨",
+        "民眾",
+        "白營",
+        "白色力量",
+        "TPP"
+      ],
+      "KMT": [
+        "國民黨",
+        "中國國民黨",
+        "國民",
+        "藍營",
+        "藍色",
+        "KMT"
+      ],
+      "DPP": [
+        "民進黨",
+        "民主進步黨",
+        "民進",
+        "綠營",
+        "綠色",
+        "DPP"
+      ]
+    },
+    "party_base_scores": {
+      "TPP": 30,
+      "KMT": 50,
+      "DPP": 50
+    },
+    "default_macro_context": {
+      "en": "2024 Taiwan presidential election — 臺東縣 single-county backtest.",
+      "zh-TW": "2024 總統大選 — 臺東縣 單一縣市回測（賴清德 vs 侯友宜 vs 柯文哲）。"
+    },
+    "default_search_keywords": {
+      "local": [
+        "臺東縣"
+      ],
+      "national": [
+        "賴清德",
+        "侯友宜",
+        "柯文哲",
+        "總統",
+        "大選"
+      ]
+    },
+    "default_calibration_params": {
+      "news_impact": 2.2,
+      "serendipity_rate": 0.05,
+      "articles_per_agent": 3,
+      "forget_rate": 0.1,
+      "delta_cap_mult": 1.0,
+      "satisfaction_decay": 0.04,
+      "anxiety_decay": 0.05,
+      "base_undecided": 0.12,
+      "max_undecided": 0.25,
+      "party_align_bonus": 15,
+      "incumbency_bonus": 8,
+      "individuality_multiplier": 1.0,
+      "neutral_ratio": 0.3,
+      "news_mix_candidate": 0.2,
+      "news_mix_national": 0.3,
+      "news_mix_local": 0.45,
+      "news_mix_international": 0.1,
+      "shift_sat_low_threshold": 25,
+      "shift_anx_high_threshold": 75,
+      "shift_consecutive_days_req": 5,
+      "negativity_dampen": 0.7,
+      "positivity_boost": 1.3
+    },
+    "default_kol": {
+      "enabled": true,
+      "ratio": 0.06,
+      "reach": 0.3
+    },
+    "default_poll_groups": [
+      {
+        "id": "likely_voters",
+        "name_zh": "可能投票者",
+        "name_en": "Likely Voters",
+        "weight": 1.0
+      }
+    ],
+    "default_sampling_modality": "mixed_73",
+    "default_evolution_window": [
+      "2024-01-08",
+      "2024-01-13"
+    ],
+    "use_electoral_college": false
+  }
+}

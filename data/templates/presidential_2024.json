@@ -1,0 +1,1980 @@
+{
+  "name": "Taiwan Presidential 2024",
+  "name_zh": "2024 總統大選（賴侯柯）",
+  "region": "台灣",
+  "region_code": "TW",
+  "country": "TW",
+  "locale": "zh-TW",
+  "target_count": 200,
+  "metadata": {
+    "source": {
+      "geo": "g0v / ronnywang twgeojson (MOI segis 2011)",
+      "demographics": "主計總處 110 年 人口及住宅普查 + 戶政司 2024 月報 + 客委會 2021 族群調查",
+      "elections": "中選會 2024 總統大選鄉鎮級開票資料",
+      "leaning": "Blue-Green PVI computed from 2024 two-party share"
+    },
+    "population_total": 23120794,
+    "township_count": 368,
+    "county_count": 22,
+    "bucket_counts": {
+      "深綠": 89,
+      "偏綠": 59,
+      "中間": 76,
+      "偏藍": 47,
+      "深藍": 97
+    }
+  },
+  "dimensions": {
+    "gender": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "男",
+          "weight": 0.4966
+        },
+        {
+          "value": "女",
+          "weight": 0.5034
+        }
+      ]
+    },
+    "age": {
+      "type": "range",
+      "bins": [
+        {
+          "range": "未滿18歲",
+          "weight": 0.0
+        },
+        {
+          "range": "18-24",
+          "weight": 0.1056
+        },
+        {
+          "range": "25-34",
+          "weight": 0.1543
+        },
+        {
+          "range": "35-44",
+          "weight": 0.1781
+        },
+        {
+          "range": "45-54",
+          "weight": 0.173
+        },
+        {
+          "range": "55-64",
+          "weight": 0.1667
+        },
+        {
+          "range": "65+",
+          "weight": 0.2223
+        }
+      ]
+    },
+    "education": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "國小以下",
+          "weight": 0.141
+        },
+        {
+          "value": "國中",
+          "weight": 0.129
+        },
+        {
+          "value": "高中職",
+          "weight": 0.322
+        },
+        {
+          "value": "專科大學",
+          "weight": 0.348
+        },
+        {
+          "value": "研究所",
+          "weight": 0.06
+        }
+      ]
+    },
+    "employment": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "就業",
+          "weight": 0.5562
+        },
+        {
+          "value": "失業",
+          "weight": 0.0212
+        },
+        {
+          "value": "非勞動力",
+          "weight": 0.4226
+        }
+      ]
+    },
+    "tenure": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "自有住宅",
+          "weight": 0.848
+        },
+        {
+          "value": "租屋",
+          "weight": 0.1135
+        },
+        {
+          "value": "其他",
+          "weight": 0.0385
+        }
+      ]
+    },
+    "household_type": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "家庭戶",
+          "weight": 0.73
+        },
+        {
+          "value": "非家庭戶",
+          "weight": 0.27
+        }
+      ]
+    },
+    "household_income": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "3萬以下",
+          "weight": 0.12
+        },
+        {
+          "value": "3-5萬",
+          "weight": 0.2
+        },
+        {
+          "value": "5-8萬",
+          "weight": 0.28
+        },
+        {
+          "value": "8-12萬",
+          "weight": 0.22
+        },
+        {
+          "value": "12-20萬",
+          "weight": 0.13
+        },
+        {
+          "value": "20萬以上",
+          "weight": 0.05
+        }
+      ]
+    },
+    "ethnicity": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "閩南",
+          "weight": 0.6624
+        },
+        {
+          "value": "客家",
+          "weight": 0.1671
+        },
+        {
+          "value": "外省",
+          "weight": 0.1121
+        },
+        {
+          "value": "原住民",
+          "weight": 0.024
+        },
+        {
+          "value": "新住民",
+          "weight": 0.0254
+        },
+        {
+          "value": "其他",
+          "weight": 0.009
+        }
+      ]
+    },
+    "party_lean": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "深綠",
+          "weight": 0.1663
+        },
+        {
+          "value": "偏綠",
+          "weight": 0.1774
+        },
+        {
+          "value": "中間",
+          "weight": 0.3198
+        },
+        {
+          "value": "偏藍",
+          "weight": 0.19
+        },
+        {
+          "value": "深藍",
+          "weight": 0.1465
+        }
+      ]
+    },
+    "media_habit": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "電視新聞",
+          "weight": 0.28
+        },
+        {
+          "value": "網路新聞",
+          "weight": 0.32
+        },
+        {
+          "value": "社群媒體",
+          "weight": 0.22
+        },
+        {
+          "value": "報紙",
+          "weight": 0.05
+        },
+        {
+          "value": "PTT/論壇",
+          "weight": 0.08
+        },
+        {
+          "value": "廣播",
+          "weight": 0.05
+        }
+      ]
+    },
+    "county": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "新北市",
+          "weight": 0.1739
+        },
+        {
+          "value": "臺中市",
+          "weight": 0.1191
+        },
+        {
+          "value": "高雄市",
+          "weight": 0.1184
+        },
+        {
+          "value": "臺北市",
+          "weight": 0.107
+        },
+        {
+          "value": "桃園市",
+          "weight": 0.0964
+        },
+        {
+          "value": "臺南市",
+          "weight": 0.0802
+        },
+        {
+          "value": "彰化縣",
+          "weight": 0.0528
+        },
+        {
+          "value": "屏東縣",
+          "weight": 0.0349
+        },
+        {
+          "value": "雲林縣",
+          "weight": 0.0286
+        },
+        {
+          "value": "新竹縣",
+          "weight": 0.0239
+        },
+        {
+          "value": "苗栗縣",
+          "weight": 0.0229
+        },
+        {
+          "value": "嘉義縣",
+          "weight": 0.0216
+        },
+        {
+          "value": "南投縣",
+          "weight": 0.0208
+        },
+        {
+          "value": "宜蘭縣",
+          "weight": 0.0194
+        },
+        {
+          "value": "新竹市",
+          "weight": 0.0184
+        },
+        {
+          "value": "基隆市",
+          "weight": 0.016
+        },
+        {
+          "value": "花蓮縣",
+          "weight": 0.0137
+        },
+        {
+          "value": "嘉義市",
+          "weight": 0.0111
+        },
+        {
+          "value": "臺東縣",
+          "weight": 0.0091
+        },
+        {
+          "value": "金門縣",
+          "weight": 0.0065
+        },
+        {
+          "value": "澎湖縣",
+          "weight": 0.0047
+        },
+        {
+          "value": "連江縣",
+          "weight": 0.0006
+        }
+      ]
+    },
+    "township": {
+      "type": "categorical",
+      "categories": [
+        {
+          "value": "南投縣|草屯鎮",
+          "weight": 0.0042
+        },
+        {
+          "value": "南投縣|國姓鄉",
+          "weight": 0.0008
+        },
+        {
+          "value": "南投縣|埔里鎮",
+          "weight": 0.0034
+        },
+        {
+          "value": "南投縣|仁愛鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "南投縣|中寮鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "南投縣|魚池鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "南投縣|南投市",
+          "weight": 0.0042
+        },
+        {
+          "value": "南投縣|名間鄉",
+          "weight": 0.0016
+        },
+        {
+          "value": "南投縣|集集鎮",
+          "weight": 0.0005
+        },
+        {
+          "value": "南投縣|竹山鎮",
+          "weight": 0.0023
+        },
+        {
+          "value": "南投縣|鹿谷鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "南投縣|水里鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "南投縣|信義鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "嘉義市|東區",
+          "weight": 0.005
+        },
+        {
+          "value": "嘉義市|西區",
+          "weight": 0.0061
+        },
+        {
+          "value": "嘉義縣|六腳鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "嘉義縣|東石鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "嘉義縣|朴子市",
+          "weight": 0.0017
+        },
+        {
+          "value": "嘉義縣|太保市",
+          "weight": 0.0016
+        },
+        {
+          "value": "嘉義縣|布袋鎮",
+          "weight": 0.0011
+        },
+        {
+          "value": "嘉義縣|義竹鄉",
+          "weight": 0.0008
+        },
+        {
+          "value": "嘉義縣|鹿草鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "嘉義縣|水上鄉",
+          "weight": 0.0022
+        },
+        {
+          "value": "嘉義縣|溪口鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "嘉義縣|大林鎮",
+          "weight": 0.0013
+        },
+        {
+          "value": "嘉義縣|梅山鄉",
+          "weight": 0.0008
+        },
+        {
+          "value": "嘉義縣|新港鄉",
+          "weight": 0.0013
+        },
+        {
+          "value": "嘉義縣|民雄鄉",
+          "weight": 0.0031
+        },
+        {
+          "value": "嘉義縣|竹崎鄉",
+          "weight": 0.0015
+        },
+        {
+          "value": "嘉義縣|中埔鄉",
+          "weight": 0.0019
+        },
+        {
+          "value": "嘉義縣|番路鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "嘉義縣|阿里山鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "嘉義縣|大埔鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "基隆市|中正區",
+          "weight": 0.0023
+        },
+        {
+          "value": "基隆市|信義區",
+          "weight": 0.0024
+        },
+        {
+          "value": "基隆市|仁愛區",
+          "weight": 0.0017
+        },
+        {
+          "value": "基隆市|中山區",
+          "weight": 0.002
+        },
+        {
+          "value": "基隆市|安樂區",
+          "weight": 0.0035
+        },
+        {
+          "value": "基隆市|暖暖區",
+          "weight": 0.0017
+        },
+        {
+          "value": "基隆市|七堵區",
+          "weight": 0.0023
+        },
+        {
+          "value": "宜蘭縣|宜蘭市",
+          "weight": 0.004
+        },
+        {
+          "value": "宜蘭縣|羅東鎮",
+          "weight": 0.0028
+        },
+        {
+          "value": "宜蘭縣|蘇澳鎮",
+          "weight": 0.0017
+        },
+        {
+          "value": "宜蘭縣|頭城鎮",
+          "weight": 0.0012
+        },
+        {
+          "value": "宜蘭縣|礁溪鄉",
+          "weight": 0.0016
+        },
+        {
+          "value": "宜蘭縣|壯圍鄉",
+          "weight": 0.0011
+        },
+        {
+          "value": "宜蘭縣|員山鄉",
+          "weight": 0.0014
+        },
+        {
+          "value": "宜蘭縣|冬山鄉",
+          "weight": 0.0023
+        },
+        {
+          "value": "宜蘭縣|五結鄉",
+          "weight": 0.0018
+        },
+        {
+          "value": "宜蘭縣|三星鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "宜蘭縣|大同鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "宜蘭縣|南澳鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "屏東縣|里港鄉",
+          "weight": 0.0011
+        },
+        {
+          "value": "屏東縣|高樹鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "屏東縣|三地門鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "屏東縣|霧臺鄉",
+          "weight": 0.0001
+        },
+        {
+          "value": "屏東縣|瑪家鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "屏東縣|九如鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "屏東縣|鹽埔鄉",
+          "weight": 0.0011
+        },
+        {
+          "value": "屏東縣|長治鄉",
+          "weight": 0.0013
+        },
+        {
+          "value": "屏東縣|麟洛鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "屏東縣|屏東市",
+          "weight": 0.0084
+        },
+        {
+          "value": "屏東縣|內埔鄉",
+          "weight": 0.0024
+        },
+        {
+          "value": "屏東縣|萬丹鄉",
+          "weight": 0.0021
+        },
+        {
+          "value": "屏東縣|泰武鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "屏東縣|竹田鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "屏東縣|萬巒鄉",
+          "weight": 0.0009
+        },
+        {
+          "value": "屏東縣|潮州鎮",
+          "weight": 0.0023
+        },
+        {
+          "value": "屏東縣|新園鄉",
+          "weight": 0.0015
+        },
+        {
+          "value": "屏東縣|崁頂鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "屏東縣|南州鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "屏東縣|新埤鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "屏東縣|來義鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "屏東縣|東港鎮",
+          "weight": 0.002
+        },
+        {
+          "value": "屏東縣|林邊鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "屏東縣|佳冬鄉",
+          "weight": 0.0008
+        },
+        {
+          "value": "屏東縣|枋寮鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "屏東縣|春日鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "屏東縣|枋山鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "屏東縣|獅子鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "屏東縣|牡丹鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "屏東縣|車城鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "屏東縣|滿州鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "屏東縣|恆春鎮",
+          "weight": 0.0013
+        },
+        {
+          "value": "屏東縣|琉球鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "彰化縣|伸港鄉",
+          "weight": 0.0016
+        },
+        {
+          "value": "彰化縣|線西鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "彰化縣|和美鎮",
+          "weight": 0.0037
+        },
+        {
+          "value": "彰化縣|鹿港鎮",
+          "weight": 0.0035
+        },
+        {
+          "value": "彰化縣|福興鄉",
+          "weight": 0.0019
+        },
+        {
+          "value": "彰化縣|秀水鄉",
+          "weight": 0.0016
+        },
+        {
+          "value": "彰化縣|彰化市",
+          "weight": 0.0095
+        },
+        {
+          "value": "彰化縣|花壇鄉",
+          "weight": 0.0019
+        },
+        {
+          "value": "彰化縣|芬園鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "彰化縣|芳苑鄉",
+          "weight": 0.0014
+        },
+        {
+          "value": "彰化縣|二林鎮",
+          "weight": 0.0021
+        },
+        {
+          "value": "彰化縣|埔鹽鄉",
+          "weight": 0.0014
+        },
+        {
+          "value": "彰化縣|溪湖鎮",
+          "weight": 0.0022
+        },
+        {
+          "value": "彰化縣|埔心鄉",
+          "weight": 0.0015
+        },
+        {
+          "value": "彰化縣|大城鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "彰化縣|竹塘鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "彰化縣|埤頭鄉",
+          "weight": 0.0013
+        },
+        {
+          "value": "彰化縣|北斗鎮",
+          "weight": 0.0014
+        },
+        {
+          "value": "彰化縣|溪州鄉",
+          "weight": 0.0012
+        },
+        {
+          "value": "彰化縣|大村鄉",
+          "weight": 0.0017
+        },
+        {
+          "value": "彰化縣|員林市",
+          "weight": 0.0051
+        },
+        {
+          "value": "彰化縣|永靖鄉",
+          "weight": 0.0015
+        },
+        {
+          "value": "彰化縣|社頭鄉",
+          "weight": 0.0018
+        },
+        {
+          "value": "彰化縣|田尾鄉",
+          "weight": 0.0011
+        },
+        {
+          "value": "彰化縣|田中鎮",
+          "weight": 0.0017
+        },
+        {
+          "value": "彰化縣|二水鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "新北市|石門區",
+          "weight": 0.0005
+        },
+        {
+          "value": "新北市|三芝區",
+          "weight": 0.001
+        },
+        {
+          "value": "新北市|淡水區",
+          "weight": 0.0084
+        },
+        {
+          "value": "新北市|八里區",
+          "weight": 0.0018
+        },
+        {
+          "value": "新北市|林口區",
+          "weight": 0.0052
+        },
+        {
+          "value": "新北市|泰山區",
+          "weight": 0.0033
+        },
+        {
+          "value": "新北市|五股區",
+          "weight": 0.004
+        },
+        {
+          "value": "新北市|蘆洲區",
+          "weight": 0.0085
+        },
+        {
+          "value": "新北市|三重區",
+          "weight": 0.0167
+        },
+        {
+          "value": "新北市|新莊區",
+          "weight": 0.0178
+        },
+        {
+          "value": "新北市|樹林區",
+          "weight": 0.0076
+        },
+        {
+          "value": "新北市|鶯歌區",
+          "weight": 0.0038
+        },
+        {
+          "value": "新北市|板橋區",
+          "weight": 0.0243
+        },
+        {
+          "value": "新北市|中和區",
+          "weight": 0.0179
+        },
+        {
+          "value": "新北市|永和區",
+          "weight": 0.0092
+        },
+        {
+          "value": "新北市|土城區",
+          "weight": 0.0104
+        },
+        {
+          "value": "新北市|三峽區",
+          "weight": 0.0048
+        },
+        {
+          "value": "新北市|新店區",
+          "weight": 0.0136
+        },
+        {
+          "value": "新北市|深坑區",
+          "weight": 0.0011
+        },
+        {
+          "value": "新北市|石碇區",
+          "weight": 0.0003
+        },
+        {
+          "value": "新北市|坪林區",
+          "weight": 0.0003
+        },
+        {
+          "value": "新北市|烏來區",
+          "weight": 0.0003
+        },
+        {
+          "value": "新北市|金山區",
+          "weight": 0.0009
+        },
+        {
+          "value": "新北市|萬里區",
+          "weight": 0.0009
+        },
+        {
+          "value": "新北市|汐止區",
+          "weight": 0.0093
+        },
+        {
+          "value": "新北市|平溪區",
+          "weight": 0.0002
+        },
+        {
+          "value": "新北市|瑞芳區",
+          "weight": 0.0017
+        },
+        {
+          "value": "新北市|雙溪區",
+          "weight": 0.0004
+        },
+        {
+          "value": "新北市|貢寮區",
+          "weight": 0.0005
+        },
+        {
+          "value": "新竹市|東區",
+          "weight": 0.0086
+        },
+        {
+          "value": "新竹市|北區",
+          "weight": 0.0064
+        },
+        {
+          "value": "新竹市|香山區",
+          "weight": 0.0034
+        },
+        {
+          "value": "新竹縣|竹北市",
+          "weight": 0.008
+        },
+        {
+          "value": "新竹縣|竹東鎮",
+          "weight": 0.004
+        },
+        {
+          "value": "新竹縣|新埔鎮",
+          "weight": 0.0015
+        },
+        {
+          "value": "新竹縣|關西鎮",
+          "weight": 0.0012
+        },
+        {
+          "value": "新竹縣|湖口鄉",
+          "weight": 0.0034
+        },
+        {
+          "value": "新竹縣|新豐鄉",
+          "weight": 0.0024
+        },
+        {
+          "value": "新竹縣|芎林鄉",
+          "weight": 0.0009
+        },
+        {
+          "value": "新竹縣|橫山鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "新竹縣|北埔鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "新竹縣|寶山鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "新竹縣|峨眉鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "新竹縣|尖石鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "新竹縣|五峰鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "桃園市|蘆竹區",
+          "weight": 0.0069
+        },
+        {
+          "value": "桃園市|龜山區",
+          "weight": 0.0076
+        },
+        {
+          "value": "桃園市|桃園區",
+          "weight": 0.0194
+        },
+        {
+          "value": "桃園市|大園區",
+          "weight": 0.0036
+        },
+        {
+          "value": "桃園市|觀音區",
+          "weight": 0.0031
+        },
+        {
+          "value": "桃園市|新屋區",
+          "weight": 0.0021
+        },
+        {
+          "value": "桃園市|楊梅區",
+          "weight": 0.0075
+        },
+        {
+          "value": "桃園市|中壢區",
+          "weight": 0.0179
+        },
+        {
+          "value": "桃園市|平鎮區",
+          "weight": 0.0095
+        },
+        {
+          "value": "桃園市|龍潭區",
+          "weight": 0.0053
+        },
+        {
+          "value": "桃園市|八德區",
+          "weight": 0.0089
+        },
+        {
+          "value": "桃園市|大溪區",
+          "weight": 0.004
+        },
+        {
+          "value": "桃園市|復興區",
+          "weight": 0.0005
+        },
+        {
+          "value": "澎湖縣|馬公市",
+          "weight": 0.0028
+        },
+        {
+          "value": "澎湖縣|湖西鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "澎湖縣|白沙鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "澎湖縣|西嶼鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "澎湖縣|望安鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "澎湖縣|七美鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "臺中市|大甲區",
+          "weight": 0.0031
+        },
+        {
+          "value": "臺中市|大安區",
+          "weight": 0.0008
+        },
+        {
+          "value": "臺中市|外埔區",
+          "weight": 0.0013
+        },
+        {
+          "value": "臺中市|清水區",
+          "weight": 0.0038
+        },
+        {
+          "value": "臺中市|梧棲區",
+          "weight": 0.0025
+        },
+        {
+          "value": "臺中市|沙鹿區",
+          "weight": 0.004
+        },
+        {
+          "value": "臺中市|龍井區",
+          "weight": 0.0033
+        },
+        {
+          "value": "臺中市|大肚區",
+          "weight": 0.0024
+        },
+        {
+          "value": "臺中市|烏日區",
+          "weight": 0.0033
+        },
+        {
+          "value": "臺中市|霧峰區",
+          "weight": 0.0028
+        },
+        {
+          "value": "臺中市|后里區",
+          "weight": 0.0023
+        },
+        {
+          "value": "臺中市|神岡區",
+          "weight": 0.0027
+        },
+        {
+          "value": "臺中市|大雅區",
+          "weight": 0.0039
+        },
+        {
+          "value": "臺中市|潭子區",
+          "weight": 0.0046
+        },
+        {
+          "value": "臺中市|西屯區",
+          "weight": 0.0097
+        },
+        {
+          "value": "臺中市|南屯區",
+          "weight": 0.0074
+        },
+        {
+          "value": "臺中市|北屯區",
+          "weight": 0.0126
+        },
+        {
+          "value": "臺中市|北區",
+          "weight": 0.0062
+        },
+        {
+          "value": "臺中市|西區",
+          "weight": 0.0047
+        },
+        {
+          "value": "臺中市|中區",
+          "weight": 0.0007
+        },
+        {
+          "value": "臺中市|東區",
+          "weight": 0.0033
+        },
+        {
+          "value": "臺中市|南區",
+          "weight": 0.0054
+        },
+        {
+          "value": "臺中市|太平區",
+          "weight": 0.0083
+        },
+        {
+          "value": "臺中市|大里區",
+          "weight": 0.0088
+        },
+        {
+          "value": "臺中市|豐原區",
+          "weight": 0.0069
+        },
+        {
+          "value": "臺中市|石岡區",
+          "weight": 0.0006
+        },
+        {
+          "value": "臺中市|新社區",
+          "weight": 0.001
+        },
+        {
+          "value": "臺中市|東勢區",
+          "weight": 0.0021
+        },
+        {
+          "value": "臺中市|和平區",
+          "weight": 0.0005
+        },
+        {
+          "value": "臺北市|北投區",
+          "weight": 0.0103
+        },
+        {
+          "value": "臺北市|士林區",
+          "weight": 0.0115
+        },
+        {
+          "value": "臺北市|大同區",
+          "weight": 0.0051
+        },
+        {
+          "value": "臺北市|中山區",
+          "weight": 0.0094
+        },
+        {
+          "value": "臺北市|松山區",
+          "weight": 0.0081
+        },
+        {
+          "value": "臺北市|內湖區",
+          "weight": 0.0116
+        },
+        {
+          "value": "臺北市|南港區",
+          "weight": 0.0049
+        },
+        {
+          "value": "臺北市|萬華區",
+          "weight": 0.0078
+        },
+        {
+          "value": "臺北市|中正區",
+          "weight": 0.0061
+        },
+        {
+          "value": "臺北市|大安區",
+          "weight": 0.012
+        },
+        {
+          "value": "臺北市|信義區",
+          "weight": 0.009
+        },
+        {
+          "value": "臺北市|文山區",
+          "weight": 0.0111
+        },
+        {
+          "value": "臺南市|後壁區",
+          "weight": 0.001
+        },
+        {
+          "value": "臺南市|白河區",
+          "weight": 0.0012
+        },
+        {
+          "value": "臺南市|北門區",
+          "weight": 0.0005
+        },
+        {
+          "value": "臺南市|學甲區",
+          "weight": 0.0011
+        },
+        {
+          "value": "臺南市|鹽水區",
+          "weight": 0.0011
+        },
+        {
+          "value": "臺南市|新營區",
+          "weight": 0.0032
+        },
+        {
+          "value": "臺南市|柳營區",
+          "weight": 0.0009
+        },
+        {
+          "value": "臺南市|東山區",
+          "weight": 0.0009
+        },
+        {
+          "value": "臺南市|將軍區",
+          "weight": 0.0008
+        },
+        {
+          "value": "臺南市|下營區",
+          "weight": 0.001
+        },
+        {
+          "value": "臺南市|六甲區",
+          "weight": 0.0009
+        },
+        {
+          "value": "臺南市|七股區",
+          "weight": 0.001
+        },
+        {
+          "value": "臺南市|佳里區",
+          "weight": 0.0025
+        },
+        {
+          "value": "臺南市|麻豆區",
+          "weight": 0.0019
+        },
+        {
+          "value": "臺南市|官田區",
+          "weight": 0.0009
+        },
+        {
+          "value": "臺南市|善化區",
+          "weight": 0.0021
+        },
+        {
+          "value": "臺南市|大內區",
+          "weight": 0.0004
+        },
+        {
+          "value": "臺南市|玉井區",
+          "weight": 0.0006
+        },
+        {
+          "value": "臺南市|楠西區",
+          "weight": 0.0004
+        },
+        {
+          "value": "臺南市|西港區",
+          "weight": 0.0011
+        },
+        {
+          "value": "臺南市|安定區",
+          "weight": 0.0013
+        },
+        {
+          "value": "臺南市|山上區",
+          "weight": 0.0003
+        },
+        {
+          "value": "臺南市|左鎮區",
+          "weight": 0.0002
+        },
+        {
+          "value": "臺南市|南化區",
+          "weight": 0.0004
+        },
+        {
+          "value": "臺南市|安南區",
+          "weight": 0.0085
+        },
+        {
+          "value": "臺南市|北區",
+          "weight": 0.0055
+        },
+        {
+          "value": "臺南市|新市區",
+          "weight": 0.0016
+        },
+        {
+          "value": "臺南市|永康區",
+          "weight": 0.01
+        },
+        {
+          "value": "臺南市|新化區",
+          "weight": 0.0019
+        },
+        {
+          "value": "臺南市|安平區",
+          "weight": 0.0029
+        },
+        {
+          "value": "臺南市|中西區",
+          "weight": 0.0032
+        },
+        {
+          "value": "臺南市|南區",
+          "weight": 0.0054
+        },
+        {
+          "value": "臺南市|東區",
+          "weight": 0.0076
+        },
+        {
+          "value": "臺南市|仁德區",
+          "weight": 0.0034
+        },
+        {
+          "value": "臺南市|歸仁區",
+          "weight": 0.0029
+        },
+        {
+          "value": "臺南市|關廟區",
+          "weight": 0.0015
+        },
+        {
+          "value": "臺南市|龍崎區",
+          "weight": 0.0002
+        },
+        {
+          "value": "臺東縣|臺東市",
+          "weight": 0.0043
+        },
+        {
+          "value": "臺東縣|成功鎮",
+          "weight": 0.0006
+        },
+        {
+          "value": "臺東縣|關山鎮",
+          "weight": 0.0004
+        },
+        {
+          "value": "臺東縣|卑南鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "臺東縣|鹿野鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "臺東縣|池上鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "臺東縣|東河鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "臺東縣|長濱鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "臺東縣|太麻里鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "臺東縣|大武鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "臺東縣|綠島鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "臺東縣|海端鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "臺東縣|延平鄉",
+          "weight": 0.0001
+        },
+        {
+          "value": "臺東縣|金峰鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "臺東縣|達仁鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "臺東縣|蘭嶼鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "花蓮縣|花蓮市",
+          "weight": 0.0041
+        },
+        {
+          "value": "花蓮縣|新城鄉",
+          "weight": 0.0009
+        },
+        {
+          "value": "花蓮縣|秀林鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "花蓮縣|吉安鄉",
+          "weight": 0.0036
+        },
+        {
+          "value": "花蓮縣|壽豐鄉",
+          "weight": 0.0008
+        },
+        {
+          "value": "花蓮縣|鳳林鎮",
+          "weight": 0.0005
+        },
+        {
+          "value": "花蓮縣|光復鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "花蓮縣|豐濱鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "花蓮縣|萬榮鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "花蓮縣|瑞穗鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "花蓮縣|玉里鎮",
+          "weight": 0.001
+        },
+        {
+          "value": "花蓮縣|富里鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "花蓮縣|卓溪鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "苗栗縣|竹南鎮",
+          "weight": 0.0036
+        },
+        {
+          "value": "苗栗縣|造橋鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "苗栗縣|後龍鎮",
+          "weight": 0.0015
+        },
+        {
+          "value": "苗栗縣|西湖鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "苗栗縣|通霄鎮",
+          "weight": 0.0014
+        },
+        {
+          "value": "苗栗縣|銅鑼鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "苗栗縣|苑裡鎮",
+          "weight": 0.0019
+        },
+        {
+          "value": "苗栗縣|三義鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "苗栗縣|頭份市",
+          "weight": 0.0044
+        },
+        {
+          "value": "苗栗縣|三灣鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "苗栗縣|南庄鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "苗栗縣|苗栗市",
+          "weight": 0.0037
+        },
+        {
+          "value": "苗栗縣|頭屋鄉",
+          "weight": 0.0004
+        },
+        {
+          "value": "苗栗縣|獅潭鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "苗栗縣|公館鄉",
+          "weight": 0.0014
+        },
+        {
+          "value": "苗栗縣|大湖鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "苗栗縣|泰安鄉",
+          "weight": 0.0002
+        },
+        {
+          "value": "苗栗縣|卓蘭鎮",
+          "weight": 0.0007
+        },
+        {
+          "value": "連江縣|南竿鄉",
+          "weight": 0.0003
+        },
+        {
+          "value": "連江縣|北竿鄉",
+          "weight": 0.0001
+        },
+        {
+          "value": "連江縣|莒光鄉",
+          "weight": 0.0001
+        },
+        {
+          "value": "連江縣|東引鄉",
+          "weight": 0.0001
+        },
+        {
+          "value": "金門縣|金城鎮",
+          "weight": 0.0019
+        },
+        {
+          "value": "金門縣|金寧鄉",
+          "weight": 0.0016
+        },
+        {
+          "value": "金門縣|烈嶼鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "金門縣|烏坵鄉",
+          "weight": 0.0
+        },
+        {
+          "value": "金門縣|金湖鎮",
+          "weight": 0.0014
+        },
+        {
+          "value": "金門縣|金沙鎮",
+          "weight": 0.001
+        },
+        {
+          "value": "雲林縣|麥寮鄉",
+          "weight": 0.002
+        },
+        {
+          "value": "雲林縣|臺西鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "雲林縣|東勢鄉",
+          "weight": 0.0006
+        },
+        {
+          "value": "雲林縣|褒忠鄉",
+          "weight": 0.0005
+        },
+        {
+          "value": "雲林縣|土庫鎮",
+          "weight": 0.0012
+        },
+        {
+          "value": "雲林縣|虎尾鎮",
+          "weight": 0.0029
+        },
+        {
+          "value": "雲林縣|四湖鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "雲林縣|元長鄉",
+          "weight": 0.0011
+        },
+        {
+          "value": "雲林縣|口湖鄉",
+          "weight": 0.0011
+        },
+        {
+          "value": "雲林縣|水林鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "雲林縣|北港鎮",
+          "weight": 0.0016
+        },
+        {
+          "value": "雲林縣|崙背鄉",
+          "weight": 0.001
+        },
+        {
+          "value": "雲林縣|二崙鄉",
+          "weight": 0.0011
+        },
+        {
+          "value": "雲林縣|西螺鎮",
+          "weight": 0.0019
+        },
+        {
+          "value": "雲林縣|莿桐鄉",
+          "weight": 0.0012
+        },
+        {
+          "value": "雲林縣|林內鄉",
+          "weight": 0.0007
+        },
+        {
+          "value": "雲林縣|斗六市",
+          "weight": 0.0045
+        },
+        {
+          "value": "雲林縣|大埤鄉",
+          "weight": 0.0008
+        },
+        {
+          "value": "雲林縣|斗南鎮",
+          "weight": 0.0019
+        },
+        {
+          "value": "雲林縣|古坑鄉",
+          "weight": 0.0013
+        },
+        {
+          "value": "高雄市|桃源區",
+          "weight": 0.0002
+        },
+        {
+          "value": "高雄市|那瑪夏區",
+          "weight": 0.0001
+        },
+        {
+          "value": "高雄市|甲仙區",
+          "weight": 0.0003
+        },
+        {
+          "value": "高雄市|六龜區",
+          "weight": 0.0005
+        },
+        {
+          "value": "高雄市|杉林區",
+          "weight": 0.0005
+        },
+        {
+          "value": "高雄市|內門區",
+          "weight": 0.0006
+        },
+        {
+          "value": "高雄市|旗山區",
+          "weight": 0.0015
+        },
+        {
+          "value": "高雄市|美濃區",
+          "weight": 0.0017
+        },
+        {
+          "value": "高雄市|茂林區",
+          "weight": 0.0001
+        },
+        {
+          "value": "高雄市|阿蓮區",
+          "weight": 0.0012
+        },
+        {
+          "value": "高雄市|田寮區",
+          "weight": 0.0003
+        },
+        {
+          "value": "高雄市|燕巢區",
+          "weight": 0.0013
+        },
+        {
+          "value": "高雄市|大樹區",
+          "weight": 0.0018
+        },
+        {
+          "value": "高雄市|大社區",
+          "weight": 0.0015
+        },
+        {
+          "value": "高雄市|茄萣區",
+          "weight": 0.0013
+        },
+        {
+          "value": "高雄市|湖內區",
+          "weight": 0.0013
+        },
+        {
+          "value": "高雄市|路竹區",
+          "weight": 0.0021
+        },
+        {
+          "value": "高雄市|永安區",
+          "weight": 0.0006
+        },
+        {
+          "value": "高雄市|岡山區",
+          "weight": 0.0041
+        },
+        {
+          "value": "高雄市|彌陀區",
+          "weight": 0.0008
+        },
+        {
+          "value": "高雄市|梓官區",
+          "weight": 0.0015
+        },
+        {
+          "value": "高雄市|橋頭區",
+          "weight": 0.0018
+        },
+        {
+          "value": "高雄市|楠梓區",
+          "weight": 0.008
+        },
+        {
+          "value": "高雄市|左營區",
+          "weight": 0.0083
+        },
+        {
+          "value": "高雄市|仁武區",
+          "weight": 0.0042
+        },
+        {
+          "value": "高雄市|鳥松區",
+          "weight": 0.002
+        },
+        {
+          "value": "高雄市|大寮區",
+          "weight": 0.0049
+        },
+        {
+          "value": "高雄市|林園區",
+          "weight": 0.003
+        },
+        {
+          "value": "高雄市|三民區",
+          "weight": 0.0144
+        },
+        {
+          "value": "高雄市|苓雅區",
+          "weight": 0.0072
+        },
+        {
+          "value": "高雄市|鼓山區",
+          "weight": 0.0058
+        },
+        {
+          "value": "高雄市|鹽埕區",
+          "weight": 0.001
+        },
+        {
+          "value": "高雄市|前金區",
+          "weight": 0.0012
+        },
+        {
+          "value": "高雄市|新興區",
+          "weight": 0.0022
+        },
+        {
+          "value": "高雄市|鳳山區",
+          "weight": 0.0152
+        },
+        {
+          "value": "高雄市|旗津區",
+          "weight": 0.0012
+        },
+        {
+          "value": "高雄市|前鎮區",
+          "weight": 0.0079
+        },
+        {
+          "value": "高雄市|小港區",
+          "weight": 0.0067
+        }
+      ]
+    }
+  },
+  "election": {
+    "type": "presidential",
+    "scope": "national",
+    "cycle": 2024,
+    "is_generic": false,
+    "candidates": [
+      {
+        "id": "lai",
+        "name": "賴清德",
+        "name_en": "William Lai",
+        "party": "DPP",
+        "party_label": "民進黨",
+        "is_incumbent": false,
+        "color": "#1B9431",
+        "description": "民進黨籍，時任副總統，主張延續蔡英文政府路線、深化對美日合作與對中強硬；支持者偏向本土、年輕世代、南部地區。"
+      },
+      {
+        "id": "hou",
+        "name": "侯友宜",
+        "name_en": "Hou Yu-ih",
+        "party": "KMT",
+        "party_label": "國民黨",
+        "is_incumbent": false,
+        "color": "#000095",
+        "description": "國民黨籍，時任新北市長，主張兩岸和平、維持現狀、擁核；支持者偏向中高齡、北部藍營、傳統公務員族群。"
+      },
+      {
+        "id": "ko",
+        "name": "柯文哲",
+        "name_en": "Ko Wen-je",
+        "party": "TPP",
+        "party_label": "民眾黨",
+        "is_incumbent": false,
+        "color": "#28C8C8",
+        "description": "民眾黨籍，前台北市長，主張務實中間、藍綠皆批、科技治理；支持者偏向年輕、中產、科技業、對藍綠失望的中間選民。"
+      }
+    ],
+    "party_palette": {
+      "TPP": [
+        "#28C8C8",
+        "#79E0E0",
+        "#1A8A8A"
+      ],
+      "KMT": [
+        "#000095",
+        "#3358D4",
+        "#07124E"
+      ],
+      "DPP": [
+        "#1B9431",
+        "#63B83A",
+        "#1A5C2F"
+      ]
+    },
+    "party_detection": {
+      "TPP": [
+        "民眾黨",
+        "台灣民眾黨",
+        "民眾",
+        "白營",
+        "白色力量",
+        "TPP"
+      ],
+      "KMT": [
+        "國民黨",
+        "中國國民黨",
+        "國民",
+        "藍營",
+        "藍色",
+        "KMT"
+      ],
+      "DPP": [
+        "民進黨",
+        "民主進步黨",
+        "民進",
+        "綠營",
+        "綠色",
+        "DPP"
+      ]
+    },
+    "party_base_scores": {
+      "TPP": 30,
+      "KMT": 50,
+      "DPP": 50
+    },
+    "default_macro_context": {
+      "en": "2024 Taiwan presidential election: William Lai (DPP) vs Hou Yu-ih (KMT) vs Ko Wen-je (TPP).",
+      "zh-TW": "2024 總統大選：民進黨賴清德、國民黨侯友宜、民眾黨柯文哲三腳督。"
+    },
+    "default_search_keywords": {
+      "local": [
+        "台北",
+        "新北",
+        "桃園",
+        "台中",
+        "台南",
+        "高雄"
+      ],
+      "national": [
+        "賴清德",
+        "侯友宜",
+        "柯文哲",
+        "總統",
+        "大選",
+        "政見"
+      ]
+    },
+    "default_calibration_params": {
+      "news_impact": 2.5,
+      "serendipity_rate": 0.05,
+      "articles_per_agent": 3,
+      "forget_rate": 0.1,
+      "delta_cap_mult": 1.0,
+      "satisfaction_decay": 0.04,
+      "anxiety_decay": 0.05,
+      "base_undecided": 0.08,
+      "max_undecided": 0.25,
+      "party_align_bonus": 15,
+      "incumbency_bonus": 8,
+      "individuality_multiplier": 1.0,
+      "neutral_ratio": 0.3,
+      "news_mix_candidate": 0.35,
+      "news_mix_national": 0.45,
+      "news_mix_local": 0.2,
+      "news_mix_international": 0.1,
+      "shift_sat_low_threshold": 25,
+      "shift_anx_high_threshold": 75,
+      "shift_consecutive_days_req": 7,
+      "negativity_dampen": 0.7,
+      "positivity_boost": 1.3
+    },
+    "default_kol": {
+      "enabled": true,
+      "ratio": 0.06,
+      "reach": 0.3
+    },
+    "default_poll_groups": [
+      {
+        "id": "likely_voters",
+        "name_zh": "可能投票者",
+        "name_en": "Likely Voters",
+        "weight": 1.0
+      }
+    ],
+    "default_sampling_modality": "mixed_73",
+    "default_evolution_window": [
+      "2024-01-08",
+      "2024-01-13"
+    ],
+    "use_electoral_college": false
+  }
+}

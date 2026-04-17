@@ -1,0 +1,19 @@
+{
+  "method": "township 18+ headcount inferred from CEC 2024 turnout; national aggregate distributions applied with county-level ethnicity overrides",
+  "sources": {
+    "gender_age": "戶政司 人口按性別及年齡（月報，2024 年底）",
+    "education": "主計總處 110 年 人口及住宅普查（2020）",
+    "employment": "主計總處 2024 人力資源調查年報",
+    "tenure_household": "主計總處 110 年 人口及住宅普查（2020）",
+    "household_income": "主計總處 2023 家庭收支調查",
+    "ethnicity_national": "客委會 2021 客家人口調查 / 原民會 2024 原住民族人口概況 / 內政部移民署新住民統計",
+    "ethnicity_county_override": "客委會 2021 分縣市客家人口調查 / 原民會 2024 原住民分鄉鎮統計",
+    "election_for_voter_count": "中選會 2024 總統大選鄉鎮級開票資料"
+  },
+  "caveat": "鄉鎮內維度（性別年齡教育就業等）均使用全國平均；鄉鎮級真實差異需未來補充。族群使用縣市級校正，地理差異（閩客外原住民）已反映。",
+  "coverage": {
+    "townships": 368,
+    "counties": 22,
+    "total_population_estimate": 23120794
+  }
+}
