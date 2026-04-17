@@ -15,14 +15,35 @@ import {
 
 const LEAN_COLORS: Record<string, string> = {
   // 3-tier aggregate buckets (from evolution dashboard API)
-  "left": "#3b82f6",     // Dem-leaning = blue
-  "center": "#94a3b8",   // Tossup = slate
-  "right": "#ef4444",    // Rep-leaning = red
-  // 5-tier per-agent labels (used in agent inspector / per-agent displays)
-  "Solid Dem": "#1e40af", "Lean Dem": "#3b82f6",
+  "left": "#1B9431",     // DPP-leaning = green
+  "center": "#94a3b8",   // Neutral = slate
+  "right": "#0000C8",    // KMT-leaning = blue
+  // 5-tier TW labels
+  "深綠": "#0d6b1e", "偏綠": "#1B9431",
+  "中間": "#94a3b8",
+  "偏藍": "#0000C8", "深藍": "#000080",
+  // Legacy US labels (backward compat)
+  "Solid Dem": "#0d6b1e", "Lean Dem": "#1B9431",
   "Tossup": "#94a3b8",
-  "Lean Rep": "#ef4444", "Solid Rep": "#991b1b",
+  "Lean Rep": "#0000C8", "Solid Rep": "#000080",
 };
+
+// TW party → color mapping for candidate charts
+const TW_PARTY_COLORS: Record<string, string> = {
+  "DPP": "#1B9431",   // 民進黨 green
+  "KMT": "#0000C8",   // 國民黨 blue
+  "TPP": "#28C8C8",   // 民眾黨 cyan
+  "IND": "#94a3b8",   // 無黨籍 gray
+};
+
+/** Detect party code from candidate name or description */
+function detectCandParty(name: string, desc?: string): string {
+  const s = `${name} ${desc || ""}`;
+  if (/民進黨|DPP|綠營|民進/.test(s)) return "DPP";
+  if (/國民黨|KMT|藍營|國民/.test(s)) return "KMT";
+  if (/民眾黨|TPP|白營|白色力量/.test(s)) return "TPP";
+  return "IND";
+}
 const REL_COLORS: Record<string, string> = { high: "#ef4444", medium: "#f59e0b", low: "#6b7280", none: "#374151" };
 
 function ChartInsight({ text }: { text?: string | Record<string, any> | null }) {
@@ -546,13 +567,21 @@ export default function EvolutionDashboardPanel({ wsId }: { wsId: string }) {
                 Object.keys(breakdown.by_leaning || {}).length > 0
               );
               if (!hasTrends && !hasBreakdown) return null;
-              const CAND_COLORS = ["#8b5cf6", "#22c55e", "#3b82f6", "#f59e0b", "#ef4444", "#ec4899"];
+              const CAND_FALLBACK_COLORS = ["#8b5cf6", "#f59e0b", "#ec4899", "#22c55e", "#ef4444", "#06b6d4"];
+              const candDescs = (data.candidate_descriptions || {}) as Record<string, string>;
               // Derive candidate names: prefer tracked list → trends → breakdown.overall
               let candNames: string[] = (data.tracked_candidate_names || []) as string[];
               if (candNames.length === 0 && hasBreakdown) {
                 candNames = Object.keys(breakdown.overall || {}).filter((k) => k !== "Undecided");
               }
               if (candNames.length === 0) return null;
+              // Build party-aware color map: detect party from name/description → party color
+              let fallbackIdx = 0;
+              const candColorMap: Record<string, string> = {};
+              for (const cn of candNames) {
+                const party = detectCandParty(cn, candDescs[cn]);
+                candColorMap[cn] = TW_PARTY_COLORS[party] || CAND_FALLBACK_COLORS[fallbackIdx++ % CAND_FALLBACK_COLORS.length];
+              }
               const latest = hasTrends ? trends[trends.length - 1] : {};
               const first = hasTrends ? trends[0] : {};
               type CandSummary = { name: string; support: number; supportDelta: number; awareness: number; sentiment: number; color: string };
@@ -566,7 +595,7 @@ export default function EvolutionDashboardPanel({ wsId }: { wsId: string }) {
                   supportDelta: supportLatest - supportFirst,
                   awareness: (latest[`${cn}_awareness`] ?? 0) as number,
                   sentiment: (latest[`${cn}_sentiment`] ?? 0) as number,
-                  color: CAND_COLORS[i % CAND_COLORS.length],
+                  color: candColorMap[cn] || CAND_FALLBACK_COLORS[i % CAND_FALLBACK_COLORS.length],
                 };
               }).sort((a, b) => b.support - a.support);
               const undecided = (latest["Undecided_support"] ?? overall["Undecided"] ?? null) as number | null;
@@ -590,7 +619,7 @@ export default function EvolutionDashboardPanel({ wsId }: { wsId: string }) {
                         <YAxis dataKey="name" type="category" tick={{ fontSize: 9, fill: "#9ca3af" }} width={70} />
                         <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => `${Number(v).toFixed(1)}%`} />
                         {candNames.map((cn, i) => (
-                          <Bar key={cn} dataKey={cn} stackId="s" fill={CAND_COLORS[i % CAND_COLORS.length]} />
+                          <Bar key={cn} dataKey={cn} stackId="s" fill={candColorMap[cn] || CAND_FALLBACK_COLORS[i % CAND_FALLBACK_COLORS.length]} />
                         ))}
                         <Legend wrapperStyle={{ fontSize: 10, color: "var(--text-secondary)" }} />
                       </BarChart>
@@ -657,7 +686,7 @@ export default function EvolutionDashboardPanel({ wsId }: { wsId: string }) {
                         <YAxis domain={["auto", "auto"]} tick={{ fontSize: 10, fill: "#6b7280" }} tickFormatter={(v: any) => `${Number(v).toFixed(0)}%`} padding={{ top: 10, bottom: 10 }} />
                         <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => `${Number(v).toFixed(1)}%`} />
                         {candNames.map((cn: string, i: number) => (
-                          <Line key={cn} type="monotone" dataKey={`${cn}_support`} stroke={CAND_COLORS[i % CAND_COLORS.length]} strokeWidth={2} dot={false} name={t("evodash.cand.support_suffix", { name: cn })} />
+                          <Line key={cn} type="monotone" dataKey={`${cn}_support`} stroke={candColorMap[cn] || CAND_FALLBACK_COLORS[i % CAND_FALLBACK_COLORS.length]} strokeWidth={2} dot={false} name={t("evodash.cand.support_suffix", { name: cn })} />
                         ))}
                         <Legend wrapperStyle={{ fontSize: 10, color: "var(--text-secondary)" }} />
                       </LineChart>
@@ -689,7 +718,7 @@ export default function EvolutionDashboardPanel({ wsId }: { wsId: string }) {
                             <YAxis domain={["auto", "auto"]} tick={{ fontSize: 10, fill: "#6b7280" }} tickFormatter={(v: any) => `${Math.round(v * 100)}%`} padding={{ top: 10, bottom: 10 }} />
                             <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => `${(v * 100).toFixed(0)}%`} />
                             {candNames.map((cn: string, i: number) => (
-                              <Line key={cn} type="monotone" dataKey={`${cn}_awareness`} stroke={CAND_COLORS[i % CAND_COLORS.length]} strokeWidth={2} dot={false} name={t("evodash.cand.awareness_suffix", { name: cn })} />
+                              <Line key={cn} type="monotone" dataKey={`${cn}_awareness`} stroke={candColorMap[cn] || CAND_FALLBACK_COLORS[i % CAND_FALLBACK_COLORS.length]} strokeWidth={2} dot={false} name={t("evodash.cand.awareness_suffix", { name: cn })} />
                             ))}
                             <Legend wrapperStyle={{ fontSize: 10, color: "var(--text-secondary)" }} />
                           </LineChart>
@@ -713,7 +742,7 @@ export default function EvolutionDashboardPanel({ wsId }: { wsId: string }) {
                         <YAxis domain={["auto", "auto"]} tick={{ fontSize: 10, fill: "#6b7280" }} padding={{ top: 10, bottom: 10 }} />
                         <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => v.toFixed(2)} />
                         {candNames.map((cn: string, i: number) => (
-                          <Line key={cn} type="monotone" dataKey={`${cn}_sentiment`} stroke={CAND_COLORS[i % CAND_COLORS.length]} strokeWidth={2} dot={false} name={t("evodash.cand.sentiment_suffix", { name: cn })} />
+                          <Line key={cn} type="monotone" dataKey={`${cn}_sentiment`} stroke={candColorMap[cn] || CAND_FALLBACK_COLORS[i % CAND_FALLBACK_COLORS.length]} strokeWidth={2} dot={false} name={t("evodash.cand.sentiment_suffix", { name: cn })} />
                         ))}
                         {/* Zero line */}
                         <Line type="monotone" dataKey={() => 0} stroke="var(--text-faint)" strokeWidth={1} strokeDasharray="4 4" dot={false} name="" legendType="none" />
