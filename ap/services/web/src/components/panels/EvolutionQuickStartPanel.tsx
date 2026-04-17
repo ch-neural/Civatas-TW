@@ -110,20 +110,19 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
   type CustomCand = { name: string; party: string };
   const [customCandidates, setCustomCandidates] = useState<CustomCand[] | null>(null);
   const [candidateInput, setCandidateInput] = useState("");
-  const [candidateParty, setCandidateParty] = useState<string>("I");
+  const [candidateParty, setCandidateParty] = useState<string>("IND");
   const customCandidatesLoadedRef = useRef(false);
 
   // Party code → internal "alignment class" used by backend scoring.
-  // Backend only distinguishes D/R/I for partisan ±8; L/G and any minor
-  // party fall into the "I" bucket (no partisan bonus) but keep their
-  // own display code/colour for the UI and diary.
+  // Taiwan buckets DPP/KMT/TPP/IND — match build_templates.py PARTY_DETECTION.
+  // Name-inference is a last-resort fallback when a custom candidate is
+  // added without an explicit party; typical cases get IND.
   const _inferParty = (name: string): string => {
     const n = (name || "").toLowerCase();
-    if (n.includes("democrat") || n.includes(" dem")) return "D";
-    if (n.includes("republican") || n.includes(" rep") || n.includes("gop")) return "R";
-    if (n.includes("libertarian")) return "L";
-    if (n.includes("green party")) return "G";
-    return "I";
+    if (n.includes("民進") || n.includes("dpp")) return "DPP";
+    if (n.includes("國民") || n.includes("kmt")) return "KMT";
+    if (n.includes("民眾黨") || n.includes("tpp")) return "TPP";
+    return "IND";
   };
 
   useEffect(() => {
@@ -813,12 +812,17 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
   const windowSpan = daysBetween(startDate, endDate);
   const progressPct = totalRounds > 0 ? Math.round((currentRound / totalRounds) * 100) : 0;
 
+  // Taiwan party color palette, matches build_templates.py PARTY_PALETTE
   const candidateColors: Record<string, string> = {
-    D: "#3b82f6",  // Democrat — blue
-    R: "#ef4444",  // Republican — red
-    I: "#a855f7",  // Independent — purple
-    L: "#f59e0b",  // Libertarian — gold
-    G: "#22c55e",  // Green — green
+    DPP: "#1B9431",   // 民進黨 — 綠營
+    KMT: "#000095",   // 國民黨 — 藍營
+    TPP: "#28C8C8",   // 民眾黨 — 白（偏青）
+    IND: "#6B7280",   // 無黨籍 — 灰
+    // Legacy US codes (kept so older persisted UI state doesn't crash)
+    D: "#1B9431", R: "#000095", I: "#6B7280", L: "#f59e0b", G: "#22c55e",
+  };
+  const candidatePartyLabels: Record<string, string> = {
+    DPP: "民進黨", KMT: "國民黨", TPP: "民眾黨", IND: "無黨籍",
   };
 
   if (tplLoading) {
@@ -916,17 +920,17 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
                   ? customCandidates
                   : candidates.map((x: any) => ({ name: x.name, party: x.party || "I" }));
                 if (base.some((cc) => cc.name === name)) return;
-                saveCandidates([...base, { name, party: candidateParty }]);
+                saveCandidates([...base, { name, party: candidateParty, party_label: candidatePartyLabels[candidateParty] || candidateParty }]);
                 setCandidateInput("");
-                setCandidateParty("I");
+                setCandidateParty("IND");
               };
               return (
               <div style={{ display: "flex", gap: 8 }}>
                 <select
                   value={candidateParty}
                   onChange={(e) => setCandidateParty(e.target.value)}
-                  title={en ? "Party (D=Democrat, R=Republican, I=Independent, L=Libertarian, G=Green)"
-                            : "政黨 (D=民主黨, R=共和黨, I=無黨籍, L=自由意志黨, G=綠黨)"}
+                  title={en ? "Party (DPP / KMT / TPP / IND)"
+                            : "政黨（DPP 民進黨 / KMT 國民黨 / TPP 民眾黨 / IND 無黨籍）"}
                   style={{
                     padding: "6px 10px", borderRadius: 6,
                     border: `1px solid ${candidateColors[candidateParty] || "#6b7280"}60`,
@@ -935,11 +939,10 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
                     fontWeight: 700, fontSize: 13, outline: "none", cursor: "pointer",
                   }}
                 >
-                  <option value="D">D · Dem</option>
-                  <option value="R">R · GOP</option>
-                  <option value="I">I · Ind</option>
-                  <option value="L">L · Lib</option>
-                  <option value="G">G · Green</option>
+                  <option value="DPP">DPP · 民進黨</option>
+                  <option value="KMT">KMT · 國民黨</option>
+                  <option value="TPP">TPP · 民眾黨</option>
+                  <option value="IND">IND · 無黨籍</option>
                 </select>
                 <input
                   value={candidateInput}
