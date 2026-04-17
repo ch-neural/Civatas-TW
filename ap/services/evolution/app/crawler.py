@@ -1,20 +1,65 @@
-"""Playwright-based web crawler that simulates human browsing behaviour.
+"""Serper-based news fetcher.
 
-Fetches headlines and summaries from preconfigured and user-provided URLs.
+Civatas-TW 2026-04-17: retired the Playwright + BeautifulSoup crawler in favour
+of Google's Serper News API. Each configured "source" is now mapped to a
+``site:<domain>`` query; Serper handles the actual crawling (Google's index
+is always fresher than anything we could scrape) and lets us specify an exact
+date window via the ``tbs`` parameter. This trims ~500 MB off the Docker
+image (no Chromium) and avoids brittle CSS selectors / anti-bot measures.
+
+The dataclass shape is unchanged — ``selector_title`` / ``selector_summary``
+fields remain on ``CrawlSource`` so legacy ``sources.json`` files load
+cleanly, but those fields are now ignored.
 """
 from __future__ import annotations
 
 import asyncio
 import hashlib
 import logging
-import re
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+import os
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from typing import Any
+from urllib.parse import urlparse
 
-from bs4 import BeautifulSoup
+import httpx
 
 logger = logging.getLogger(__name__)
+
+# Serper News defaults for Taiwan traditional Chinese.
+_SERPER_URL = "https://google.serper.dev/news"
+_SERPER_GL = "tw"
+_SERPER_HL = "zh-tw"
+_SERPER_LR = "lang_zh-TW"
+_DEFAULT_WINDOW_DAYS = 7
+
+
+def _get_serper_key() -> str:
+    """Load SERPER_API_KEY from (a) shared/settings.json if available,
+    (b) env var, (c) raise. Matches tavily_research.py's behaviour so the
+    same onboarding-wizard key reaches both the api gateway and evolution."""
+    try:
+        from shared.global_settings import load_settings  # type: ignore
+        key = (load_settings() or {}).get("serper_api_key", "")
+    except Exception:
+        key = ""
+    if not key:
+        key = os.getenv("SERPER_API_KEY", "") or ""
+    return key.strip()
+
+
+def _domain_of(url: str) -> str:
+    """Extract a domain usable with Google's `site:` operator.
+    www.cna.com.tw/list/aipl.aspx → cna.com.tw
+    """
+    try:
+        host = urlparse(url).netloc or url
+    except Exception:
+        host = url
+    host = host.lower().strip()
+    if host.startswith("www."):
+        host = host[4:]
+    return host
 
 # ── Political leaning options ────────────────────────────────────────
 
@@ -184,99 +229,120 @@ class CrawledArticle:
     crawled_at: str  # ISO format
 
 
-async def crawl_source(source: CrawlSource) -> list[CrawledArticle]:
-    """Use Playwright to crawl a single source URL and extract articles."""
+async def crawl_source(
+    source: CrawlSource,
+    *,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    extra_keywords: str = "",
+) -> list[CrawledArticle]:
+    """Fetch news for one source via Google Serper News API.
+
+    Args:
+      source: CrawlSource with a URL whose domain becomes the ``site:`` filter.
+      start_date / end_date: ISO yyyy-mm-dd (inclusive). If both omitted,
+        defaults to the last ``_DEFAULT_WINDOW_DAYS`` (7) days.
+      extra_keywords: optional free-text appended to the query (e.g.
+        "賴清德 民調" would narrow results beyond just "site:ltn.com.tw").
+
+    Returns a list of CrawledArticle. Returns empty list on any API/network
+    failure (logged, but won't raise) — this matches the Playwright-era
+    behaviour so a single bad source can't break the whole crawl_all batch.
+    """
     articles: list[CrawledArticle] = []
-    try:
-        from playwright.async_api import async_playwright
-    except ImportError:
-        logger.error("Playwright not installed — cannot crawl.")
+    api_key = _get_serper_key()
+    if not api_key:
+        logger.warning(f"SERPER_API_KEY 未設定，跳過 {source.name}")
         return articles
 
+    domain = _domain_of(source.url)
+    if not domain:
+        logger.warning(f"{source.name}: 無法從 URL 解析網域 ({source.url})")
+        return articles
+
+    # Build Google date-range tbs. Serper accepts the same cdr:1 format used
+    # by tavily_research.py in the api service.
+    now = datetime.now(timezone.utc).date()
     try:
-        async with async_playwright() as pw:
-            browser = await pw.chromium.launch(headless=True)
-            context = await browser.new_context(
-                user_agent=(
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/120.0.0.0 Safari/537.36"
-                ),
-                locale="zh-TW",
-            )
-            page = await context.new_page()
+        end_dt = datetime.strptime(end_date, "%Y-%m-%d").date() if end_date else now
+    except ValueError:
+        end_dt = now
+    try:
+        start_dt = datetime.strptime(start_date, "%Y-%m-%d").date() if start_date else (end_dt - timedelta(days=_DEFAULT_WINDOW_DAYS))
+    except ValueError:
+        start_dt = end_dt - timedelta(days=_DEFAULT_WINDOW_DAYS)
+    tbs = f"cdr:1,cd_min:{start_dt.strftime('%m/%d/%Y')},cd_max:{end_dt.strftime('%m/%d/%Y')}"
 
-            # PTT requires age verification cookie
-            if "ptt.cc" in source.url:
-                await context.add_cookies([{
-                    "name": "over18",
-                    "value": "1",
-                    "domain": ".ptt.cc",
-                    "path": "/",
-                }])
+    query = f"site:{domain}"
+    if extra_keywords.strip():
+        query = f"{query} {extra_keywords.strip()}"
 
-            logger.info(f"Crawling {source.name}: {source.url}")
-            await page.goto(source.url, wait_until="domcontentloaded", timeout=600.0)
+    num = max(1, min(source.max_items or 10, 100))
+    payload = {
+        "q": query,
+        "gl": _SERPER_GL,
+        "hl": _SERPER_HL,
+        "lr": _SERPER_LR,
+        "num": num,
+        "tbs": tbs,
+    }
+    headers = {"X-API-KEY": api_key, "Content-Type": "application/json"}
 
-            # Give dynamic pages a moment to render
-            await page.wait_for_timeout(2000)
-
-            html = await page.content()
-            await browser.close()
-
-        # Parse with BeautifulSoup
-        soup = BeautifulSoup(html, "html.parser")
-
-        # Extract titles
-        title_els = soup.select(source.selector_title) if source.selector_title else []
-        title_els = title_els[:source.max_items]
-
-        # Extract summaries (if selector provided)
-        summary_els = (
-            soup.select(source.selector_summary)
-            if source.selector_summary
-            else []
-        )
-
-        now = datetime.now(timezone.utc).isoformat()
-
-        for i, title_el in enumerate(title_els):
-            raw_title = title_el.get_text(strip=True)
-            if not raw_title or len(raw_title) < 4:
-                continue
-            # Clean title
-            title = re.sub(r"\s+", " ", raw_title)[:120]
-
-            # Try to get a matching summary
-            summary = ""
-            if i < len(summary_els):
-                summary = summary_els[i].get_text(strip=True)[:100]
-
-            aid = _make_id(f"{source.url}:{title}")
-            articles.append(CrawledArticle(
-                article_id=aid,
-                title=title,
-                summary=summary,
-                source_url=source.url,
-                source_tag=source.tag,
-                source_leaning=source.leaning,
-                crawled_at=now,
-            ))
-
-        logger.info(f"  → {len(articles)} articles from {source.name}")
-
+    logger.info(f"Serper → {source.name} ({domain})  window={start_dt}~{end_dt}  num={num}")
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(_SERPER_URL, json=payload, headers=headers)
+            resp.raise_for_status()
+            data = resp.json()
+    except httpx.HTTPStatusError as e:
+        body = (e.response.text or "")[:200]
+        logger.warning(f"Serper {e.response.status_code} for {source.name}: {body}")
+        return articles
     except Exception as e:
-        logger.exception(f"Failed to crawl {source.name}: {e}")
+        logger.warning(f"Serper request failed for {source.name}: {e}")
+        return articles
 
+    raw = data.get("news", []) or []
+    fetched_at = datetime.now(timezone.utc).isoformat()
+    for r in raw:
+        title = (r.get("title") or "").strip()
+        if not title or len(title) < 4:
+            continue
+        link = r.get("link") or source.url
+        summary = (r.get("snippet") or "")[:200]
+        aid = _make_id(f"{link}:{title}")
+        articles.append(CrawledArticle(
+            article_id=aid,
+            title=title[:200],
+            summary=summary,
+            source_url=link,
+            source_tag=source.tag,
+            source_leaning=source.leaning,
+            crawled_at=fetched_at,
+        ))
+
+    logger.info(f"  → {len(articles)} articles from {source.name}")
     return articles
 
 
-async def crawl_all(sources: list[CrawlSource]) -> list[CrawledArticle]:
-    """Crawl all sources sequentially (share one browser instance to save RAM)."""
+async def crawl_all(
+    sources: list[CrawlSource],
+    *,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    extra_keywords: str = "",
+) -> list[CrawledArticle]:
+    """Fetch news for all sources (concurrently — Serper calls are HTTP, not
+    browser automation, so parallelism is cheap)."""
+    tasks = [
+        crawl_source(src, start_date=start_date, end_date=end_date, extra_keywords=extra_keywords)
+        for src in sources
+    ]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
     all_articles: list[CrawledArticle] = []
-    for src in sources:
-        batch = await crawl_source(src)
-        all_articles.extend(batch)
-        # Be polite — small delay between sources
-        await asyncio.sleep(1)
+    for res in results:
+        if isinstance(res, Exception):
+            logger.warning(f"crawl_all: one source raised — {res}")
+            continue
+        all_articles.extend(res)
     return all_articles

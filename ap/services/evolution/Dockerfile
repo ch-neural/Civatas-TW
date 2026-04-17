@@ -6,8 +6,9 @@ COPY services/evolution/requirements.txt .
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -r requirements.txt
 
-# Install Playwright Chromium + ALL required OS-level deps automatically
-RUN playwright install --with-deps chromium
+# Playwright Chromium removed 2026-04-17 — crawler now uses Serper News API
+# (google.serper.dev/news) which handles crawling server-side, removing the
+# ~500 MB Chromium bundle + OS-level X11/font dependencies from this image.
 
 # Pre-download ChromaDB ONNX embedding model (79MB) so it's baked into
 # the image and won't need to be fetched at runtime.

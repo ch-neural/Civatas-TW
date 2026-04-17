@@ -237,6 +237,8 @@ services:
       - DEFAULT_LOCALE=${DEFAULT_LOCALE:-en}
       - CIVATAS_USA_DATA_DIR=/app/shared/us_data
       - TZ=${TZ:-UTC}
+      # Serper News API — used by crawler.py (replaces the retired Playwright path)
+      - SERPER_API_KEY=${SERPER_API_KEY:-}
     volumes:
       - ./data/outputs:/data/outputs
       - ./data/evolution:/data/evolution

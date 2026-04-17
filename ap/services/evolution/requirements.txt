@@ -1,8 +1,8 @@
 fastapi>=0.100
 uvicorn[standard]>=0.22
 httpx>=0.24
-playwright>=1.40
-beautifulsoup4>=4.12
+# playwright / beautifulsoup4 retired 2026-04-17 — crawler now uses Serper News
+# API. Remove if nothing else needs them (verify with grep first).
 chromadb>=0.4
 openai>=1.0
 pydantic>=2.0
