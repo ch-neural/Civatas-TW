@@ -2564,6 +2564,32 @@ async def start_evolution(
         "round_start_date": round_start_date,
         "round_end_date": round_end_date,
     }
+    # Extract agent demographics for dashboard cross-analysis
+    _info: dict[str, dict] = {}
+    for a in agents:
+        aid = a.get("person_id", a.get("agent_id", ""))
+        _info[str(aid)] = {
+            "age": a.get("age", ""),
+            "gender": a.get("gender", ""),
+            "education": a.get("education", ""),
+            "occupation": a.get("occupation", ""),
+            "ethnicity": a.get("ethnicity", ""),
+            "county": a.get("county", ""),
+            "township": a.get("township", ""),
+            "district": a.get("district", a.get("township", a.get("county", ""))),
+            "household_income": a.get("household_income", a.get("income_band", "")),
+            "party_lean": a.get("party_lean", a.get("political_leaning", "")),
+        }
+    job["agent_info"] = _info
+    # Persist to disk so dashboard can load it even after container restart
+    try:
+        _data_dir = os.environ.get("EVOLUTION_DATA_DIR", "/data/evolution")
+        os.makedirs(_data_dir, exist_ok=True)
+        with open(os.path.join(_data_dir, "agent_info.json"), "w", encoding="utf-8") as _f:
+            json.dump(_info, _f, ensure_ascii=False)
+    except Exception:
+        pass
+
     _jobs[job_id] = job
 
     # Fetch real TW market data (TAIEX / forex / oil) for the virtual round's
