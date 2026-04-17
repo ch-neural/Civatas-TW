@@ -1,5 +1,5 @@
 {
-  "method": "township 18+ headcount inferred from CEC 2024 turnout; national aggregate distributions applied with county-level ethnicity overrides",
+  "method": "township 18+ headcount inferred from CEC 2024 turnout; county-level demographic overrides (age, education, employment, income, tenure, ethnicity) applied; national average fallback for gender and household_type",
   "sources": {
     "gender_age": "戶政司 人口按性別及年齡（月報，2024 年底）",
     "education": "主計總處 110 年 人口及住宅普查（2020）",
@@ -10,7 +10,7 @@
     "ethnicity_county_override": "客委會 2021 分縣市客家人口調查 / 原民會 2024 原住民分鄉鎮統計",
     "election_for_voter_count": "中選會 2024 總統大選鄉鎮級開票資料"
   },
-  "caveat": "鄉鎮內維度（性別年齡教育就業等）均使用全國平均；鄉鎮級真實差異需未來補充。族群使用縣市級校正，地理差異（閩客外原住民）已反映。",
+  "caveat": "鄉鎮內維度使用縣市級分佈（年齡/教育/就業/所得/住宅 tenure/族群）；性別與家戶型態仍使用全國平均。鄉鎮級真實差異（如內湖所得 vs 萬華）需未來補充。",
   "coverage": {
     "townships": 368,
     "counties": 22,

@@ -47,27 +47,27 @@
         },
         {
           "range": "18-24",
-          "weight": 0.1056
+          "weight": 0.0915
         },
         {
           "range": "25-34",
-          "weight": 0.1543
+          "weight": 0.1602
         },
         {
           "range": "35-44",
-          "weight": 0.1781
+          "weight": 0.1773
         },
         {
           "range": "45-54",
-          "weight": 0.173
+          "weight": 0.1659
         },
         {
           "range": "55-64",
-          "weight": 0.1667
+          "weight": 0.1693
         },
         {
           "range": "65+",
-          "weight": 0.2223
+          "weight": 0.2358
         }
       ]
     },
@@ -76,23 +76,23 @@
       "categories": [
         {
           "value": "國小以下",
-          "weight": 0.141
+          "weight": 0.075
         },
         {
           "value": "國中",
-          "weight": 0.129
+          "weight": 0.078
         },
         {
           "value": "高中職",
-          "weight": 0.322
+          "weight": 0.24
         },
         {
           "value": "專科大學",
-          "weight": 0.348
+          "weight": 0.467
         },
         {
           "value": "研究所",
-          "weight": 0.06
+          "weight": 0.14
         }
       ]
     },
@@ -101,15 +101,15 @@
       "categories": [
         {
           "value": "就業",
-          "weight": 0.5562
+          "weight": 0.578
         },
         {
           "value": "失業",
-          "weight": 0.0212
+          "weight": 0.022
         },
         {
           "value": "非勞動力",
-          "weight": 0.4226
+          "weight": 0.4
         }
       ]
     },
@@ -118,15 +118,15 @@
       "categories": [
         {
           "value": "自有住宅",
-          "weight": 0.848
+          "weight": 0.738
         },
         {
           "value": "租屋",
-          "weight": 0.1135
+          "weight": 0.22
         },
         {
           "value": "其他",
-          "weight": 0.0385
+          "weight": 0.042
         }
       ]
     },
@@ -148,27 +148,27 @@
       "categories": [
         {
           "value": "3萬以下",
-          "weight": 0.12
+          "weight": 0.085
         },
         {
           "value": "3-5萬",
-          "weight": 0.2
+          "weight": 0.145
         },
         {
           "value": "5-8萬",
-          "weight": 0.28
+          "weight": 0.265
         },
         {
           "value": "8-12萬",
-          "weight": 0.22
+          "weight": 0.27
         },
         {
           "value": "12-20萬",
-          "weight": 0.13
+          "weight": 0.165
         },
         {
           "value": "20萬以上",
-          "weight": 0.05
+          "weight": 0.07
         }
       ]
     },
@@ -337,26 +337,18 @@
       }
     ],
     "party_palette": {
-      "KMT": [
-        "#000095",
-        "#3358D4",
-        "#07124E"
-      ],
       "DPP": [
         "#1B9431",
         "#63B83A",
         "#1A5C2F"
+      ],
+      "KMT": [
+        "#000095",
+        "#3358D4",
+        "#07124E"
       ]
     },
     "party_detection": {
-      "KMT": [
-        "國民黨",
-        "中國國民黨",
-        "國民",
-        "藍營",
-        "藍色",
-        "KMT"
-      ],
       "DPP": [
         "民進黨",
         "民主進步黨",
@@ -364,12 +356,24 @@
         "綠營",
         "綠色",
         "DPP"
+      ],
+      "KMT": [
+        "國民黨",
+        "中國國民黨",
+        "國民",
+        "藍營",
+        "藍色",
+        "KMT"
       ]
     },
     "party_base_scores": {
-      "KMT": 50,
-      "DPP": 50
+      "DPP": 50,
+      "KMT": 50
     },
+    "default_age_range": [
+      20,
+      95
+    ],
     "default_macro_context": {
       "en": "2026 Taipei mayoral race: incumbent Chiang Wan-an (KMT) vs challenger Puma Shen (DPP).",
       "zh-TW": "2026 台北市長選舉：國民黨蔣萬安尋求連任，民進黨由沈伯洋挑戰。藍白合使本選區僅兩強對決。"

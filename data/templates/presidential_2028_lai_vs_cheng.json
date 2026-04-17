@@ -47,27 +47,27 @@
         },
         {
           "range": "18-24",
-          "weight": 0.1056
+          "weight": 0.1005
         },
         {
           "range": "25-34",
-          "weight": 0.1543
+          "weight": 0.1505
         },
         {
           "range": "35-44",
-          "weight": 0.1781
+          "weight": 0.1764
         },
         {
           "range": "45-54",
-          "weight": 0.173
+          "weight": 0.1735
         },
         {
           "range": "55-64",
-          "weight": 0.1667
+          "weight": 0.1698
         },
         {
           "range": "65+",
-          "weight": 0.2223
+          "weight": 0.2293
         }
       ]
     },
@@ -76,23 +76,23 @@
       "categories": [
         {
           "value": "國小以下",
-          "weight": 0.141
+          "weight": 0.1297
         },
         {
           "value": "國中",
-          "weight": 0.129
+          "weight": 0.1248
         },
         {
           "value": "高中職",
-          "weight": 0.322
+          "weight": 0.3117
         },
         {
           "value": "專科大學",
-          "weight": 0.348
+          "weight": 0.3647
         },
         {
           "value": "研究所",
-          "weight": 0.06
+          "weight": 0.0691
         }
       ]
     },
@@ -101,15 +101,15 @@
       "categories": [
         {
           "value": "就業",
-          "weight": 0.5562
+          "weight": 0.5604
         },
         {
           "value": "失業",
-          "weight": 0.0212
+          "weight": 0.0214
         },
         {
           "value": "非勞動力",
-          "weight": 0.4226
+          "weight": 0.4182
         }
       ]
     },
@@ -118,15 +118,15 @@
       "categories": [
         {
           "value": "自有住宅",
-          "weight": 0.848
+          "weight": 0.837
         },
         {
           "value": "租屋",
-          "weight": 0.1135
+          "weight": 0.1244
         },
         {
           "value": "其他",
-          "weight": 0.0385
+          "weight": 0.0386
         }
       ]
     },
@@ -148,27 +148,27 @@
       "categories": [
         {
           "value": "3萬以下",
-          "weight": 0.12
+          "weight": 0.1133
         },
         {
           "value": "3-5萬",
-          "weight": 0.2
+          "weight": 0.1908
         },
         {
           "value": "5-8萬",
-          "weight": 0.28
+          "weight": 0.2833
         },
         {
           "value": "8-12萬",
-          "weight": 0.22
+          "weight": 0.2301
         },
         {
           "value": "12-20萬",
-          "weight": 0.13
+          "weight": 0.1322
         },
         {
           "value": "20萬以上",
-          "weight": 0.05
+          "weight": 0.0503
         }
       ]
     },
@@ -1887,6 +1887,10 @@
       "DPP": 50,
       "KMT": 50
     },
+    "default_age_range": [
+      20,
+      95
+    ],
     "default_macro_context": {
       "en": "2028 Taiwan presidential election scenario — William Lai (DPP) vs Cheng Li-wun (KMT).",
       "zh-TW": "2028 總統大選假設情境：賴清德 vs 鄭麗文。兩強對決，無第三勢力候選人。"

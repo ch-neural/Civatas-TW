@@ -48,27 +48,27 @@
         },
         {
           "range": "18-24",
-          "weight": 0.1056
+          "weight": 0.1005
         },
         {
           "range": "25-34",
-          "weight": 0.1543
+          "weight": 0.1505
         },
         {
           "range": "35-44",
-          "weight": 0.1781
+          "weight": 0.1764
         },
         {
           "range": "45-54",
-          "weight": 0.173
+          "weight": 0.1735
         },
         {
           "range": "55-64",
-          "weight": 0.1667
+          "weight": 0.1698
         },
         {
           "range": "65+",
-          "weight": 0.2223
+          "weight": 0.2293
         }
       ]
     },
@@ -77,23 +77,23 @@
       "categories": [
         {
           "value": "國小以下",
-          "weight": 0.141
+          "weight": 0.1297
         },
         {
           "value": "國中",
-          "weight": 0.129
+          "weight": 0.1248
         },
         {
           "value": "高中職",
-          "weight": 0.322
+          "weight": 0.3117
         },
         {
           "value": "專科大學",
-          "weight": 0.348
+          "weight": 0.3647
         },
         {
           "value": "研究所",
-          "weight": 0.06
+          "weight": 0.0691
         }
       ]
     },
@@ -102,15 +102,15 @@
       "categories": [
         {
           "value": "就業",
-          "weight": 0.5562
+          "weight": 0.5604
         },
         {
           "value": "失業",
-          "weight": 0.0212
+          "weight": 0.0214
         },
         {
           "value": "非勞動力",
-          "weight": 0.4226
+          "weight": 0.4182
         }
       ]
     },
@@ -119,15 +119,15 @@
       "categories": [
         {
           "value": "自有住宅",
-          "weight": 0.848
+          "weight": 0.837
         },
         {
           "value": "租屋",
-          "weight": 0.1135
+          "weight": 0.1244
         },
         {
           "value": "其他",
-          "weight": 0.0385
+          "weight": 0.0386
         }
       ]
     },
@@ -149,27 +149,27 @@
       "categories": [
         {
           "value": "3萬以下",
-          "weight": 0.12
+          "weight": 0.1133
         },
         {
           "value": "3-5萬",
-          "weight": 0.2
+          "weight": 0.1908
         },
         {
           "value": "5-8萬",
-          "weight": 0.28
+          "weight": 0.2833
         },
         {
           "value": "8-12萬",
-          "weight": 0.22
+          "weight": 0.2301
         },
         {
           "value": "12-20萬",
-          "weight": 0.13
+          "weight": 0.1322
         },
         {
           "value": "20萬以上",
-          "weight": 0.05
+          "weight": 0.0503
         }
       ]
     },
@@ -1910,15 +1910,15 @@
         "#63B83A",
         "#1A5C2F"
       ],
-      "TPP": [
-        "#28C8C8",
-        "#79E0E0",
-        "#1A8A8A"
-      ],
       "KMT": [
         "#000095",
         "#3358D4",
         "#07124E"
+      ],
+      "TPP": [
+        "#28C8C8",
+        "#79E0E0",
+        "#1A8A8A"
       ]
     },
     "party_detection": {
@@ -1930,14 +1930,6 @@
         "綠色",
         "DPP"
       ],
-      "TPP": [
-        "民眾黨",
-        "台灣民眾黨",
-        "民眾",
-        "白營",
-        "白色力量",
-        "TPP"
-      ],
       "KMT": [
         "國民黨",
         "中國國民黨",
@@ -1945,13 +1937,25 @@
         "藍營",
         "藍色",
         "KMT"
+      ],
+      "TPP": [
+        "民眾黨",
+        "台灣民眾黨",
+        "民眾",
+        "白營",
+        "白色力量",
+        "TPP"
       ]
     },
     "party_base_scores": {
       "DPP": 50,
-      "TPP": 30,
-      "KMT": 50
+      "KMT": 50,
+      "TPP": 30
     },
+    "default_age_range": [
+      20,
+      85
+    ],
     "default_macro_context": {
       "en": "2028 Taiwan presidential primary-style poll: which candidate do you prefer among 7 cross-party figures?",
       "zh-TW": "2028 總統大選民意調查 — 7 位跨黨派候選人中，您最屬意哪一位？（涵蓋民進黨賴/蕭、國民黨盧/蔣/韓/鄭、民眾黨黃）"

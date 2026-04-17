@@ -47,27 +47,27 @@
         },
         {
           "range": "18-24",
-          "weight": 0.1056
+          "weight": 0.1101
         },
         {
           "range": "25-34",
-          "weight": 0.1543
+          "weight": 0.1633
         },
         {
           "range": "35-44",
-          "weight": 0.1781
+          "weight": 0.187
         },
         {
           "range": "45-54",
-          "weight": 0.173
+          "weight": 0.1751
         },
         {
           "range": "55-64",
-          "weight": 0.1667
+          "weight": 0.1633
         },
         {
           "range": "65+",
-          "weight": 0.2223
+          "weight": 0.2012
         }
       ]
     },
@@ -76,23 +76,23 @@
       "categories": [
         {
           "value": "國小以下",
-          "weight": 0.141
+          "weight": 0.118
         },
         {
           "value": "國中",
-          "weight": 0.129
+          "weight": 0.118
         },
         {
           "value": "高中職",
-          "weight": 0.322
+          "weight": 0.315
         },
         {
           "value": "專科大學",
-          "weight": 0.348
+          "weight": 0.379
         },
         {
           "value": "研究所",
-          "weight": 0.06
+          "weight": 0.07
         }
       ]
     },
@@ -101,15 +101,15 @@
       "categories": [
         {
           "value": "就業",
-          "weight": 0.5562
+          "weight": 0.57
         },
         {
           "value": "失業",
-          "weight": 0.0212
+          "weight": 0.021
         },
         {
           "value": "非勞動力",
-          "weight": 0.4226
+          "weight": 0.409
         }
       ]
     },
@@ -118,15 +118,15 @@
       "categories": [
         {
           "value": "自有住宅",
-          "weight": 0.848
+          "weight": 0.828
         },
         {
           "value": "租屋",
-          "weight": 0.1135
+          "weight": 0.132
         },
         {
           "value": "其他",
-          "weight": 0.0385
+          "weight": 0.04
         }
       ]
     },
@@ -148,27 +148,27 @@
       "categories": [
         {
           "value": "3萬以下",
-          "weight": 0.12
+          "weight": 0.105
         },
         {
           "value": "3-5萬",
-          "weight": 0.2
+          "weight": 0.185
         },
         {
           "value": "5-8萬",
-          "weight": 0.28
+          "weight": 0.285
         },
         {
           "value": "8-12萬",
-          "weight": 0.22
+          "weight": 0.232
         },
         {
           "value": "12-20萬",
-          "weight": 0.13
+          "weight": 0.138
         },
         {
           "value": "20萬以上",
-          "weight": 0.05
+          "weight": 0.055
         }
       ]
     },
@@ -415,30 +415,30 @@
       }
     ],
     "party_palette": {
-      "KMT": [
-        "#000095",
-        "#3358D4",
-        "#07124E"
+      "DPP": [
+        "#1B9431",
+        "#63B83A",
+        "#1A5C2F"
       ],
       "TPP": [
         "#28C8C8",
         "#79E0E0",
         "#1A8A8A"
       ],
-      "DPP": [
-        "#1B9431",
-        "#63B83A",
-        "#1A5C2F"
+      "KMT": [
+        "#000095",
+        "#3358D4",
+        "#07124E"
       ]
     },
     "party_detection": {
-      "KMT": [
-        "國民黨",
-        "中國國民黨",
-        "國民",
-        "藍營",
-        "藍色",
-        "KMT"
+      "DPP": [
+        "民進黨",
+        "民主進步黨",
+        "民進",
+        "綠營",
+        "綠色",
+        "DPP"
       ],
       "TPP": [
         "民眾黨",
@@ -448,20 +448,24 @@
         "白色力量",
         "TPP"
       ],
-      "DPP": [
-        "民進黨",
-        "民主進步黨",
-        "民進",
-        "綠營",
-        "綠色",
-        "DPP"
+      "KMT": [
+        "國民黨",
+        "中國國民黨",
+        "國民",
+        "藍營",
+        "藍色",
+        "KMT"
       ]
     },
     "party_base_scores": {
-      "KMT": 50,
+      "DPP": 50,
       "TPP": 30,
-      "DPP": 50
+      "KMT": 50
     },
+    "default_age_range": [
+      20,
+      95
+    ],
     "default_macro_context": {
       "en": "2026 Taichung mayoral race: Johnny Chiang (KMT, successor to Lu Shiow-yen) vs Ho Hsin-chun (DPP) vs Mai Yu-chen (TPP).",
       "zh-TW": "2026 台中市長選舉：國民黨江啟臣（現任盧秀燕接班）、民進黨何欣純、民眾黨麥玉珍三強對決。"

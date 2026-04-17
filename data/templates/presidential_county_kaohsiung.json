@@ -48,27 +48,27 @@
         },
         {
           "range": "18-24",
-          "weight": 0.1056
+          "weight": 0.1021
         },
         {
           "range": "25-34",
-          "weight": 0.1543
+          "weight": 0.145
         },
         {
           "range": "35-44",
-          "weight": 0.1781
+          "weight": 0.1717
         },
         {
           "range": "45-54",
-          "weight": 0.173
+          "weight": 0.174
         },
         {
           "range": "55-64",
-          "weight": 0.1667
+          "weight": 0.174
         },
         {
           "range": "65+",
-          "weight": 0.2223
+          "weight": 0.2332
         }
       ]
     },
@@ -77,19 +77,19 @@
       "categories": [
         {
           "value": "國小以下",
-          "weight": 0.141
+          "weight": 0.14
         },
         {
           "value": "國中",
-          "weight": 0.129
+          "weight": 0.135
         },
         {
           "value": "高中職",
-          "weight": 0.322
+          "weight": 0.32
         },
         {
           "value": "專科大學",
-          "weight": 0.348
+          "weight": 0.345
         },
         {
           "value": "研究所",
@@ -102,15 +102,15 @@
       "categories": [
         {
           "value": "就業",
-          "weight": 0.5562
+          "weight": 0.555
         },
         {
           "value": "失業",
-          "weight": 0.0212
+          "weight": 0.022
         },
         {
           "value": "非勞動力",
-          "weight": 0.4226
+          "weight": 0.423
         }
       ]
     },
@@ -119,15 +119,15 @@
       "categories": [
         {
           "value": "自有住宅",
-          "weight": 0.848
+          "weight": 0.855
         },
         {
           "value": "租屋",
-          "weight": 0.1135
+          "weight": 0.108
         },
         {
           "value": "其他",
-          "weight": 0.0385
+          "weight": 0.037
         }
       ]
     },
@@ -149,7 +149,7 @@
       "categories": [
         {
           "value": "3萬以下",
-          "weight": 0.12
+          "weight": 0.118
         },
         {
           "value": "3-5萬",
@@ -157,19 +157,19 @@
         },
         {
           "value": "5-8萬",
-          "weight": 0.28
+          "weight": 0.288
         },
         {
           "value": "8-12萬",
-          "weight": 0.22
+          "weight": 0.222
         },
         {
           "value": "12-20萬",
-          "weight": 0.13
+          "weight": 0.125
         },
         {
           "value": "20萬以上",
-          "weight": 0.05
+          "weight": 0.047
         }
       ]
     },
@@ -499,6 +499,10 @@
       "TPP": 30,
       "KMT": 50
     },
+    "default_age_range": [
+      20,
+      95
+    ],
     "default_macro_context": {
       "en": "2024 Taiwan presidential election — 高雄市 single-county backtest.",
       "zh-TW": "2024 總統大選 — 高雄市 單一縣市回測（賴清德 vs 侯友宜 vs 柯文哲）。"

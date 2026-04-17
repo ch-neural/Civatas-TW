@@ -47,27 +47,27 @@
         },
         {
           "range": "18-24",
-          "weight": 0.1056
+          "weight": 0.1021
         },
         {
           "range": "25-34",
-          "weight": 0.1543
+          "weight": 0.145
         },
         {
           "range": "35-44",
-          "weight": 0.1781
+          "weight": 0.1717
         },
         {
           "range": "45-54",
-          "weight": 0.173
+          "weight": 0.174
         },
         {
           "range": "55-64",
-          "weight": 0.1667
+          "weight": 0.174
         },
         {
           "range": "65+",
-          "weight": 0.2223
+          "weight": 0.2332
         }
       ]
     },
@@ -76,19 +76,19 @@
       "categories": [
         {
           "value": "國小以下",
-          "weight": 0.141
+          "weight": 0.14
         },
         {
           "value": "國中",
-          "weight": 0.129
+          "weight": 0.135
         },
         {
           "value": "高中職",
-          "weight": 0.322
+          "weight": 0.32
         },
         {
           "value": "專科大學",
-          "weight": 0.348
+          "weight": 0.345
         },
         {
           "value": "研究所",
@@ -101,15 +101,15 @@
       "categories": [
         {
           "value": "就業",
-          "weight": 0.5562
+          "weight": 0.555
         },
         {
           "value": "失業",
-          "weight": 0.0212
+          "weight": 0.022
         },
         {
           "value": "非勞動力",
-          "weight": 0.4226
+          "weight": 0.423
         }
       ]
     },
@@ -118,15 +118,15 @@
       "categories": [
         {
           "value": "自有住宅",
-          "weight": 0.848
+          "weight": 0.855
         },
         {
           "value": "租屋",
-          "weight": 0.1135
+          "weight": 0.108
         },
         {
           "value": "其他",
-          "weight": 0.0385
+          "weight": 0.037
         }
       ]
     },
@@ -148,7 +148,7 @@
       "categories": [
         {
           "value": "3萬以下",
-          "weight": 0.12
+          "weight": 0.118
         },
         {
           "value": "3-5萬",
@@ -156,19 +156,19 @@
         },
         {
           "value": "5-8萬",
-          "weight": 0.28
+          "weight": 0.288
         },
         {
           "value": "8-12萬",
-          "weight": 0.22
+          "weight": 0.222
         },
         {
           "value": "12-20萬",
-          "weight": 0.13
+          "weight": 0.125
         },
         {
           "value": "20萬以上",
-          "weight": 0.05
+          "weight": 0.047
         }
       ]
     },
@@ -441,26 +441,18 @@
       }
     ],
     "party_palette": {
-      "KMT": [
-        "#000095",
-        "#3358D4",
-        "#07124E"
-      ],
       "DPP": [
         "#1B9431",
         "#63B83A",
         "#1A5C2F"
+      ],
+      "KMT": [
+        "#000095",
+        "#3358D4",
+        "#07124E"
       ]
     },
     "party_detection": {
-      "KMT": [
-        "國民黨",
-        "中國國民黨",
-        "國民",
-        "藍營",
-        "藍色",
-        "KMT"
-      ],
       "DPP": [
         "民進黨",
         "民主進步黨",
@@ -468,12 +460,24 @@
         "綠營",
         "綠色",
         "DPP"
+      ],
+      "KMT": [
+        "國民黨",
+        "中國國民黨",
+        "國民",
+        "藍營",
+        "藍色",
+        "KMT"
       ]
     },
     "party_base_scores": {
-      "KMT": 50,
-      "DPP": 50
+      "DPP": 50,
+      "KMT": 50
     },
+    "default_age_range": [
+      20,
+      95
+    ],
     "default_macro_context": {
       "en": "2026 Kaohsiung mayoral race: Lai Jui-lung (DPP) vs Ko Chih-en (KMT) in the southern DPP stronghold.",
       "zh-TW": "2026 高雄市長選舉：民進黨賴瑞隆、國民黨柯志恩對決。民進黨南台灣鐵票區能否守住是焦點。"

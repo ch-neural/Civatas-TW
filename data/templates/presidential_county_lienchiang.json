@@ -48,27 +48,27 @@
         },
         {
           "range": "18-24",
-          "weight": 0.1056
+          "weight": 0.1017
         },
         {
           "range": "25-34",
-          "weight": 0.1543
+          "weight": 0.1445
         },
         {
           "range": "35-44",
-          "weight": 0.178
+          "weight": 0.1711
         },
         {
           "range": "45-54",
-          "weight": 0.173
+          "weight": 0.1757
         },
         {
           "range": "55-64",
-          "weight": 0.1667
+          "weight": 0.1711
         },
         {
           "range": "65+",
-          "weight": 0.2224
+          "weight": 0.2359
         }
       ]
     },
@@ -77,23 +77,23 @@
       "categories": [
         {
           "value": "國小以下",
-          "weight": 0.141
+          "weight": 0.15
         },
         {
           "value": "國中",
-          "weight": 0.129
+          "weight": 0.1419
         },
         {
           "value": "高中職",
-          "weight": 0.322
+          "weight": 0.3402
         },
         {
           "value": "專科大學",
-          "weight": 0.348
+          "weight": 0.3279
         },
         {
           "value": "研究所",
-          "weight": 0.06
+          "weight": 0.04
         }
       ]
     },
@@ -102,15 +102,15 @@
       "categories": [
         {
           "value": "就業",
-          "weight": 0.5563
+          "weight": 0.55
         },
         {
           "value": "失業",
-          "weight": 0.0212
+          "weight": 0.015
         },
         {
           "value": "非勞動力",
-          "weight": 0.4225
+          "weight": 0.435
         }
       ]
     },
@@ -119,15 +119,15 @@
       "categories": [
         {
           "value": "自有住宅",
-          "weight": 0.848
+          "weight": 0.908
         },
         {
           "value": "租屋",
-          "weight": 0.1135
+          "weight": 0.055
         },
         {
           "value": "其他",
-          "weight": 0.0385
+          "weight": 0.037
         }
       ]
     },
@@ -149,27 +149,27 @@
       "categories": [
         {
           "value": "3萬以下",
-          "weight": 0.12
-        },
-        {
-          "value": "3-5萬",
-          "weight": 0.2
-        },
-        {
-          "value": "5-8萬",
-          "weight": 0.2799
-        },
-        {
-          "value": "8-12萬",
-          "weight": 0.2201
-        },
-        {
-          "value": "12-20萬",
           "weight": 0.13
         },
         {
+          "value": "3-5萬",
+          "weight": 0.21
+        },
+        {
+          "value": "5-8萬",
+          "weight": 0.29
+        },
+        {
+          "value": "8-12萬",
+          "weight": 0.215
+        },
+        {
+          "value": "12-20萬",
+          "weight": 0.118
+        },
+        {
           "value": "20萬以上",
-          "weight": 0.05
+          "weight": 0.037
         }
       ]
     },
@@ -363,6 +363,10 @@
       "TPP": 30,
       "KMT": 50
     },
+    "default_age_range": [
+      20,
+      95
+    ],
     "default_macro_context": {
       "en": "2024 Taiwan presidential election — 連江縣 single-county backtest.",
       "zh-TW": "2024 總統大選 — 連江縣 單一縣市回測（賴清德 vs 侯友宜 vs 柯文哲）。"
