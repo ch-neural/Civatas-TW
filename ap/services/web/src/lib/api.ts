@@ -374,6 +374,8 @@ export async function startEvolution(
   workspaceId?: string,
   enabledVendors?: string[],
   candidatePartyMap?: Record<string, string>,
+  roundStartDate?: string,
+  roundEndDate?: string,
 ) {
   const body: Record<string, unknown> = { agents, days, concurrency };
   if (candidateNames?.length) body.candidate_names = candidateNames;
@@ -383,6 +385,8 @@ export async function startEvolution(
   if (workspaceId) body.workspace_id = workspaceId;
   if (enabledVendors?.length) body.enabled_vendors = enabledVendors;
   if (candidatePartyMap) body.candidate_party_map = candidatePartyMap;
+  if (roundStartDate) body.round_start_date = roundStartDate;
+  if (roundEndDate) body.round_end_date = roundEndDate;
   return apiFetch("/api/pipeline/evolution/evolve", {
     method: "POST",
     body: JSON.stringify(body),

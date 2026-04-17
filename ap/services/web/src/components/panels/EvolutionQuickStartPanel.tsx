@@ -686,7 +686,11 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
         .map((v: any) => v.id as string);
       if (agentVendorIds.length) enabledVendors = agentVendorIds;
     } catch { /* ignore — backend will auto-derive from agents */ }
-    const res = await startEvolution(personas, crawlInterval, concurrency, candidateNames, advParams as Record<string, unknown>, candDescs, partyDetection, wsId, enabledVendors, candPartyMap);
+    // Pass round's real-date range so the backend can fetch real TAIEX data
+    // for that period. Agents who actually follow the stock market (decided
+    // by income / age / occupation in tw_market_data._should_see_market) will
+    // see the market summary in their macro_context.
+    const res = await startEvolution(personas, crawlInterval, concurrency, candidateNames, advParams as Record<string, unknown>, candDescs, partyDetection, wsId, enabledVendors, candPartyMap, roundStart, roundEnd);
     const jobId = res?.job_id || null;
     activeJobIdRef.current = jobId;
 

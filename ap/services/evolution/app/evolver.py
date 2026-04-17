@@ -1365,6 +1365,17 @@ async def evolve_one_day(
         else:
             # ── Single-call mode for commercial APIs ──
             macro_context = job.get("macro_context", "").strip() if job else ""
+            # TAIEX market snippet — only injected for agents who realistically
+            # follow the stock market (high income, mid-age white-collar, or
+            # finance-literate media habits). Low-income / young / student
+            # personas don't see it — matches real TW investor demographics.
+            try:
+                from .tw_market_data import _should_see_market
+                _market_txt = (job.get("_market_zh_text") or "") if job else ""
+                if _market_txt and _should_see_market(agent):
+                    macro_context = (macro_context + "\n\n" + _market_txt).strip() if macro_context else _market_txt
+            except Exception:
+                pass
             macro_context_text = f"[Macro political & economic context]\n{macro_context}\n" if macro_context else ""
 
             # Extract demographic fields for richer prompt
@@ -2448,6 +2459,8 @@ async def start_evolution(
     party_detection: dict | None = None,
     enabled_vendors: list[str] | None = None,
     candidate_party_map: dict | None = None,
+    round_start_date: str | None = None,
+    round_end_date: str | None = None,
 ) -> dict:
     """Start a multi-day evolution run as a background job.
 
@@ -2484,8 +2497,25 @@ async def start_evolution(
         "candidate_descriptions": candidate_descriptions or {},
         "_party_detection": augmented_pd,
         "enabled_vendors": enabled_vendors or [],
+        "round_start_date": round_start_date,
+        "round_end_date": round_end_date,
     }
     _jobs[job_id] = job
+
+    # Fetch real TAIEX data for the virtual round's real-date window. Only
+    # gate-eligible agents (high-income / mid-age / finance-literate) will
+    # actually see this in their macro_context — see tw_market_data._should_see_market.
+    if round_start_date and round_end_date:
+        try:
+            from .tw_market_data import build_market_context
+            market_txt = await build_market_context(round_start_date, round_end_date)
+            if market_txt:
+                job["_market_zh_text"] = market_txt
+                logger.info(f"[{job_id}] Market ctx injected ({round_start_date}~{round_end_date}), "
+                            f"{market_txt.splitlines()[1] if len(market_txt.splitlines()) > 1 else ''}")
+        except Exception as e:
+            logger.warning(f"[{job_id}] Market fetch failed: {e}")
+
     _save_jobs()
 
     asyncio.create_task(_run_evolution_bg(job, agents, pool, days, concurrency, enabled_vendors=enabled_vendors))

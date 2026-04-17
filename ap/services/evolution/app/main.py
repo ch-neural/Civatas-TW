@@ -82,6 +82,11 @@ class StartEvolutionRequest(BaseModel):
     # name -> party code ("DPP"/"KMT"/"TPP"/"IND"). Authoritative — overrides
     # description-keyword heuristics. Pass this from the template candidates.
     candidate_party_map: dict | None = None
+    # Real calendar date range this virtual round represents. Used to fetch
+    # real TAIEX data (via tw_market_data) so agents' macro_context reflects
+    # the actual market conditions of that period. Format: "YYYY-MM-DD".
+    round_start_date: str | None = None
+    round_end_date: str | None = None
     workspace_id: str = ""  # scope state + news pool to this workspace
 
 
@@ -1090,6 +1095,8 @@ async def start_evolve(req: StartEvolutionRequest):
         party_detection=req.party_detection,
         enabled_vendors=req.enabled_vendors,
         candidate_party_map=req.candidate_party_map,
+        round_start_date=req.round_start_date,
+        round_end_date=req.round_end_date,
     )
     return result
 
