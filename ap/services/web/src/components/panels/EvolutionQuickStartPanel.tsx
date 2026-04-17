@@ -1570,22 +1570,22 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
                 </p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                   <AdvSlider label={en ? "Candidate news" : "候選人新聞"}
-                    hint={en ? "News about specific candidates and campaigns" : "特定候選人和選戰新聞"}
+                    hint={en ? "News about specific candidates and campaigns" : "特定候選人、政見、民調、造勢活動"}
                     value={advParams.news_mix_candidate} min={0} max={60} step={5}
                     onChange={(v) => setAdvParams({ ...advParams, news_mix_candidate: v })}
                     disabled={running} />
-                  <AdvSlider label={en ? "National / Election" : "全國/選舉"}
-                    hint={en ? "Federal policy, Congress, Supreme Court, economy" : "聯邦政策、國會、最高法院、經濟"}
+                  <AdvSlider label={en ? "National / Election" : "全國/中央"}
+                    hint={en ? "Central government, Legislative Yuan, cross-strait, economy" : "總統、行政院、立法院、司法院、兩岸、國防、央行經濟"}
                     value={advParams.news_mix_national} min={0} max={60} step={5}
                     onChange={(v) => setAdvParams({ ...advParams, news_mix_national: v })}
                     disabled={running} />
                   <AdvSlider label={en ? "Local news" : "地方新聞"}
-                    hint={en ? "State/county governance, local elections, community" : "州/郡治理、地方選舉、社區"}
+                    hint={en ? "County / city governance, local elections, infrastructure" : "縣市長、議會、地方建設、交通、治安、學校"}
                     value={advParams.news_mix_local} min={0} max={60} step={5}
                     onChange={(v) => setAdvParams({ ...advParams, news_mix_local: v })}
                     disabled={running} />
                   <AdvSlider label={en ? "International" : "國際"}
-                    hint={en ? "Foreign affairs, trade, global events" : "外交、貿易、全球事件"}
+                    hint={en ? "Foreign affairs, US-China-Taiwan, global events" : "美中台關係、俄烏、日韓、WHA、全球局勢"}
                     value={advParams.news_mix_international} min={0} max={60} step={5}
                     onChange={(v) => setAdvParams({ ...advParams, news_mix_international: v })}
                     disabled={running} />

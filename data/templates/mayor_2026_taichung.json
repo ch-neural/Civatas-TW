@@ -415,15 +415,15 @@
       }
     ],
     "party_palette": {
-      "TPP": [
-        "#28C8C8",
-        "#79E0E0",
-        "#1A8A8A"
-      ],
       "KMT": [
         "#000095",
         "#3358D4",
         "#07124E"
+      ],
+      "TPP": [
+        "#28C8C8",
+        "#79E0E0",
+        "#1A8A8A"
       ],
       "DPP": [
         "#1B9431",
@@ -432,14 +432,6 @@
       ]
     },
     "party_detection": {
-      "TPP": [
-        "民眾黨",
-        "台灣民眾黨",
-        "民眾",
-        "白營",
-        "白色力量",
-        "TPP"
-      ],
       "KMT": [
         "國民黨",
         "中國國民黨",
@@ -447,6 +439,14 @@
         "藍營",
         "藍色",
         "KMT"
+      ],
+      "TPP": [
+        "民眾黨",
+        "台灣民眾黨",
+        "民眾",
+        "白營",
+        "白色力量",
+        "TPP"
       ],
       "DPP": [
         "民進黨",
@@ -458,8 +458,8 @@
       ]
     },
     "party_base_scores": {
-      "TPP": 30,
       "KMT": 50,
+      "TPP": 30,
       "DPP": 50
     },
     "default_macro_context": {
@@ -492,10 +492,10 @@
       "incumbency_bonus": 12,
       "individuality_multiplier": 1.0,
       "neutral_ratio": 0.3,
-      "news_mix_candidate": 0.25,
-      "news_mix_national": 0.25,
-      "news_mix_local": 0.45,
-      "news_mix_international": 0.05,
+      "news_mix_candidate": 25,
+      "news_mix_national": 25,
+      "news_mix_local": 45,
+      "news_mix_international": 5,
       "shift_sat_low_threshold": 25,
       "shift_anx_high_threshold": 75,
       "shift_consecutive_days_req": 5,

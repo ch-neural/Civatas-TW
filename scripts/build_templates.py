@@ -273,6 +273,9 @@ def _calibration_defaults(profile: str) -> dict:
 
     profile ∈ {"generic", "2024_backtest", "2028", "mayor", "county"}
     """
+    # Note: news_mix_* are 0-100 integer percentages (sum should = 100).
+    # The UI slider expects integers; 0-1 floats would floor to 0 and break
+    # the mix totaliser.
     base = {
         "news_impact": 2.0,
         "serendipity_rate": 0.05,
@@ -287,10 +290,10 @@ def _calibration_defaults(profile: str) -> dict:
         "incumbency_bonus": 8,
         "individuality_multiplier": 1.0,
         "neutral_ratio": 0.3,
-        "news_mix_candidate": 0.20,
-        "news_mix_national": 0.45,
-        "news_mix_local": 0.25,
-        "news_mix_international": 0.10,
+        "news_mix_candidate": 20,
+        "news_mix_national": 45,
+        "news_mix_local": 25,
+        "news_mix_international": 10,
         "shift_sat_low_threshold": 25,
         "shift_anx_high_threshold": 75,
         "shift_consecutive_days_req": 5,
@@ -298,21 +301,28 @@ def _calibration_defaults(profile: str) -> dict:
         "positivity_boost": 1.30,
     }
     if profile == "2024_backtest":
+        # 2024 回測：候選人新聞占比高（使用者常想驗證特定候選人）
         return {**base, "news_impact": 2.5, "base_undecided": 0.08,
-                "shift_consecutive_days_req": 7, "news_mix_candidate": 0.35,
-                "news_mix_local": 0.20}
+                "shift_consecutive_days_req": 7,
+                "news_mix_candidate": 35, "news_mix_national": 35,
+                "news_mix_local": 20, "news_mix_international": 10}
     if profile == "2028":
+        # 2028 推測：情境更開放（高 base_undecided），候選人比例略高
         return {**base, "news_impact": 1.8, "base_undecided": 0.22,
                 "incumbency_bonus": 5, "shift_consecutive_days_req": 4,
-                "news_mix_candidate": 0.25}
+                "news_mix_candidate": 25, "news_mix_national": 40,
+                "news_mix_local": 25, "news_mix_international": 10}
     if profile == "mayor":
-        # Local election: national news matters less, local much more.
-        return {**base, "news_impact": 2.2, "news_mix_candidate": 0.25,
-                "news_mix_national": 0.25, "news_mix_local": 0.45,
-                "news_mix_international": 0.05, "incumbency_bonus": 12}
+        # 直轄市長：本地新聞占比大幅提高（城市 vs 中央政策）
+        return {**base, "news_impact": 2.2, "incumbency_bonus": 12,
+                "news_mix_candidate": 25, "news_mix_national": 25,
+                "news_mix_local": 45, "news_mix_international": 5}
     if profile == "county":
-        return {**base, "news_impact": 2.2, "news_mix_local": 0.45,
-                "news_mix_national": 0.30, "news_mix_candidate": 0.20}
+        # 單一縣市回測：地方新聞主導
+        return {**base, "news_impact": 2.2,
+                "news_mix_candidate": 20, "news_mix_national": 30,
+                "news_mix_local": 45,
+                "news_mix_international": 5}
     return base  # generic
 
 

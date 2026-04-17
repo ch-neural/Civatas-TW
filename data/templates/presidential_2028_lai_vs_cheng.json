@@ -1854,26 +1854,18 @@
       }
     ],
     "party_palette": {
-      "KMT": [
-        "#000095",
-        "#3358D4",
-        "#07124E"
-      ],
       "DPP": [
         "#1B9431",
         "#63B83A",
         "#1A5C2F"
+      ],
+      "KMT": [
+        "#000095",
+        "#3358D4",
+        "#07124E"
       ]
     },
     "party_detection": {
-      "KMT": [
-        "國民黨",
-        "中國國民黨",
-        "國民",
-        "藍營",
-        "藍色",
-        "KMT"
-      ],
       "DPP": [
         "民進黨",
         "民主進步黨",
@@ -1881,11 +1873,19 @@
         "綠營",
         "綠色",
         "DPP"
+      ],
+      "KMT": [
+        "國民黨",
+        "中國國民黨",
+        "國民",
+        "藍營",
+        "藍色",
+        "KMT"
       ]
     },
     "party_base_scores": {
-      "KMT": 50,
-      "DPP": 50
+      "DPP": 50,
+      "KMT": 50
     },
     "default_macro_context": {
       "en": "2028 Taiwan presidential election scenario — William Lai (DPP) vs Cheng Li-wun (KMT).",
@@ -1924,10 +1924,10 @@
       "incumbency_bonus": 5,
       "individuality_multiplier": 1.0,
       "neutral_ratio": 0.3,
-      "news_mix_candidate": 0.25,
-      "news_mix_national": 0.45,
-      "news_mix_local": 0.25,
-      "news_mix_international": 0.1,
+      "news_mix_candidate": 25,
+      "news_mix_national": 40,
+      "news_mix_local": 25,
+      "news_mix_international": 10,
       "shift_sat_low_threshold": 25,
       "shift_anx_high_threshold": 75,
       "shift_consecutive_days_req": 4,

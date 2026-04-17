@@ -352,6 +352,11 @@
       }
     ],
     "party_palette": {
+      "DPP": [
+        "#1B9431",
+        "#63B83A",
+        "#1A5C2F"
+      ],
       "TPP": [
         "#28C8C8",
         "#79E0E0",
@@ -361,14 +366,17 @@
         "#000095",
         "#3358D4",
         "#07124E"
-      ],
-      "DPP": [
-        "#1B9431",
-        "#63B83A",
-        "#1A5C2F"
       ]
     },
     "party_detection": {
+      "DPP": [
+        "民進黨",
+        "民主進步黨",
+        "民進",
+        "綠營",
+        "綠色",
+        "DPP"
+      ],
       "TPP": [
         "民眾黨",
         "台灣民眾黨",
@@ -384,20 +392,12 @@
         "藍營",
         "藍色",
         "KMT"
-      ],
-      "DPP": [
-        "民進黨",
-        "民主進步黨",
-        "民進",
-        "綠營",
-        "綠色",
-        "DPP"
       ]
     },
     "party_base_scores": {
+      "DPP": 50,
       "TPP": 30,
-      "KMT": 50,
-      "DPP": 50
+      "KMT": 50
     },
     "default_macro_context": {
       "en": "2024 Taiwan presidential election — 新竹縣 single-county backtest.",
@@ -429,10 +429,10 @@
       "incumbency_bonus": 8,
       "individuality_multiplier": 1.0,
       "neutral_ratio": 0.3,
-      "news_mix_candidate": 0.2,
-      "news_mix_national": 0.3,
-      "news_mix_local": 0.45,
-      "news_mix_international": 0.1,
+      "news_mix_candidate": 20,
+      "news_mix_national": 30,
+      "news_mix_local": 45,
+      "news_mix_international": 5,
       "shift_sat_low_threshold": 25,
       "shift_anx_high_threshold": 75,
       "shift_consecutive_days_req": 5,
