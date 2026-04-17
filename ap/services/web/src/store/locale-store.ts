@@ -46,15 +46,14 @@ export const useLocaleStore = create<LocaleState>()(
       // manual choice will stick (no re-migration).
       version: 1,
       migrate: (persistedState: any, fromVersion: number) => {
-        if (fromVersion < 1) {
-          const s = persistedState?.state || persistedState || {};
-          // If legacy default "en" is present (the Civatas-USA source of truth
-          // default), flip to zh-TW. Preserve any non-default choice.
-          if (s.locale === "en" || s.locale === undefined) {
-            return { ...persistedState, state: { ...s, locale: "zh-TW" } };
-          }
+        // zustand persist v4: migrate receives the STATE object directly
+        // (unwrapped from {state, version} envelope). Flip the Civatas-USA
+        // default "en" to zh-TW exactly once. Users who manually toggle to
+        // EN after this migration will keep their choice (version becomes 1).
+        if (fromVersion < 1 && (!persistedState || persistedState.locale === "en")) {
+          return { ...(persistedState || {}), locale: "zh-TW" } as LocaleState;
         }
-        return persistedState;
+        return persistedState as LocaleState;
       },
       storage: {
         getItem: (name) => {
