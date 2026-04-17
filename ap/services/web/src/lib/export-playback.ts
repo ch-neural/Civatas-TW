@@ -315,9 +315,9 @@ const leanChart = new Chart(document.getElementById('leaningChart').getContext('
   data: {
     labels: [],
     datasets: [
-      { label: EN ? 'Dem-leaning' : '偏藍', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)', fill: true, tension: 0.3, pointRadius: 0 },
-      { label: EN ? 'Tossup' : '搖擺', data: [], borderColor: '#94a3b8', backgroundColor: 'rgba(148,163,184,0.15)', fill: true, tension: 0.3, pointRadius: 0 },
-      { label: EN ? 'Rep-leaning' : '偏紅', data: [], borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.15)', fill: true, tension: 0.3, pointRadius: 0 },
+      { label: EN ? 'DPP-leaning' : '綠營傾向', data: [], borderColor: '#1B9431', backgroundColor: 'rgba(27,148,49,0.15)', fill: true, tension: 0.3, pointRadius: 0 },
+      { label: EN ? 'Neutral' : '中間', data: [], borderColor: '#94a3b8', backgroundColor: 'rgba(148,163,184,0.15)', fill: true, tension: 0.3, pointRadius: 0 },
+      { label: EN ? 'KMT-leaning' : '藍營傾向', data: [], borderColor: '#0000C8', backgroundColor: 'rgba(0,0,200,0.15)', fill: true, tension: 0.3, pointRadius: 0 },
     ]
   },
   options: { responsive: true, scales: { y: { min: 0, max: 100 } }, animation: { duration: 250 } }

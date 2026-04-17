@@ -585,8 +585,8 @@ export default function EvolutionPanel({
                         </div>
                         <p style={{ fontFamily: "var(--font-cjk)", fontSize: 11, color: "var(--text-muted)", marginTop: 8, lineHeight: 1.5 }}>
                           {en
-                            ? "Agents with a Dem/Rep lean will see more news from sources with a similar bias. E.g. a 'Lean Dem' agent sees more CNN, NPR content."
-                            : "偏左/偏右的 Agent 會優先看到立場相近的新聞。例如：傾向民主黨的 Agent 會更常看到 CNN、NPR 的內容。"}
+                            ? "Agents with a green/blue lean will see more news from sources with a similar bias. E.g. a '偏綠' agent sees more 自由時報, 三立 content."
+                            : "偏綠/偏藍的 Agent 會優先看到立場相近的新聞。例如：偏綠的 Agent 會更常看到自由時報、三立的內容；偏藍的會更常看到聯合報、中時的內容。"}
                         </p>
                       </div>
                     </div>

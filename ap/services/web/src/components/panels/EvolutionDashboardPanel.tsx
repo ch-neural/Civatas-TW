@@ -527,9 +527,9 @@ export default function EvolutionDashboardPanel({ wsId }: { wsId: string }) {
                   <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#6b7280" }} tickFormatter={(d) => `D${d}`} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "#6b7280" }} />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Area type="monotone" dataKey="left" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} name={t("evodash.chart.lean_left")} />
+                  <Area type="monotone" dataKey="left" stackId="1" stroke="#1B9431" fill="#1B9431" fillOpacity={0.6} name={t("evodash.chart.lean_left")} />
                   <Area type="monotone" dataKey="center" stackId="1" stroke="#94a3b8" fill="#94a3b8" fillOpacity={0.4} name={t("evodash.chart.lean_neutral")} />
-                  <Area type="monotone" dataKey="right" stackId="1" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} name={t("evodash.chart.lean_right")} />
+                  <Area type="monotone" dataKey="right" stackId="1" stroke="#0000C8" fill="#0000C8" fillOpacity={0.6} name={t("evodash.chart.lean_right")} />
                   <Legend wrapperStyle={{ fontSize: 10, color: "var(--text-secondary)" }} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -891,9 +891,9 @@ export default function EvolutionDashboardPanel({ wsId }: { wsId: string }) {
                     <Tooltip contentStyle={{ ...tooltipStyle, fontFamily: "var(--font-cjk)" }}
                       formatter={(val: any, name: any) => [isCount ? `${val}` : `${val}`, name ?? ""]} />
                     <Legend wrapperStyle={{ fontSize: 10, fontFamily: "var(--font-cjk)", color: "var(--text-secondary)" }} />
-                    <Bar dataKey={mk.left} name={t("evodash.chart.lean_left")} fill="#3b82f6" radius={[0, 3, 3, 0]} barSize={8} />
+                    <Bar dataKey={mk.left} name={t("evodash.chart.lean_left")} fill="#1B9431" radius={[0, 3, 3, 0]} barSize={8} />
                     <Bar dataKey={mk.neutral} name={t("evodash.chart.lean_neutral")} fill="#94a3b8" radius={[0, 3, 3, 0]} barSize={8} />
-                    <Bar dataKey={mk.right} name={t("evodash.chart.lean_right")} fill="#ef4444" radius={[0, 3, 3, 0]} barSize={8} />
+                    <Bar dataKey={mk.right} name={t("evodash.chart.lean_right")} fill="#0000C8" radius={[0, 3, 3, 0]} barSize={8} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (

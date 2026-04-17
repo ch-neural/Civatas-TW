@@ -429,9 +429,9 @@ const satAnxChart = new Chart(document.getElementById('satAnxChart').getContext(
 const leanChart = new Chart(document.getElementById('leaningChart').getContext('2d'), {
   type: 'bar',
   data: { labels: [], datasets: [
-    { label: EN ? 'Dem-leaning' : '偏藍', data: [], backgroundColor: '#3b82f6', stack: 'a' },
-    { label: EN ? 'Tossup' : '搖擺', data: [], backgroundColor: '#94a3b8', stack: 'a' },
-    { label: EN ? 'Rep-leaning' : '偏紅', data: [], backgroundColor: '#ef4444', stack: 'a' },
+    { label: EN ? 'DPP-leaning' : '綠營傾向', data: [], backgroundColor: '#1B9431', stack: 'a' },
+    { label: EN ? 'Neutral' : '中間', data: [], backgroundColor: '#94a3b8', stack: 'a' },
+    { label: EN ? 'KMT-leaning' : '藍營傾向', data: [], backgroundColor: '#0000C8', stack: 'a' },
   ]},
   options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v + '%' } } }, animation: { duration: 250 } }
 });
