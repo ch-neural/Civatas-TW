@@ -47,12 +47,18 @@ export default function CreateWorkspaceDialog() {
         if (cancelled) return;
         const list = res.templates || [];
         setTemplateList(list);
-        // Auto-pick first US national template if user hasn't picked one
+        // Auto-pick first national generic template if user hasn't picked one.
+        // TW templates (country=TW) are preferred; fall back to any national
+        // template, then any template at all.
         if (!selectedTemplate) {
-          const firstUSNational = list.find(
-            (t) => t.country === "US" && t.election?.scope === "national" && t.election?.is_generic
-          ) || list.find((t) => t.country === "US");
-          if (firstUSNational) setSelectedTemplate(firstUSNational.id);
+          const firstTWGeneric = list.find(
+            (t) => t.country === "TW" && t.election?.scope === "national" && t.election?.is_generic
+          );
+          const firstNationalGeneric = firstTWGeneric || list.find(
+            (t) => t.election?.scope === "national" && t.election?.is_generic
+          );
+          const first = firstNationalGeneric || list.find((t) => t.country === "TW") || list[0];
+          if (first) setSelectedTemplate(first.id);
         }
       })
       .catch((e) => {
@@ -65,27 +71,39 @@ export default function CreateWorkspaceDialog() {
     return () => { cancelled = true; };
   }, [showCreateDialog]);  // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Group US templates so the dropdown is structured: National first, then By State
+  // Group templates: 全國 (national/generic/2024/2028) / 民調 (poll) /
+  // 直轄市長 (mayoral) / 單一縣市 (county scope) / 其他。TW 與 US template
+  // 都會顯示（US 僅在 legacy 匯入時可能出現）。
   const groupedTemplates = useMemo(() => {
-    const usTemplates = templateList.filter((t) => t.country === "US");
     const groups: Record<string, TemplateMeta[]> = {
       national: [],
-      state: [],
+      poll: [],
+      mayoral: [],
+      state: [],     // US "state" scope == TW "county" scope; keep alias bucket
+      county: [],
       other: [],
     };
-    for (const t of usTemplates) {
+    for (const t of templateList) {
       const scope = t.election?.scope;
-      if (scope === "national") groups.national.push(t);
+      const etype = t.election?.type;
+      if (etype === "poll") groups.poll.push(t);
+      else if (etype === "mayoral") groups.mayoral.push(t);
+      else if (scope === "national") groups.national.push(t);
+      else if (scope === "county") groups.county.push(t);
       else if (scope === "state") groups.state.push(t);
       else groups.other.push(t);
     }
-    groups.national.sort((a, b) => {
-      const aGen = a.election?.is_generic ? 0 : 1;
-      const bGen = b.election?.is_generic ? 0 : 1;
-      if (aGen !== bGen) return aGen - bGen;
-      return (b.election?.cycle || 0) - (a.election?.cycle || 0);
-    });
+    const sortNational = (arr: TemplateMeta[]) =>
+      arr.sort((a, b) => {
+        const aGen = a.election?.is_generic ? 0 : 1;
+        const bGen = b.election?.is_generic ? 0 : 1;
+        if (aGen !== bGen) return aGen - bGen;
+        return (b.election?.cycle || 0) - (a.election?.cycle || 0);
+      });
+    sortNational(groups.national);
     groups.state.sort((a, b) => (a.region_code || "").localeCompare(b.region_code || ""));
+    groups.county.sort((a, b) => (a.region_code || "").localeCompare(b.region_code || ""));
+    groups.mayoral.sort((a, b) => (a.region_code || "").localeCompare(b.region_code || ""));
     return groups;
   }, [templateList]);
 
@@ -193,19 +211,55 @@ export default function CreateWorkspaceDialog() {
               }}
             >
               {groupedTemplates.national.length > 0 && (
-                <optgroup label="🇺🇸 National Presidential — all 51 states">
+                <optgroup label="🇹🇼 全國總統 — 22 縣市 + 368 鄉鎮">
                   {groupedTemplates.national.map((tpl) => (
                     <option key={tpl.id} value={tpl.id}>
-                      {tpl.name}{tpl.election?.cycle ? ` · ${tpl.election.cycle}` : ""}
+                      {tpl.name_zh || tpl.name}{tpl.election?.cycle ? ` · ${tpl.election.cycle}` : ""}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {groupedTemplates.poll.length > 0 && (
+                <optgroup label="📊 民意調查">
+                  {groupedTemplates.poll.map((tpl) => (
+                    <option key={tpl.id} value={tpl.id}>
+                      {tpl.name_zh || tpl.name}{tpl.election?.candidate_count ? ` · ${tpl.election.candidate_count} 人` : ""}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {groupedTemplates.mayoral.length > 0 && (
+                <optgroup label="🏛 直轄市長選舉">
+                  {groupedTemplates.mayoral.map((tpl) => (
+                    <option key={tpl.id} value={tpl.id}>
+                      {tpl.name_zh || tpl.name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {groupedTemplates.county.length > 0 && (
+                <optgroup label="🗺 按縣市 — 單一縣市">
+                  {groupedTemplates.county.map((tpl) => (
+                    <option key={tpl.id} value={tpl.id}>
+                      {tpl.region}{tpl.metadata?.state_pvi_label ? ` (${tpl.metadata.state_pvi_label})` : ""}
                     </option>
                   ))}
                 </optgroup>
               )}
               {groupedTemplates.state.length > 0 && (
-                <optgroup label="🗺 By State — one state only">
+                <optgroup label="🗺 按州（Legacy US）">
                   {groupedTemplates.state.map((tpl) => (
                     <option key={tpl.id} value={tpl.id}>
                       {tpl.region_code} · {tpl.region}{tpl.metadata?.state_pvi_label ? ` (${tpl.metadata.state_pvi_label})` : ""}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {groupedTemplates.other.length > 0 && (
+                <optgroup label="其他">
+                  {groupedTemplates.other.map((tpl) => (
+                    <option key={tpl.id} value={tpl.id}>
+                      {tpl.name_zh || tpl.name}
                     </option>
                   ))}
                 </optgroup>
@@ -215,10 +269,12 @@ export default function CreateWorkspaceDialog() {
           {selectedTemplateMeta && (
             <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, marginTop: 4, lineHeight: 1.5 }}>
               {selectedTemplateMeta.region}
-              {selectedTemplateMeta.metadata?.state_pvi_label && ` · Cook PVI ${selectedTemplateMeta.metadata.state_pvi_label}`}
-              {selectedTemplateMeta.metadata?.national_pvi_label && ` · Cook PVI ${selectedTemplateMeta.metadata.national_pvi_label}`}
-              {selectedTemplateMeta.metadata?.county_count && ` · ${selectedTemplateMeta.metadata.county_count} counties`}
-              {selectedTemplateMeta.election?.candidate_count != null && ` · ${selectedTemplateMeta.election.candidate_count} candidates`}
+              {selectedTemplateMeta.metadata?.state_pvi_label && ` · PVI ${selectedTemplateMeta.metadata.state_pvi_label}`}
+              {selectedTemplateMeta.metadata?.national_pvi_label && ` · PVI ${selectedTemplateMeta.metadata.national_pvi_label}`}
+              {selectedTemplateMeta.metadata?.township_count && ` · ${selectedTemplateMeta.metadata.township_count} 鄉鎮`}
+              {selectedTemplateMeta.metadata?.county_count && ` · ${selectedTemplateMeta.metadata.county_count} 縣市`}
+              {selectedTemplateMeta.metadata?.population_total && ` · ${Math.round(selectedTemplateMeta.metadata.population_total / 10000).toLocaleString()} 萬人`}
+              {selectedTemplateMeta.election?.candidate_count != null && ` · ${selectedTemplateMeta.election.candidate_count} 位候選人`}
             </div>
           )}
         </div>
