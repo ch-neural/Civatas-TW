@@ -660,12 +660,18 @@ PROFILES_FILE = os.path.join(DATA_DIR, "agent_profiles.json")
 def _load_states() -> dict[str, dict]:
     sf = _state_file()
     if os.path.isfile(sf):
-        with open(sf) as f:
-            return json.load(f)
+        try:
+            with open(sf) as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            logger.warning(f"Corrupt states file {sf}: {e}; returning empty")
     # Fallback to legacy global file
     if _active_ws and os.path.isfile(STATE_FILE):
-        with open(STATE_FILE) as f:
-            return json.load(f)
+        try:
+            with open(STATE_FILE) as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            pass
     return {}
 
 
@@ -692,11 +698,17 @@ def _save_profiles(profiles: dict):
 def _load_diaries() -> list[dict]:
     df = _diaries_file()
     if os.path.isfile(df):
-        with open(df) as f:
-            return json.load(f)
+        try:
+            with open(df) as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            logger.warning(f"Corrupt diaries file {df}: {e}; returning empty")
     if _active_ws and os.path.isfile(DIARIES_FILE):
-        with open(DIARIES_FILE) as f:
-            return json.load(f)
+        try:
+            with open(DIARIES_FILE) as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            pass
     return []
 
 
