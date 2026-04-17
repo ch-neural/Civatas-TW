@@ -531,10 +531,10 @@ def _from_template(
         "political_leaning": fields.get("political_leaning", "中間"),
         "llm_vendor": vendor,
         "personality": (_pers := {
-            "expressiveness": fields.get("expressiveness", "moderately expressive"),
-            "emotional_stability": fields.get("emotional_stability", "fairly stable"),
-            "sociability": fields.get("sociability", "moderately social"),
-            "openness": fields.get("openness", "moderately open"),
+            "expressiveness": fields.get("expressiveness", "一般"),
+            "emotional_stability": fields.get("emotional_stability", "一般穩定"),
+            "sociability": fields.get("sociability", "中度社交"),
+            "openness": fields.get("openness", "中度開放"),
         }),
         "individuality": compute_individuality(
             _pers,
@@ -709,10 +709,10 @@ async def _from_llm(
         "political_leaning": political_leaning,
         "llm_vendor": vendor,
         "personality": (_pers := {
-            "expressiveness": fields.get("expressiveness", "moderately expressive"),
-            "emotional_stability": fields.get("emotional_stability", "fairly stable"),
-            "sociability": fields.get("sociability", "moderately social"),
-            "openness": fields.get("openness", "moderately open"),
+            "expressiveness": fields.get("expressiveness", "一般"),
+            "emotional_stability": fields.get("emotional_stability", "一般穩定"),
+            "sociability": fields.get("sociability", "中度社交"),
+            "openness": fields.get("openness", "中度開放"),
         }),
         "individuality": compute_individuality(
             _pers,
@@ -755,9 +755,9 @@ def compute_individuality(personality: dict, age: int = 40, occupation: str = ""
     """
     import random as _rng
 
-    es = personality.get("emotional_stability", "fairly stable")
-    expr = personality.get("expressiveness", "moderately expressive")
-    op = personality.get("openness", "moderately open")
+    es = personality.get("emotional_stability", "一般穩定")
+    expr = personality.get("expressiveness", "一般")
+    op = personality.get("openness", "中度開放")
 
     # Bilingual lookup helper: legacy CJK personas still in DB must keep working.
     def _key(v: str, en_map: dict, cjk_map: dict, default):
