@@ -585,6 +585,15 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
         { name: "中天新聞網", site: "ctinews.com", leaning: "深藍" },
         { name: "旺報", site: "want-daily.com", leaning: "深藍" },
       ],
+      // 社群媒體 — 每輪抓 1 個，讓 media_habit='社群媒體'/'PTT/論壇' 的
+      // agent 有 channel-matched 內容可讀。否則 feed_engine 只能 fallback
+      // 用 leaning 相似度配傳統媒體，社群 agent 看起來會像讀報紙的。
+      [
+        { name: "PTT Gossiping",   site: "ptt.cc/bbs/Gossiping",   leaning: "中間" },
+        { name: "PTT HatePolitics",site: "ptt.cc/bbs/HatePolitics",leaning: "中間" },
+        { name: "Dcard 時事",       site: "dcard.tw",               leaning: "中間" },
+        { name: "LINE Today",      site: "today.line.me",          leaning: "中間" },
+      ],
     ];
     const pickRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
     // Build rotating sources for this round (1 from each pool)
