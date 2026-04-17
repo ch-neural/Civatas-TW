@@ -281,6 +281,48 @@ DEFAULT_SOURCES: list[dict[str, Any]] = [
         "language": "en",
         "default_keywords": "Taiwan",
     },
+    # ── 社群媒體／論壇（只有 media_habit 含「PTT/論壇」或「社群媒體」
+    #    的 persona 會在 feed_engine 看到這些；見 DEFAULT_DIET_MAP）──
+    {
+        "name": "PTT Gossiping",
+        "url": "https://www.ptt.cc/bbs/Gossiping/index.html",
+        "tag": "PTT Gossiping",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 8,
+        "language": "zh-TW",
+        "default_keywords": "",
+    },
+    {
+        "name": "PTT HatePolitics",
+        "url": "https://www.ptt.cc/bbs/HatePolitics/index.html",
+        "tag": "PTT HatePolitics",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 8,
+        "language": "zh-TW",
+        "default_keywords": "",
+    },
+    {
+        "name": "Dcard 時事",
+        "url": "https://www.dcard.tw/f/trending",
+        "tag": "Dcard 時事",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 6,
+        "language": "zh-TW",
+        "default_keywords": "",
+    },
+    {
+        "name": "LINE Today",
+        "url": "https://today.line.me/tw/v2/tab/news",
+        "tag": "LINE Today",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 8,
+        "language": "zh-TW",
+        "default_keywords": "",
+    },
 ]
 
 

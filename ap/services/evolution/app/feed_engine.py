@@ -291,16 +291,19 @@ def select_feed(
 
     # ── Determine agent preferences ─────────────────────────────────
     media_habit = agent.get("media_habit") or ""
-    agent_leaning = agent.get("political_leaning") or "Tossup"
+    agent_leaning = agent.get("political_leaning") or "中間"
 
     preferred_tags: set[str] = set()
     for habit_key, tag_list in diet_map.items():
         if habit_key in media_habit:
             preferred_tags.update(tag_list)
 
-    # Fallback to mainstream US sources if no match
+    # Fallback to mainstream TW neutral outlets if no match.
+    # Deliberately excludes 社群媒體 / PTT/論壇 sources — agents without a
+    # specified social-media habit should NOT be exposed to PTT / Dcard /
+    # LINE Today content (those are only for personas who actively read them).
     if not preferred_tags:
-        preferred_tags = {"Reuters", "Associated Press", "The Hill"}
+        preferred_tags = {"中央通訊社", "公視新聞", "關鍵評論網", "聯合新聞網"}
 
     now = datetime.now(timezone.utc)
 

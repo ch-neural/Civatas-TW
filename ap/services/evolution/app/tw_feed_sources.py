@@ -138,7 +138,7 @@ DEFAULT_DIET_MAP: dict[str, list[str]] = {
     ],
     "社群媒體": [
         "Facebook 動態", "LINE 群組轉傳", "LINE Today", "Instagram Reels",
-        "Threads", "X（Twitter）", "Dcard 時事", "PTT Gossiping",
+        "Threads", "X（Twitter）", "Dcard 時事", "PTT Gossiping", "PTT HatePolitics",
     ],
     "報紙": [
         "聯合報", "中國時報", "自由時報", "經濟日報", "工商時報",
