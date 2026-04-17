@@ -82,6 +82,66 @@ const DEFAULT_ADV_PARAMS = {
 
 type AdvParams = typeof DEFAULT_ADV_PARAMS;
 
+/* ── Time-compression auto-scaling ──
+ * Each virtual day represents (realDateRange / simDays) real days. If the user
+ * shrinks simDays or widens the date range, each virtual day covers more real
+ * time, so time-scale-dependent params (news_impact / decay / life-event rate
+ * / leaning-shift consecutive-days requirement) must scale accordingly.
+ *
+ * Scale factor = currentCompression / templateRefCompression.
+ *   factor > 1 → each virtual day is MORE compressed than template baseline
+ *                → news_impact ↑, decay ↑, shift_consecutive_days_req ↓
+ *   factor < 1 → each virtual day covers LESS real time → inverse
+ *
+ * Baseline is always the template's calibration (NOT current advParams) so the
+ * scale can be re-applied on each simDays / date change without compounding.
+ */
+function computeCompression(startStr: string, endStr: string, days: number): number {
+  if (!startStr || !endStr || !days || days <= 0) return 1;
+  const s = new Date(startStr).getTime();
+  const e = new Date(endStr).getTime();
+  if (isNaN(s) || isNaN(e) || e <= s) return 1;
+  const realDays = (e - s) / 86400000;
+  return Math.max(0.1, realDays / days);
+}
+
+function clampNum(v: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, v));
+}
+
+function scaleTimeDependentParams(baseline: AdvParams, factor: number): AdvParams {
+  if (Math.abs(factor - 1) < 0.02) return baseline; // noise band
+  const sqrtF = Math.sqrt(factor);
+  return {
+    ...baseline,
+    // News impact scales sub-linearly — doubling compression shouldn't fully
+    // double LLM shock; sqrt gives diminishing returns.
+    news_impact: Math.round(clampNum(baseline.news_impact * sqrtF, 0.5, 5.0) * 10) / 10,
+    // Consecutive-days threshold is linear: compressed time needs fewer days.
+    shift_consecutive_days_req: clampNum(
+      Math.round(baseline.shift_consecutive_days_req / factor),
+      1, 14,
+    ),
+    // Decay / mean-reversion scale linearly with real-time-per-virtual-day.
+    satisfaction_decay: Math.round(clampNum(baseline.satisfaction_decay * factor, 0, 0.1) * 1000) / 1000,
+    anxiety_decay: Math.round(clampNum(baseline.anxiety_decay * factor, 0, 0.15) * 1000) / 1000,
+    // Max daily change cap — sqrt scaling to allow larger daily moves when
+    // compressed, without letting tiny sim_days produce unrealistic swings.
+    delta_cap_mult: Math.round(clampNum(baseline.delta_cap_mult * sqrtF, 0.5, 3.0) * 10) / 10,
+    // Forget rate scales linearly: more real time per virtual day = forget more.
+    forget_rate: Math.round(clampNum(baseline.forget_rate * factor, 0.01, 0.5) * 100) / 100,
+    // Articles per agent: moderately scale (capped), since user-visible cost.
+    articles_per_agent: clampNum(
+      Math.round(baseline.articles_per_agent * Math.min(factor, 2)),
+      1, 10,
+    ),
+    // NOT scaled (template-identity / political state / user choice):
+    //   serendipity_rate, base_undecided, max_undecided, party_align_bonus,
+    //   incumbency_bonus, individuality_multiplier, neutral_ratio, news_mix_*,
+    //   enable_dynamic_leaning, shift_sat_threshold_low, shift_anx_threshold_high.
+  };
+}
+
 /* ── component ── */
 
 export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
@@ -166,9 +226,30 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
         if (typeof c === "string") return { name: c, party: _inferParty(c) };
         return { name: String(c?.name || ""), party: c?.party || _inferParty(c?.name || "") };
       }).filter((c: CustomCand) => c.name);
-      setCustomCandidates(upgraded);
+      // Only restore custom candidates if they match the current template's
+      // candidate list. When the user switches templates, stale custom
+      // candidates from the previous template must NOT override the new one.
+      const tplNameArr: string[] = (candidates || []).map((c: any) => c.name);
+      const customNameArr: string[] = upgraded.map((c) => c.name);
+      const customNameSet = new Set(customNameArr);
+      const isMatch = tplNameArr.length === customNameArr.length && tplNameArr.every((n) => customNameSet.has(n));
+      if (isMatch || tplNameArr.length === 0) {
+        setCustomCandidates(upgraded);
+      }
+      // else: stale custom candidates discarded — template candidates will be used
     }).catch(() => {});
-  }, [wsId]);
+  }, [wsId, candidates]);
+
+  // When the template changes (different candidate set), reset custom
+  // candidates so the new template's candidates take effect immediately.
+  const prevTplCandRef = useRef<string>("");
+  useEffect(() => {
+    const tplKey = (candidates || []).map((c: any) => c.name).sort().join("|");
+    if (prevTplCandRef.current && prevTplCandRef.current !== tplKey && customCandidates !== null) {
+      setCustomCandidates(null);  // clear stale custom → fall through to template
+    }
+    prevTplCandRef.current = tplKey;
+  }, [candidates]);
 
   // Effective candidates: custom list overrides template candidates.
   // L/G get their own display code but are treated as "I" in scoring
@@ -199,6 +280,9 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
   const [advParams, setAdvParams] = useState<AdvParams>({ ...DEFAULT_ADV_PARAMS });
   // Track the template-provided calibration defaults so we can show "modified" dot
   const [templateCalib, setTemplateCalib] = useState<AdvParams>({ ...DEFAULT_ADV_PARAMS });
+  // Reference compression (template's default window ÷ default sim_days). Used
+  // as the baseline for auto-scaling when the user changes days or date range.
+  const [templateRefCompression, setTemplateRefCompression] = useState(1);
 
   // Merge template calibration_params into AdvParams shape
   const calibToAdv = useCallback((cp: Record<string, unknown>): AdvParams => {
@@ -237,8 +321,15 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
     const defaultEnd = electionIsFuture
       ? today
       : (ed ? addDays(ed, -1) : addDays(today, -1));
-    setStartDate(ew?.start_date || defaultStart);
-    setEndDate(ew?.end_date || defaultEnd);
+    const refStart = ew?.start_date || defaultStart;
+    const refEnd = ew?.end_date || defaultEnd;
+    setStartDate(refStart);
+    setEndDate(refEnd);
+
+    // Establish the template's reference compression so later simDays / date
+    // changes can scale time-dependent params relative to this baseline.
+    const refDays = tplSimDays || 30;
+    setTemplateRefCompression(computeCompression(refStart, refEnd, refDays));
 
     // Load template calibration params as advanced parameter defaults
     const cp = (template as any)?.election?.default_calibration_params;
@@ -260,6 +351,38 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
 
   // Gate: only persist AFTER template + saved settings have been fully loaded
   const settingsReadyRef = useRef(false);
+
+  // ── Auto-scale time-dependent advanced params when user changes simDays or
+  // the date range. Baseline is always templateCalib (NOT current advParams),
+  // so repeated day-count changes don't compound. User edits to non-scaled
+  // fields (news_mix / party bonuses / etc.) are preserved.
+  // Skipped until templateCalib has loaded (templateRefCompression > 0).
+  const autoScaleReadyRef = useRef(false);
+  useEffect(() => {
+    if (!templateRefCompression || templateRefCompression <= 0) return;
+    // Skip the very first run (mount) so we don't immediately overwrite the
+    // template-provided advParams. Only run when user actually changes days/dates.
+    if (!autoScaleReadyRef.current) {
+      autoScaleReadyRef.current = true;
+      return;
+    }
+    const nowC = computeCompression(startDate, endDate, simDays);
+    const factor = nowC / templateRefCompression;
+    setAdvParams((prev) => {
+      const scaled = scaleTimeDependentParams(templateCalib, factor);
+      return {
+        ...prev,            // keep user edits on non-scaled fields
+        ...scaled,          // overwrite scaled fields with time-adjusted values
+      };
+    });
+  }, [simDays, startDate, endDate, templateCalib, templateRefCompression]);
+
+  // Compute current compression ratio for banner display (read-only).
+  const currentCompression = computeCompression(startDate, endDate, simDays);
+  const compressionFactor = templateRefCompression > 0
+    ? currentCompression / templateRefCompression
+    : 1;
+  const compressionDiverges = Math.abs(compressionFactor - 1) > 0.05;
 
   // Persist settings when changed — but only after initial load completes
   useEffect(() => {
@@ -1368,6 +1491,37 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
               background: "var(--bg-card)", border: "1px solid var(--border-subtle)",
               borderRadius: 12, padding: 20, marginTop: 8,
             }}>
+              {/* ── Time-compression banner ── */}
+              {compressionDiverges && (
+                <div style={{
+                  marginBottom: 18, padding: "10px 14px", borderRadius: 8,
+                  background: "rgba(59,130,246,0.08)",
+                  border: "1px solid rgba(59,130,246,0.25)",
+                  fontSize: 11, color: "rgba(255,255,255,0.75)", lineHeight: 1.55,
+                }}>
+                  <div style={{ fontWeight: 600, marginBottom: 4, color: "#93c5fd" }}>
+                    {en ? "⏱ Time-compression auto-scaled" : "⏱ 時間壓縮自動調整"}
+                  </div>
+                  {en ? (
+                    <>
+                      Each virtual day ≈ <strong>{currentCompression.toFixed(1)}</strong> real days
+                      {" "}(template baseline: {(templateRefCompression).toFixed(1)} real days/day,
+                      {" "}scale ×{compressionFactor.toFixed(2)}).
+                      {" "}News impact, decay, shift-day threshold, forget rate, and articles/day
+                      have been adjusted. You can still fine-tune any value below.
+                    </>
+                  ) : (
+                    <>
+                      每虛擬日 ≈ <strong>{currentCompression.toFixed(1)}</strong> 個真實日
+                      （模板基準：{(templateRefCompression).toFixed(1)} 真實日/虛擬日、
+                      係數 ×{compressionFactor.toFixed(2)}）。
+                      已自動調整：新聞影響倍率、滿意度/焦慮度衰減、連續天數閾值、
+                      記憶遺忘率、每日文章數。下列任何值仍可再微調。
+                    </>
+                  )}
+                </div>
+              )}
+
               {/* ── Section 1: Political Leaning Shifts ── */}
               <div style={{ marginBottom: 24 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
