@@ -766,7 +766,7 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
               })()}
 
               {/* Data Sources — 可信賴的官方統計與公開資料基礎 */}
-              <TaiwanDataSourcesPanel en={en} highlighted={generating} />
+              <TaiwanDataSourcesPanel highlighted={generating} />
             </div>
           </div>
         </div>
@@ -780,7 +780,9 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
  * to communicate the pipeline's statistical provenance — census, election,
  * ethnicity surveys, and geography. Highlighted (border-glow) while generating.
  */
-function TaiwanDataSourcesPanel({ en, highlighted }: { en: boolean; highlighted: boolean }) {
+function TaiwanDataSourcesPanel({ highlighted }: { highlighted: boolean }) {
+  const locale = useLocaleStore((s) => s.locale);
+  const en = locale === "en";
   type Src = { color: string; icon: string; title: string; title_en: string; body: string; body_en: string; note?: string };
   const sources: Src[] = [
     {
