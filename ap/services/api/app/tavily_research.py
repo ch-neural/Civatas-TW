@@ -666,6 +666,7 @@ async def _search_serper_social(query: str, start_date: str, end_date: str, num:
         "q": full_query,
         "gl": SERPER_GL,
         "hl": SERPER_HL,
+        "lr": "lang_zh-TW",
         "num": min(num, 100),
         "tbs": tbs,
     }

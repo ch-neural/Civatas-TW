@@ -1834,7 +1834,7 @@ async def candidate_visibility(payload: dict = Body(...)):
             async with _hx.AsyncClient(timeout=30.0) as client:
                 resp = await client.post(
                     "https://google.serper.dev/search",
-                    json={"q": query, "gl": "tw", "hl": "zh-TW", "num": 10},
+                    json={"q": query, "gl": "tw", "hl": "zh-TW", "lr": "lang_zh-TW", "num": 10},
                     headers={"X-API-KEY": serper_key, "Content-Type": "application/json"},
                 )
                 return len(resp.json().get("organic", []))
