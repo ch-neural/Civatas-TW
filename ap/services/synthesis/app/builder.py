@@ -713,33 +713,32 @@ def _enforce_logical_consistency(row: dict) -> None:
             dist = {}
         if dist:
             return _rng.choices(list(dist.keys()), weights=list(dist.values()), k=1)[0]
-        # BLS-aligned English categories tracking US workforce composition.
+        # Taiwan 行業分類（主計總處 2024 勞動力調查簡化為 10 類）
         return _rng.choices(
-            ["Healthcare", "Retail", "Manufacturing", "Education",
-             "Professional Services", "Construction", "Transportation",
-             "Hospitality", "Finance", "Public Sector"],
-            weights=[16, 13, 12, 11, 10, 9, 8, 8, 7, 6], k=1
+            ["製造業", "批發零售", "營建業", "住宿餐飲",
+             "金融保險", "教育", "醫療照護", "資訊科技",
+             "運輸倉儲", "公部門"],
+            weights=[19, 14, 8, 10, 6, 9, 9, 8, 7, 10], k=1
         )[0]
 
     if age < 18:
-        row["occupation"] = "Student"
-    elif occ in ("無工作", "無", "", "待業", "有工作", "Unemployed", "Not in labor force"):
-        # Census "無工作" includes students, retirees, homemakers, unemployed.
-        # "有工作" gets assigned a specific industry from census distribution.
-        if occ in ("有工作",):
+        row["occupation"] = "學生"
+    elif occ in ("無工作", "無", "", "待業", "有工作", "就業", "失業", "非勞動力",
+                 "Unemployed", "Not in labor force"):
+        if occ in ("有工作", "就業"):
             row["occupation"] = _assign_from_census()
         else:
             # Infer sub-category based on age/gender using census ratios
             if age >= 65:
-                row["occupation"] = "Retired"
+                row["occupation"] = "退休"
             elif age <= 22:
-                row["occupation"] = "Student"
-            elif gender in ("Female", "female") and _rng.random() < 0.28:
-                row["occupation"] = "Homemaker"
+                row["occupation"] = "學生"
+            elif gender in ("女", "Female", "female") and _rng.random() < 0.28:
+                row["occupation"] = "家管"
             else:
                 # ~15% truly unemployed/not in labor force; rest get working occ
                 if _rng.random() < 0.15:
-                    row["occupation"] = "Unemployed"
+                    row["occupation"] = "待業"
                 else:
                     row["occupation"] = _assign_from_census()
 
