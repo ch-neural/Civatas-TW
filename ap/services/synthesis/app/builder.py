@@ -460,7 +460,19 @@ def build_population_flat(config: ProjectConfig) -> list[dict]:
 
         # Flatten: no nulls, custom fields inline
         _fill_defaults(row, config.filters)
-        row["county"] = config.region or ""  # Inject county for census lookup
+        # Inject county from config.region ONLY if the dim didn't already sample
+        # one, and ONLY if region is a real Taiwan county (22-county list).
+        # For national templates (region="台灣"), keep the dimension-sampled
+        # county — overwriting with "台灣" loses the per-agent geographic signal.
+        if not row.get("county"):
+            _tw_counties = {
+                "臺北市","新北市","桃園市","臺中市","臺南市","高雄市","基隆市","新竹市","嘉義市",
+                "新竹縣","苗栗縣","彰化縣","南投縣","雲林縣","嘉義縣","屏東縣","宜蘭縣",
+                "花蓮縣","臺東縣","澎湖縣","金門縣","連江縣",
+            }
+            _r = (config.region or "").strip()
+            if _r in _tw_counties:
+                row["county"] = _r
         _enforce_logical_consistency(row)
         
         # --- Post-validation: enforce age filter constraint ---
