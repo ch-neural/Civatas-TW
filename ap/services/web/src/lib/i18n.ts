@@ -44,12 +44,12 @@ export const STRINGS = {
   "status.llm_offline":          { en: "LLM offline",              "zh-TW": "LLM 離線" },
   "status.llm_checking":         { en: "Checking...",              "zh-TW": "檢查中..." },
 
-  // ── PopulationSetupPanel (US branch) ──
-  "popsetup.title":              { en: "Population Setup (US)",    "zh-TW": "人口設定（美國）" },
+  // ── PopulationSetupPanel ──
+  "popsetup.title":              { en: "Population Setup",          "zh-TW": "人口設定" },
   "popsetup.agents_exist":       { en: "agents generated",          "zh-TW": "位 Agent 已生成" },
   "popsetup.subtitle":           {
     en: "Pick an election template, then click Generate to synthesize the population.",
-    "zh-TW": "選擇選舉範本，然後點擊 Generate 來合成人口。",
+    "zh-TW": "選擇選舉範本，然後點擊「生成」來合成人口。",
   },
   "popsetup.map_title.national": { en: "Taiwan — 22 counties & cities", "zh-TW": "台灣 — 全國 22 縣市" },
   "popsetup.map_title.state":    { en: "Taiwan — {region}", "zh-TW": "台灣 — {region}" },
@@ -68,32 +68,32 @@ export const STRINGS = {
   "popsetup.scope.help.title":   { en: "ℹ️ How template scope works", "zh-TW": "ℹ️ 範本範圍說明" },
   "popsetup.scope.help.national":{
     en: "Currently selected: National scope (all 51 states + DC). The synthetic population is sampled from all 3,142 US counties, weighted by population. Use this for full nationwide forecasts.",
-    "zh-TW": "目前選擇：全國範圍（50 州 + DC）。虛擬人口會從全美 3,142 個郡按人口加權抽樣。適合全國性預測。",
+    "zh-TW": "目前選擇：全國範圍（22 縣市）。虛擬人口會從全台 368 個鄉鎮市區按人口加權抽樣。適合全國性預測。",
   },
   "popsetup.scope.help.state":   {
     en: "Currently selected: {region} only. The synthetic population is sampled from {counties} {region} counties weighted by population. The yellow outline on the map shows which state you've picked. Use this for single-state campaigns or swing-state analysis.",
-    "zh-TW": "目前選擇：僅 {region}。虛擬人口會從 {region} 的 {counties} 個郡按人口加權抽樣。地圖上黃框標示你選的那一州。適合單州競選或搖擺州分析。",
+    "zh-TW": "目前選擇：僅 {region}。虛擬人口會從 {region} 的 {counties} 個鄉鎮市區按人口加權抽樣。地圖上黃框標示你選的縣市。適合單縣市選戰或搖擺縣市分析。",
   },
   "popsetup.scope.help.switch":  {
     en: "There is no \"none\" option — to simulate all states, pick a 🇺🇸 National Presidential template; to simulate one state, pick from 🗺 By State.",
-    "zh-TW": "沒有「不選」這個選項 — 要模擬所有州，請選 🇺🇸 全國總統範本；要模擬單一州，請從 🗺 按州 中挑選。",
+    "zh-TW": "沒有「不選」這個選項 — 要模擬全國，請選 🇹🇼 全國總統範本；要模擬單一縣市，請從 🗺 按縣市 中挑選。",
   },
   "popsetup.template.choose_one": { en: "Pick one of two scopes:", "zh-TW": "請從兩種範圍擇一：" },
   "popsetup.template.scope_intro_national":{
     en: "🇺🇸 National Presidential = all 51 states (cannot pick a single state here)",
-    "zh-TW": "🇺🇸 National Presidential = 全部 51 州（這裡不能選單州）",
+    "zh-TW": "🇹🇼 全國總統 = 22 縣市 + 368 鄉鎮（不可選單一縣市）",
   },
   "popsetup.template.scope_intro_state":{
     en: "🗺 By State = exactly one state",
-    "zh-TW": "🗺 By State = 只有單一州",
+    "zh-TW": "🗺 按縣市 = 只含單一縣市",
   },
   "popsetup.template.optgroup.national":{
     en: "🇺🇸 National Presidential — all 51 states",
-    "zh-TW": "🇺🇸 全國總統 — 全部 51 州",
+    "zh-TW": "🇹🇼 全國總統 — 22 縣市",
   },
   "popsetup.template.optgroup.state":{
     en: "🗺 By State — one state only",
-    "zh-TW": "🗺 按州 — 單一州",
+    "zh-TW": "🗺 按縣市 — 單一縣市",
   },
   "popsetup.template.optgroup.other":{ en: "Other", "zh-TW": "其他" },
 
@@ -503,11 +503,11 @@ export const STRINGS = {
   "histevo.alignment.satisfaction_role.lt_governor":         { en: "Deputy Magistrate",    "zh-TW": "副縣市長" },
   "histevo.alignment.satisfaction_role.us_senator":          { en: "Legislator (at-large)","zh-TW": "不分區立委" },
   "histevo.alignment.satisfaction_role.us_representative":   { en: "Legislator (district)","zh-TW": "區域立委" },
-  "histevo.alignment.satisfaction_role.state_senator":       { en: "State Senator",        "zh-TW": "州參議員" },
-  "histevo.alignment.satisfaction_role.state_representative":{ en: "State Representative", "zh-TW": "州眾議員" },
+  "histevo.alignment.satisfaction_role.state_senator":       { en: "State Senator",        "zh-TW": "直轄市議員" },
+  "histevo.alignment.satisfaction_role.state_representative":{ en: "State Representative", "zh-TW": "縣市議員" },
   "histevo.alignment.satisfaction_role.mayor":               { en: "Mayor",                "zh-TW": "市長" },
   "histevo.alignment.satisfaction_role.cabinet_secretary":   { en: "Cabinet Secretary",    "zh-TW": "聯邦部長" },
-  "histevo.alignment.satisfaction_role.attorney_general":    { en: "Attorney General",     "zh-TW": "司法部長/州檢察長" },
+  "histevo.alignment.satisfaction_role.attorney_general":    { en: "Attorney General",     "zh-TW": "法務部長 / 檢察總長" },
   "histevo.alignment.satisfaction_role.house_speaker":       { en: "House Speaker",        "zh-TW": "眾議院議長" },
 
   // ── HistoricalEvolutionPanel · Tracked Candidates alerts & labels ──
@@ -520,7 +520,7 @@ export const STRINGS = {
   "histevo.tracked.missing.national_vis":  { en: "national visibility", "zh-TW": "全國能見度" },
   "histevo.tracked.missing.home_base":     { en: "home base",           "zh-TW": "地盤" },
   "histevo.tracked.description_label":     { en: "Description",         "zh-TW": "背景描述" },
-  "histevo.tracked.description_placeholder":{ en: "Background (e.g.: cardiologist, gubernatorial candidate) — press Auto above to fetch from Wikipedia", "zh-TW": "客觀背景（如：心臟科醫師、州長候選人）— 按上方「自動」可從維基百科取得" },
+  "histevo.tracked.description_placeholder":{ en: "Background (e.g.: cardiologist, gubernatorial candidate) — press Auto above to fetch from Wikipedia", "zh-TW": "客觀背景（如：心臟科醫師、市長候選人）— 按上方「自動」可從維基百科取得" },
 
   "histevo.params.title":              { en: "Evolution Parameters", "zh-TW": "演化參數" },
   "histevo.params.neutral_ratio":      { en: "Independent ratio",    "zh-TW": "中立比例" },
@@ -749,16 +749,16 @@ export const STRINGS = {
   "prediction.s2.survey.role.lt_governor":             { en: "Deputy Magistrate",    "zh-TW": "副縣市長" },
   "prediction.s2.survey.role.us_senator":              { en: "Legislator (at-large)","zh-TW": "不分區立委" },
   "prediction.s2.survey.role.us_representative":       { en: "Legislator (district)","zh-TW": "區域立委" },
-  "prediction.s2.survey.role.state_senator":           { en: "State Senator",        "zh-TW": "州參議員" },
-  "prediction.s2.survey.role.state_representative":    { en: "State Representative", "zh-TW": "州眾議員" },
+  "prediction.s2.survey.role.state_senator":           { en: "State Senator",        "zh-TW": "直轄市議員" },
+  "prediction.s2.survey.role.state_representative":    { en: "State Representative", "zh-TW": "縣市議員" },
   "prediction.s2.survey.role.mayor":                   { en: "Mayor",                "zh-TW": "市長" },
   "prediction.s2.survey.role.cabinet_secretary":       { en: "Cabinet Secretary",    "zh-TW": "聯邦部長" },
-  "prediction.s2.survey.role.attorney_general":        { en: "Attorney General",     "zh-TW": "司法部長/州檢察長" },
+  "prediction.s2.survey.role.attorney_general":        { en: "Attorney General",     "zh-TW": "法務部長 / 檢察總長" },
   "prediction.s2.survey.role.house_speaker":           { en: "House Speaker",        "zh-TW": "眾議院議長" },
   "prediction.s2.survey.role.presidential_candidate":  { en: "Presidential Candidate","zh-TW": "總統候選人" },
   "prediction.s2.survey.role.senate_candidate":        { en: "Senate Candidate",     "zh-TW": "參議員候選人" },
   "prediction.s2.survey.role.house_candidate":         { en: "House Candidate",      "zh-TW": "眾議員候選人" },
-  "prediction.s2.survey.role.gubernatorial_candidate": { en: "Gubernatorial Candidate","zh-TW": "州長候選人" },
+  "prediction.s2.survey.role.gubernatorial_candidate": { en: "Gubernatorial Candidate","zh-TW": "縣市長候選人" },
   "prediction.s2.survey.role.mayoral_candidate":       { en: "Mayoral Candidate",    "zh-TW": "市長候選人" },
   "prediction.s2.survey.party_placeholder":{ en: "Party (D / R / I)",   "zh-TW": "政黨 (D / R / I)" },
   "prediction.s2.election.add_group":   { en: "+ Add group",            "zh-TW": "+ 新增組別" },
@@ -1504,11 +1504,11 @@ export const STRINGS = {
   },
   "news.us_sources_title": {
     en: "📰 US News Sources by Political Lean ({total} outlets)",
-    "zh-TW": "📰 美國新聞來源（按政治傾向分類，共 {total} 家）",
+    "zh-TW": "📰 台灣新聞來源（依藍綠白 5-tier 分類，共 {total} 家）",
   },
   "news.us_sources_caption": {
     en: "Each US workspace pulls news from this set when running evolution. Bias classification follows AllSides Media Bias Chart v9 + Ad Fontes; the conservative call wins ties. Edit per source below.",
-    "zh-TW": "美國工作區的演化會從這份來源池抓新聞。政治傾向參考 AllSides Media Bias Chart v9 與 Ad Fontes，分歧時取較中性的分類。可在下方逐一編輯。",
+    "zh-TW": "演化會從這份來源池抓新聞。政治傾向依卓越新聞獎基金會媒體信任度調查、台灣事實查核中心媒體立場標註；分歧時取較中性的分類。可在下方逐一編輯。",
   },
   "news.bucket.solid_dem":         { en: "Solid Democratic",        "zh-TW": "強烈民主黨" },
   "news.bucket.lean_dem":          { en: "Lean Democratic",         "zh-TW": "傾向民主黨" },
