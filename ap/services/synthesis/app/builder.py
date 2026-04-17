@@ -635,16 +635,21 @@ def _fill_defaults(row: dict, filters: dict = None) -> None:
             if _resolve_field_name(fk) == "age" and fv:
                 age_filter_groups.append(fv)
 
-    # Taiwan admin-hierarchy derivation: if township is present as "縣市|鄉鎮",
-    # split into structured county + derive a human-readable district string.
+    # Taiwan admin-hierarchy derivation: township ("縣市|鄉鎮") is the source of
+    # truth. county + district are *derived* from township so they are always
+    # consistent. Templates expose both `county` and `township` as independent
+    # categorical dimensions; without this override we'd sample a random
+    # county-wide distribution AND a random township-wide distribution, which
+    # produces agents like 「county=新北市 but township=雲林縣|西螺鎮」.
     township = str(row.get("township") or "").strip()
     county = str(row.get("county") or "").strip()
     district = str(row.get("district") or "").strip()
     if township and "|" in township:
         parsed_county, parsed_town = township.split("|", 1)
-        if not county:
-            row["county"] = parsed_county
-            county = parsed_county
+        # Force county to match the township's parent — overrides any value the
+        # county dimension may have independently sampled.
+        row["county"] = parsed_county
+        county = parsed_county
         if not district or district == "unknown":
             row["district"] = f"{parsed_county}{parsed_town}"
     elif county and (not district or district == "unknown"):
