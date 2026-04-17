@@ -73,11 +73,19 @@ class CrawlSource:
     name: str
     url: str
     tag: str                 # e.g. "聯合報", "自由時報"
-    selector_title: str      # CSS selector for headline elements
-    selector_summary: str    # CSS selector for summary text
+    selector_title: str      # CSS selector (legacy; ignored by Serper path)
+    selector_summary: str    # CSS selector (legacy; ignored by Serper path)
     max_items: int = 10
     is_default: bool = True
     leaning: str = "中間"      # political leaning of this source (5-bucket or 3-tier)
+    # Civatas-TW 2026-04-17: fields for mixed-language source pool.
+    # ``language``: "zh-TW" (default; pulls Traditional-Chinese-language results)
+    #               or "en" (for Taiwan-English outlets & international bureaus).
+    # ``default_keywords``: extra terms appended to every query from this source.
+    # For international outlets (Reuters / BBC / Bloomberg …) set it to
+    # "Taiwan" so we don't pull their domestic politics coverage.
+    language: str = "zh-TW"
+    default_keywords: str = ""
 
 DEFAULT_SOURCES: list[dict[str, Any]] = [
     # ── 中間 / 通訊社 ──
@@ -191,6 +199,88 @@ DEFAULT_SOURCES: list[dict[str, Any]] = [
         "selector_summary": "p",
         "max_items": 10,
     },
+    # ── 台灣本地英文媒體（不用強制 Taiwan keyword；文章本身就是台灣新聞）──
+    {
+        "name": "Focus Taiwan (中央社英文版)",
+        "url": "https://focustaiwan.tw/politics",
+        "tag": "FocusTW",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 8,
+        "language": "en",
+        "default_keywords": "",
+    },
+    {
+        "name": "Taipei Times (自由時報英文版)",
+        "url": "https://www.taipeitimes.com/News/front",
+        "tag": "TaipeiTimes",
+        "leaning": "偏綠",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 8,
+        "language": "en",
+        "default_keywords": "",
+    },
+    {
+        "name": "Taiwan News",
+        "url": "https://www.taiwannews.com.tw/news/politics",
+        "tag": "TWNews",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 8,
+        "language": "en",
+        "default_keywords": "",
+    },
+    # ── 國際主流媒體涵蓋台灣議題（強制 Taiwan keyword，避免拉到美國內政）──
+    {
+        "name": "Reuters (Taiwan)",
+        "url": "https://www.reuters.com/",
+        "tag": "Reuters",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 6,
+        "language": "en",
+        "default_keywords": "Taiwan",
+    },
+    {
+        "name": "Bloomberg (Taiwan)",
+        "url": "https://www.bloomberg.com/",
+        "tag": "Bloomberg",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 6,
+        "language": "en",
+        "default_keywords": "Taiwan",
+    },
+    {
+        "name": "BBC News (Taiwan)",
+        "url": "https://www.bbc.com/news",
+        "tag": "BBC",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 6,
+        "language": "en",
+        "default_keywords": "Taiwan",
+    },
+    {
+        "name": "Nikkei Asia (Taiwan)",
+        "url": "https://asia.nikkei.com/",
+        "tag": "NikkeiAsia",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 6,
+        "language": "en",
+        "default_keywords": "Taiwan",
+    },
+    {
+        "name": "The Guardian (Taiwan)",
+        "url": "https://www.theguardian.com/world",
+        "tag": "Guardian",
+        "leaning": "中間",
+        "selector_title": "", "selector_summary": "",
+        "max_items": 5,
+        "language": "en",
+        "default_keywords": "Taiwan",
+    },
 ]
 
 
@@ -212,6 +302,8 @@ def build_default_sources() -> list[CrawlSource]:
             max_items=s.get("max_items", 10),
             is_default=True,
             leaning=s.get("leaning", "中間"),
+            language=s.get("language", "zh-TW"),
+            default_keywords=s.get("default_keywords", ""),
         ))
     return results
 
@@ -273,16 +365,31 @@ async def crawl_source(
         start_dt = end_dt - timedelta(days=_DEFAULT_WINDOW_DAYS)
     tbs = f"cdr:1,cd_min:{start_dt.strftime('%m/%d/%Y')},cd_max:{end_dt.strftime('%m/%d/%Y')}"
 
-    query = f"site:{domain}"
+    # Build query: site:domain + source's own default_keywords + any extras.
+    # Chinese sources: no keyword needed (already returns Taiwan news).
+    # English international sources: default_keywords="Taiwan" keeps us out
+    # of their US/UK domestic coverage.
+    query_parts = [f"site:{domain}"]
+    src_kw = (getattr(source, "default_keywords", "") or "").strip()
+    if src_kw:
+        query_parts.append(src_kw)
     if extra_keywords.strip():
-        query = f"{query} {extra_keywords.strip()}"
+        query_parts.append(extra_keywords.strip())
+    query = " ".join(query_parts)
+
+    # Language: zh-TW (default) or en. Forced via lr + hl parameters.
+    lang = (getattr(source, "language", "zh-TW") or "zh-TW").lower()
+    if lang.startswith("en"):
+        hl, lr = "en", "lang_en"
+    else:
+        hl, lr = _SERPER_HL, _SERPER_LR
 
     num = max(1, min(source.max_items or 10, 100))
     payload = {
         "q": query,
-        "gl": _SERPER_GL,
-        "hl": _SERPER_HL,
-        "lr": _SERPER_LR,
+        "gl": _SERPER_GL,  # always Taiwan locale for rank signal
+        "hl": hl,
+        "lr": lr,
         "num": num,
         "tbs": tbs,
     }

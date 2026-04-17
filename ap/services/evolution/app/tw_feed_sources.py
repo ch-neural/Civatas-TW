@@ -95,10 +95,20 @@ DEFAULT_SOURCE_LEANINGS: dict[str, str] = {
     "Cofacts":          "中間",
 
     # ── 英文外電 / 國際 ──────────────────────────────────────────────
-    "BBC 中文網":       "中間",
-    "紐約時報中文網":   "中間",
-    "Reuters 中文":     "中間",
-    "DW 德國之聲":      "中間",
+    "BBC 中文網":                "中間",
+    "紐約時報中文網":            "中間",
+    "Reuters 中文":              "中間",
+    "DW 德國之聲":               "中間",
+    # 台灣本地英文媒體（台灣人英文閱讀圈常讀）
+    "Focus Taiwan (中央社英文版)":  "中間",
+    "Taipei Times (自由時報英文版)": "偏綠",
+    "Taiwan News":                  "中間",
+    # 國際媒體寫台灣（加 Taiwan keyword 定向）
+    "Reuters (Taiwan)":             "中間",
+    "Bloomberg (Taiwan)":           "中間",
+    "BBC News (Taiwan)":            "中間",
+    "Nikkei Asia (Taiwan)":         "中間",
+    "The Guardian (Taiwan)":        "中間",
 
     # ── 廣播 ────────────────────────────────────────────────────────
     "央廣":             "中間",
