@@ -961,7 +961,7 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
                   ? customCandidates
                   : candidates.map((x: any) => ({ name: x.name, party: x.party || "I" }));
                 if (base.some((cc) => cc.name === name)) return;
-                saveCandidates([...base, { name, party: candidateParty, party_label: candidatePartyLabels[candidateParty] || candidateParty }]);
+                saveCandidates([...base, { name, party: candidateParty }]);
                 setCandidateInput("");
                 setCandidateParty("IND");
               };
