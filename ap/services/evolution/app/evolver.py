@@ -265,12 +265,12 @@ async def _call_llm(prompt: str, vendor: str | None = None, enabled_vendors: lis
         if vendor and enabled_vendors is not None and vendor not in enabled_vendors:
             logger.debug(f"Agent vendor '{vendor}' is disabled in control panel, using enabled vendors: {all_vendor_names[:3]}")
     else:
-        # No specific vendor requested — try default env-based client first,
-        # then fall back to named vendors if available.
+        # No specific vendor requested — use configured vendors directly.
+        # Only fall back to env-based default client when no vendors are configured.
         import random as _rand
         shuffled = list(all_vendor_names)
         _rand.shuffle(shuffled)
-        try_order = [None] + shuffled
+        try_order = shuffled if shuffled else [None]
 
     # Sanitize prompt to strip characters that break JSON/UTF-8 encoding:
     # - Control characters (Cc category) except \n \t \r
