@@ -612,8 +612,13 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
     const _elec = electionRef.current || {};
     const candidateNames = _cands.map((c: any) => c.name).filter(Boolean);
     const candDescs: Record<string, string> = {};
+    const candPartyMap: Record<string, string> = {};
     for (const c of _cands) {
       if (c.name && c.description) candDescs[c.name] = c.description;
+      // Authoritative party code from the template (DPP/KMT/TPP/IND) —
+      // lets the evolver skip description-keyword heuristics that can
+      // misclassify e.g. a KMT candidate whose description mentions 民進黨.
+      if (c.name && c.party) candPartyMap[c.name] = String(c.party).toUpperCase();
     }
     const partyDetection = _elec?.party_detection ?? undefined;
     // Fetch all configured agent vendors (non-system) so newly-added vendors are included
@@ -626,7 +631,7 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
         .map((v: any) => v.id as string);
       if (agentVendorIds.length) enabledVendors = agentVendorIds;
     } catch { /* ignore — backend will auto-derive from agents */ }
-    const res = await startEvolution(personas, crawlInterval, concurrency, candidateNames, advParams as Record<string, unknown>, candDescs, partyDetection, wsId, enabledVendors);
+    const res = await startEvolution(personas, crawlInterval, concurrency, candidateNames, advParams as Record<string, unknown>, candDescs, partyDetection, wsId, enabledVendors, candPartyMap);
     const jobId = res?.job_id || null;
     activeJobIdRef.current = jobId;
 

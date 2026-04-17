@@ -2333,8 +2333,21 @@ def _push_live(job: dict, msg: str):
 
 # ── Background job runner ────────────────────────────────────────────
 
-# Party-description keywords for auto-classifying candidates into 3 Taiwan buckets.
-# Match against candidate.description (case-insensitive for latin tokens; 中文 substring).
+# Strong party-membership markers. If a description contains any of these,
+# the candidate's party affiliation is definitive — weak keyword counts are
+# ignored. Fixes the bug where a KMT candidate's description like "國民黨籍,
+# ...批判民進黨..." matched _DPP_DESC_KWS ("民進") first and got misclassified.
+_STRONG_PARTY_PATTERNS: dict[str, tuple[str, ...]] = {
+    "DPP": ("民進黨籍", "民主進步黨籍", "民進黨黨員", "民進黨員", "DPP member"),
+    "KMT": ("國民黨籍", "中國國民黨籍", "國民黨黨員", "國民黨員", "KMT member"),
+    "TPP": ("民眾黨籍", "台灣民眾黨籍", "民眾黨黨員", "民眾黨員", "TPP member"),
+    "IND": ("無黨籍", "無黨籍參選", "獨立參選人", "unaffiliated"),
+}
+
+# Weak keyword pools — used only when no strong marker matches.
+# For each bucket we count hits; the bucket with the highest count wins.
+# This prevents a KMT candidate's "批判民進黨" (one occurrence of 民進)
+# from outweighing their own party's "國民黨" mention.
 _DPP_DESC_KWS = ("民進", "民主進步", "dpp", "綠營", "綠色", "泛綠", "台獨", "本土派", "獨派")
 _KMT_DESC_KWS = ("國民黨", "中國國民", "kmt", "藍營", "藍色", "泛藍", "統派", "兩岸和平")
 _TPP_DESC_KWS = ("民眾黨", "台灣民眾", "tpp", "白營", "白色", "白色力量", "中間選民",
@@ -2342,13 +2355,53 @@ _TPP_DESC_KWS = ("民眾黨", "台灣民眾", "tpp", "白營", "白色", "白色
 _IND_DESC_KWS = ("無黨籍", "獨立參選", "無黨", "unaffiliated", "independent")
 
 
+def _classify_party_from_desc(desc: str) -> str | None:
+    """Return DPP/KMT/TPP/IND bucket for a candidate's description, or None.
+
+    Priority: strong membership markers first → weak keyword-count tie-break.
+    """
+    if not desc:
+        return None
+    desc_l = desc.lower()
+    # 1) Strong markers — definitive affiliation
+    for bucket, patterns in _STRONG_PARTY_PATTERNS.items():
+        for pat in patterns:
+            if pat in desc or pat.lower() in desc_l:
+                return bucket
+    # 2) Weak keyword counts
+    counts = {
+        "DPP": sum(1 for k in _DPP_DESC_KWS if k in desc or k in desc_l),
+        "KMT": sum(1 for k in _KMT_DESC_KWS if k in desc or k in desc_l),
+        "TPP": sum(1 for k in _TPP_DESC_KWS if k in desc or k in desc_l),
+        "IND": sum(1 for k in _IND_DESC_KWS if k in desc or k in desc_l),
+    }
+    best_bucket = max(counts, key=lambda b: counts[b])
+    if counts[best_bucket] == 0:
+        return None
+    # Tie detection: if two buckets tie at the top, refuse to classify
+    # (avoids misassignment — let the template's explicit party_detection win)
+    top_count = counts[best_bucket]
+    ties = [b for b, c in counts.items() if c == top_count]
+    if len(ties) > 1:
+        return None
+    return best_bucket
+
+
 def _augment_party_detection(
     pd: dict | None,
     cand_names: list[str] | None,
     cand_descs: dict | None,
+    cand_party_map: dict | None = None,
 ) -> dict:
     """Auto-augment party_detection by classifying each candidate name into a
-    bucket (DPP / KMT / TPP / IND) based on their description keywords.
+    bucket (DPP / KMT / TPP / IND).
+
+    Classification priority:
+      1. ``cand_party_map[cname]`` — direct party code from the template
+         (e.g. {"賴清德":"DPP", "鄭麗文":"KMT"}). This is the authoritative
+         source and overrides description parsing.
+      2. Strong membership marker in description ("○○黨籍").
+      3. Weighted keyword count in description (with tie-rejection).
 
     The *full Chinese name* is added to the bucket (not a surname) — Chinese
     single-character surnames collide badly in news text (賴 would match both
@@ -2357,28 +2410,28 @@ def _augment_party_detection(
     out = {k: list((pd or {}).get(k, [])) for k in ("DPP", "KMT", "TPP", "IND")}
     existing = {str(s).strip() for bucket in out.values() for s in bucket}
     added: list[tuple[str, str]] = []
+    cand_party_map = cand_party_map or {}
     for cname in (cand_names or []):
         cname = str(cname or "").strip()
         if not cname or cname in existing:
             continue
+        # 1) Authoritative: party code from the template
+        explicit_party = str(cand_party_map.get(cname, "") or "").upper().strip()
+        if explicit_party in ("DPP", "KMT", "TPP", "IND"):
+            out[explicit_party].append(cname)
+            existing.add(cname)
+            added.append((cname, explicit_party))
+            continue
+        # 2) & 3) Description-based classification (fallback)
         desc = str((cand_descs or {}).get(cname, ""))
-        desc_l = desc.lower()
-        bucket = None
-        if any(k in desc or k in desc_l for k in _DPP_DESC_KWS):
-            bucket = "DPP"
-        elif any(k in desc or k in desc_l for k in _KMT_DESC_KWS):
-            bucket = "KMT"
-        elif any(k in desc or k in desc_l for k in _TPP_DESC_KWS):
-            bucket = "TPP"
-        elif any(k in desc or k in desc_l for k in _IND_DESC_KWS):
-            bucket = "IND"
+        bucket = _classify_party_from_desc(desc)
         if bucket:
             out[bucket].append(cname)
             existing.add(cname)
             added.append((cname, bucket))
     if added:
         logger.info(
-            "Party detection auto-augmented from descriptions: "
+            "Party detection auto-augmented: "
             + ", ".join(f"{c}→{b}" for c, b in added)
         )
     return out
@@ -2394,15 +2447,24 @@ async def start_evolution(
     candidate_descriptions: dict | None = None,
     party_detection: dict | None = None,
     enabled_vendors: list[str] | None = None,
+    candidate_party_map: dict | None = None,
 ) -> dict:
-    """Start a multi-day evolution run as a background job."""
+    """Start a multi-day evolution run as a background job.
+
+    candidate_party_map: optional {candidate_name: party_code} where party_code
+    is one of DPP/KMT/TPP/IND. When supplied, the template's explicit party
+    assignment takes precedence over description-keyword heuristics — this
+    prevents KMT candidates whose descriptions mention 民進黨 (as a target of
+    criticism) from being misclassified as DPP.
+    """
     from .news_pool import get_pool
 
     job_id = uuid.uuid4().hex[:8]
     pool = news_pool or get_pool()
 
     augmented_pd = _augment_party_detection(
-        party_detection, candidate_names, candidate_descriptions
+        party_detection, candidate_names, candidate_descriptions,
+        cand_party_map=candidate_party_map,
     )
 
     job = {

@@ -78,7 +78,10 @@ class StartEvolutionRequest(BaseModel):
     candidate_names: list[str] | None = None
     scoring_params: dict | None = None  # tunable evolution parameters
     candidate_descriptions: dict | None = None  # name -> description text
-    party_detection: dict | None = None  # {"D": [...], "R": [...], "I": [...]}
+    party_detection: dict | None = None  # {"DPP": [...], "KMT": [...], "TPP": [...], "IND": [...]}
+    # name -> party code ("DPP"/"KMT"/"TPP"/"IND"). Authoritative — overrides
+    # description-keyword heuristics. Pass this from the template candidates.
+    candidate_party_map: dict | None = None
     workspace_id: str = ""  # scope state + news pool to this workspace
 
 
@@ -1086,6 +1089,7 @@ async def start_evolve(req: StartEvolutionRequest):
         candidate_descriptions=req.candidate_descriptions,
         party_detection=req.party_detection,
         enabled_vendors=req.enabled_vendors,
+        candidate_party_map=req.candidate_party_map,
     )
     return result
 
