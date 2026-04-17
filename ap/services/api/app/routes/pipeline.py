@@ -490,22 +490,33 @@ Return ONLY valid JSON, no markdown fencing."""
             data_text += f"  {' '.join(parts)}\n"
 
     import httpx as _httpx
-    async with _httpx.AsyncClient(timeout=60.0) as client:
+    # Reasoning models (o1/o3/o4-mini) don't support temperature or max_tokens;
+    # use max_completion_tokens instead, and skip temperature.
+    _is_reasoning = any(model.startswith(p) for p in ("o1", "o3", "o4"))
+    _llm_body: dict = {
+        "model": model,
+        "messages": [
+            {"role": "system" if not _is_reasoning else "user", "content": system_prompt},
+            {"role": "user", "content": data_text},
+        ] if not _is_reasoning else [
+            {"role": "user", "content": f"{system_prompt}\n\n---\n\n{data_text}"},
+        ],
+    }
+    if _is_reasoning:
+        _llm_body["max_completion_tokens"] = 2000
+    else:
+        _llm_body["temperature"] = 0.3
+        _llm_body["max_tokens"] = 800
+
+    async with _httpx.AsyncClient(timeout=120.0) as client:
         resp = await client.post(
             f"{base_url}/chat/completions",
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={
-                "model": model,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": data_text},
-                ],
-                "temperature": 0.3,
-                "max_tokens": 800,
-            },
+            json=_llm_body,
         )
     if resp.status_code != 200:
-        return JSONResponse(status_code=502, content={"error": f"LLM API error: {resp.status_code}"})
+        _err_body = resp.text[:200] if resp.text else ""
+        return JSONResponse(status_code=502, content={"error": f"LLM API error: {resp.status_code} {_err_body}"})
 
     import json
     raw = resp.json()["choices"][0]["message"]["content"].strip()
