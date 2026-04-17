@@ -751,15 +751,15 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                 return (
                   <div style={{ padding: 16, borderRadius: 8, background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.15)" }}>
                     <div style={{ color: "#86efac", fontSize: 13, fontWeight: 600, marginBottom: 14 }}>
-                      ✓ {agents.length} agents generated
+                      ✓ {en ? `${agents.length} agents generated` : `已生成 ${agents.length} 位代理人`}
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20 }}>
-                      <MiniBar title="Political Leaning" data={count(agents, "political_leaning")} color="#e94560" />
-                      <MiniBar title="Race" data={count(agents, "race")} color="#f59e0b" />
-                      <MiniBar title="Gender" data={count(agents, "gender")} color="#a78bfa" />
-                      <MiniBar title="Household Income" data={count(agents, "household_income")} color="#22d3ee" />
-                      <MiniBar title="Education" data={count(agents, "education")} color="#fbbf24" />
-                      <MiniBar title="Top States" data={count(agents, "district")} color="#34d399" />
+                      <MiniBar title={en ? "Political Leaning" : "政治傾向"}   data={count(agents, "political_leaning")} color="#e94560" />
+                      <MiniBar title={en ? "Ethnicity" : "族群"}               data={count(agents, "ethnicity")}        color="#f59e0b" />
+                      <MiniBar title={en ? "Gender" : "性別"}                  data={count(agents, "gender")}           color="#a78bfa" />
+                      <MiniBar title={en ? "Household Income" : "家戶月所得"} data={count(agents, "household_income")} color="#22d3ee" />
+                      <MiniBar title={en ? "Education" : "教育程度"}          data={count(agents, "education")}        color="#fbbf24" />
+                      <MiniBar title={en ? "Top Districts" : "熱門地區"}      data={count(agents, "district")}         color="#34d399" />
                     </div>
                   </div>
                 );
