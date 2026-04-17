@@ -39,6 +39,7 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
   // ── UI Locale — user-toggleable, drives text labels only ──
   const t = useTr();
   const locale = useLocaleStore((s) => s.locale);
+  const en = locale === "en";
 
   // ── Data ──
   const [counties, setCounties] = useState<any[]>([]);
