@@ -452,8 +452,18 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
   // Build search queries distributed by news category mix
   const buildQueries = useCallback(() => {
     const candidateNameList = candidates.map((c: any) => c.name as string).filter(Boolean);
-    const nationalKws = (searchKeywords.national || "US election economy voters congress federal policy").split("\n").filter(Boolean);
-    const localKws = (searchKeywords.local || "swing state governor local election county school").split("\n").filter(Boolean);
+    // Template stores default_search_keywords as either a list[str] (newer
+    // Civatas-TW build_templates.py output) or a newline-delimited string
+    // (legacy). Handle both robustly — previously calling .split on a list
+    // threw TypeError and the outer try-catch silently swallowed the whole
+    // crawl phase, leaving the news pool permanently empty.
+    const toKwList = (val: any, fallback: string): string[] => {
+      if (Array.isArray(val)) return val.filter((s: any) => !!s).map(String);
+      if (typeof val === "string") return val.split("\n").filter(Boolean);
+      return fallback.split("\n").filter(Boolean);
+    };
+    const nationalKws = toKwList(searchKeywords.national, "總統 行政院 立法院 兩岸 經濟 通膨 健保");
+    const localKws = toKwList(searchKeywords.local, "縣市長 議會 捷運 治安 學校 健保 長照");
     const natPick = () => nationalKws[Math.floor(Math.random() * nationalKws.length)] || "";
     const locPick = () => localKws[Math.floor(Math.random() * localKws.length)] || "";
     // Round-robin index so each candidate gets searched in turn across queries
