@@ -450,14 +450,22 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
           saveUiSettings(wsId, "evolution-progress", { ...saved, status: "done", activeJobId: null }).catch(() => {});
           return;
         }
-        if (status === "paused") {
+        if (status === "paused" || status === "error") {
           setCurrentRound(cr || 0);
           setTotalRounds(tr || 0);
           setNewsCount(nc || 0);
           setCurrentSimDate(simDate || "");
           setPaused(true);
           setPhase("paused");
-          setPhaseLabel(en ? "Paused — click Resume to continue" : "已暫停 — 點擊繼續");
+          setPhaseLabel(
+            status === "error"
+              ? (en ? "Interrupted — click Resume to continue" : "演化中斷 — 點擊繼續")
+              : (en ? "Paused — click Resume to continue" : "已暫停 — 點擊繼續")
+          );
+          // Normalize error → paused so next reload also shows Resume
+          if (status === "error") {
+            saveUiSettings(wsId, "evolution-progress", { ...saved, status: "paused" }).catch(() => {});
+          }
           return;
         }
 
