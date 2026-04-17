@@ -764,9 +764,158 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                   </div>
                 );
               })()}
+
+              {/* Data Sources — 可信賴的官方統計與公開資料基礎 */}
+              <TaiwanDataSourcesPanel en={en} highlighted={generating} />
             </div>
           </div>
         </div>
       </div>
     );
+}
+
+
+/**
+ * Taiwan data sources trust panel. Displayed at the bottom of Population Setup
+ * to communicate the pipeline's statistical provenance — census, election,
+ * ethnicity surveys, and geography. Highlighted (border-glow) while generating.
+ */
+function TaiwanDataSourcesPanel({ en, highlighted }: { en: boolean; highlighted: boolean }) {
+  type Src = { color: string; icon: string; title: string; title_en: string; body: string; body_en: string; note?: string };
+  const sources: Src[] = [
+    {
+      color: "#3b82f6", icon: "📊",
+      title: "人口及住宅普查",
+      title_en: "Census of Population and Housing",
+      body: "主計總處 110 年（2020）— 教育、就業、家戶型態、居住、原住民族別",
+      body_en: "DGBAS 2020 Census — education, employment, household type, tenure, indigenous",
+    },
+    {
+      color: "#8b5cf6", icon: "🏠",
+      title: "戶政月報",
+      title_en: "Household Registration Monthly",
+      body: "內政部戶政司 2024 年底 — 性別／單一年齡／368 鄉鎮現住人口",
+      body_en: "MOI 戶政司 Dec 2024 — gender / single-age / 368 townships",
+    },
+    {
+      color: "#22c55e", icon: "🗳️",
+      title: "2024 總統大選開票",
+      title_en: "2024 CEC Presidential Results",
+      body: "中選會鄉鎮級開票 — 368 鄉鎮完整 · 有效票 13,947,506",
+      body_en: "CEC township-level · 368 townships · 13.95M valid votes",
+      note: "賴清德 40.05% / 侯友宜 33.49% / 柯文哲 26.46%（與官方分毫不差）",
+    },
+    {
+      color: "#f59e0b", icon: "💰",
+      title: "家庭收支調查",
+      title_en: "Family Income & Expenditure Survey",
+      body: "主計總處 2023 — 月所得 6 級距（< 3萬 ~ > 20萬 新台幣）",
+      body_en: "DGBAS 2023 — 6 monthly income bands (NT$)",
+    },
+    {
+      color: "#06b6d4", icon: "💼",
+      title: "人力資源調查",
+      title_en: "Labor Force Survey",
+      body: "主計總處 2024 年報 — 勞動力參與率、就業／失業／非勞動力分布",
+      body_en: "DGBAS 2024 annual — labor participation, employment status",
+    },
+    {
+      color: "#ec4899", icon: "🎎",
+      title: "客家人口調查",
+      title_en: "Hakka Population Survey",
+      body: "客委會 2021 全國調查 — 自我認定人口比例（桃竹苗 36–70%）",
+      body_en: "HAC 2021 — self-identified Hakka share by county",
+    },
+    {
+      color: "#f97316", icon: "🏹",
+      title: "原住民族人口概況",
+      title_en: "Indigenous Population Census",
+      body: "原民會 2024 — 16 族分鄉鎮統計（花東最高 27–37%）",
+      body_en: "CIP 2024 — 16 tribes by township (花東 peak 27–37%)",
+    },
+    {
+      color: "#6366f1", icon: "🗺",
+      title: "行政區邊界",
+      title_en: "Administrative Boundaries",
+      body: "g0v / ronnywang twgeojson（內政部 MOI segis 2011）· MIT",
+      body_en: "g0v / ronnywang twgeojson (MOI segis 2011) · MIT",
+    },
+    {
+      color: "#ef4444", icon: "🎯",
+      title: "藍綠傾向指數（TW-PVI）",
+      title_en: "Blue-Green PVI",
+      body: "從 2024 兩黨得票率計算 5-tier bucket（深綠 +22 ~ 深藍 −40）",
+      body_en: "5-bucket bias from 2024 two-party share (G+22 ~ B−40)",
+      note: "深綠 89 / 偏綠 59 / 中間 76 / 偏藍 47 / 深藍 97（368 鄉鎮）",
+    },
+  ];
+
+  return (
+    <div
+      style={{
+        marginTop: 18,
+        padding: 16,
+        borderRadius: 10,
+        background: "rgba(59,130,246,0.04)",
+        border: `1px solid ${highlighted ? "rgba(59,130,246,0.55)" : "rgba(59,130,246,0.15)"}`,
+        boxShadow: highlighted ? "0 0 14px rgba(59,130,246,0.25)" : "none",
+        transition: "all 0.3s",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+        <span style={{ fontSize: 16 }}>🛡️</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#93c5fd" }}>
+          {en ? "Data Sources — official statistics the pipeline builds on" : "資料來源 — 可信賴的官方統計與公開資料基礎"}
+        </span>
+      </div>
+      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginBottom: 12, lineHeight: 1.6 }}>
+        {en
+          ? "Every persona is synthesized from these public, verifiable data sources. National totals are reproduced exactly."
+          : "每位代理人都是從以下公開且可驗證的資料來源合成而來；全國彙總數字與官方資料完全吻合。"}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 8 }}>
+        {sources.map((s) => (
+          <div
+            key={s.title}
+            style={{
+              padding: "10px 12px",
+              borderRadius: 8,
+              background: "rgba(255,255,255,0.02)",
+              border: `1px solid ${s.color}33`,
+              display: "flex", gap: 10, alignItems: "flex-start",
+            }}
+          >
+            <div style={{
+              flexShrink: 0, width: 28, height: 28, borderRadius: 6,
+              background: `${s.color}22`, display: "flex", alignItems: "center",
+              justifyContent: "center", fontSize: 14,
+            }}>
+              {s.icon}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.85)", marginBottom: 2 }}>
+                {en ? s.title_en : s.title}
+              </div>
+              <div style={{ fontSize: 10.5, color: "rgba(255,255,255,0.55)", lineHeight: 1.45 }}>
+                {en ? s.body_en : s.body}
+              </div>
+              {s.note ? (
+                <div style={{ fontSize: 9.5, color: s.color, marginTop: 3, lineHeight: 1.4, fontWeight: 500 }}>
+                  {s.note}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{
+        marginTop: 12, paddingTop: 10, borderTop: "1px dashed rgba(255,255,255,0.08)",
+        fontSize: 10, color: "rgba(255,255,255,0.4)", lineHeight: 1.55,
+      }}>
+        {en
+          ? "Methodology: township 18+ headcount is derived from CEC turnout; national aggregate distributions are applied and county-level overrides adjust ethnicity geography (Hakka 桃竹苗, Indigenous 花東, 外省 北台灣)."
+          : "方法學：鄉鎮 18+ 人口由中選會投票率反推；套用全國彙總分布，族群欄位在縣市層級 override 以反映地理現實（客家集中桃竹苗、原住民集中花東、外省集中北台灣）。"}
+      </div>
+    </div>
+  );
 }
