@@ -327,9 +327,10 @@ LLM 對 metadata-heavy 的族群（需要族別 / 省籍 name）會省略具體 
 ### Stage 6 待辦（開發到另一台 PC 前）
 - [x] `Tavily/Serper` 新聞搜尋 `lr=lang_en` 改 `lr=lang_zh-TW`（CLAUDE.md
       最末提到，Stage 6 待驗證項目）
-- [ ] 若原住民 / 外省 文化深度不足仍是痛點 → tribal_affiliation /
-      origin_province 預分配（Option B）
-- [ ] 鄉鎮內維度用全國平均的限制（內湖所得 vs 萬華等）— 需補鄉鎮級資料
+- [x] 原住民族別 + 外省籍貫預分配 → `tribal_affiliation` / `origin_province`
+      欄位加入 Person schema，synthesis 預分配，persona/evolution prompt 注入
+- [x] 縣市級維度 override（年齡/教育/就業/所得/住宅 tenure）取代全國平均
+      — 22 縣市完整覆蓋，鄉鎮級差異（內湖 vs 萬華）仍為 future work
 - [ ] 補 2020 鄉鎮級總統資料讓 PVI 兩屆平均、增強穩定性（非必要）
 
 ## 候選人清單
@@ -368,8 +369,9 @@ LLM 對 metadata-heavy 的族群（需要族別 / 省籍 name）會省略具體 
 
 ### 已知限制（do not "fix" without understanding）
 
-- **鄉鎮內維度均用全國平均**。鄉鎮級真實差異（例如內湖所得遠高於萬華）需未來補資料
-  精煉。族群維度已有縣市級 override 反映地理現實。
+- **鄉鎮內維度使用縣市級分佈**（年齡/教育/就業/所得/住宅 tenure/族群 6 維度皆有
+  22 縣市 override）。鄉鎮級真實差異（例如內湖所得遠高於萬華）需未來補資料精煉。
+  性別與家戶型態仍使用全國平均（縣市間差異極小）。
 - **2020 全國鄉鎮級總統資料**：public CSV mirror 不存在（中選會僅開 ODS）。
   目前 `compute_pvi.py` 單屆基於 2024 計算偏差值。補 2020 可增強穩定性，但非必要。
 - **樣本數小時 EC 失真**：台灣沒有選舉人團，但若 prediction 嘗試用縣市 winner-take-all
