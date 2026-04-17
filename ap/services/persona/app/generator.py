@@ -517,6 +517,8 @@ def _from_template(
         "county": fields.get("county", ""),
         "township": fields.get("township", ""),
         "cross_strait": fields.get("cross_strait", ""),
+        "tribal_affiliation": fields.get("tribal_affiliation", ""),
+        "origin_province": fields.get("origin_province", ""),
         "party_lean": fields.get("party_lean", ""),
         "household_income": fields.get("household_income", ""),
         "household_type": fields.get("household_type", ""),
@@ -609,7 +611,11 @@ async def _from_llm(
                         break
         except Exception:
             pass
-    system = prompt or _default_llm_prompt(locale, county=_county_for_prompt)
+    system = prompt or _default_llm_prompt(
+        locale, county=_county_for_prompt,
+        tribal_affiliation=fields.get("tribal_affiliation", ""),
+        origin_province=fields.get("origin_province", ""),
+    )
     user_content = "\n".join(f"- {k}: {v}" for k, v in fields.items() if v)
 
     # Per-agent geographic anchor — system prompt is built once per call but
@@ -695,6 +701,8 @@ async def _from_llm(
         "county": fields.get("county", ""),
         "township": fields.get("township", ""),
         "cross_strait": fields.get("cross_strait", ""),
+        "tribal_affiliation": fields.get("tribal_affiliation", ""),
+        "origin_province": fields.get("origin_province", ""),
         "party_lean": fields.get("party_lean", ""),
         "household_income": fields.get("household_income", ""),
         "household_type": fields.get("household_type", ""),
@@ -940,6 +948,8 @@ def _person_fields(p: Person) -> dict[str, str]:
     if not township_val and _district:
         township_val = _district
     cross_strait_val = getattr(p, "cross_strait", "") or ""
+    tribal_affiliation_val = getattr(p, "tribal_affiliation", "") or ""
+    origin_province_val = getattr(p, "origin_province", "") or ""
 
     fields = {
         "person_id": str(p.person_id),
@@ -961,6 +971,8 @@ def _person_fields(p: Person) -> dict[str, str]:
         "marital_status": p.marital_status or "",
         "party_lean": party_lean,
         "cross_strait": cross_strait_val,
+        "tribal_affiliation": tribal_affiliation_val,
+        "origin_province": origin_province_val,
         "issue_1": issue_1,
         "issue_2": issue_2,
         "media_habit": media_habit,
@@ -992,7 +1004,7 @@ def _fix_truncated_text(text: str) -> str:
     return text + "。"
 
 
-def _default_llm_prompt(locale: str, county: str = "") -> str:
+def _default_llm_prompt(locale: str, county: str = "", tribal_affiliation: str = "", origin_province: str = "") -> str:
     """Taiwan persona prompt (繁體中文). ``county`` accepts a county name or
     admin_key '縣市|鄉鎮'; defaults to 臺北市."""
-    return _BUILD_PERSONA_PROMPT_EN(county or "臺北市")
+    return _BUILD_PERSONA_PROMPT_EN(county or "臺北市", tribal_affiliation=tribal_affiliation, origin_province=origin_province)

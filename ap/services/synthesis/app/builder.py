@@ -759,3 +759,139 @@ def _enforce_logical_consistency(row: dict) -> None:
                 else:
                     row["occupation"] = _assign_from_census()
 
+    # 原住民 geographic re-sampling: 台灣原住民 ~580k (2.5%) 高度集中在
+    # 花東 + 原鄉部落 + 都會移民聚落。如果 template 的 national marginal 讓
+    # 原住民 agent 被分配到雲林/彰化/臺南/嘉義等 <1% 的縣市，persona 的地理
+    # 敘事會完全失真（沒有部落、族語、傳統領域、豐年祭 context）。
+    # 這裡針對原住民重新採樣 township，其他 ethnicity 不動。
+    if row.get("ethnicity") == "原住民":
+        _r_county = (row.get("county") or "").strip()
+        # 原住民 meaningful counties（>3% 或有重要原鄉）
+        _ind_ok_counties = {
+            "臺東縣", "花蓮縣", "屏東縣", "南投縣",
+            "新北市", "桃園市", "高雄市", "宜蘭縣",
+            "新竹縣", "苗栗縣",
+        }
+        if _r_county not in _ind_ok_counties:
+            # Weighted 原鄉 + 都會原民 pool. Weights roughly match 2024 原民會
+            # 縣市人口分佈（臺東 35% / 花蓮 15% / 新北 12% / 桃園 10% / 屏東
+            # 10% / 南投 8% / 高雄 7% / 宜蘭 3% / 新竹縣 3% / 苗栗 1%）。
+            _ind_pool = [
+                ("臺東縣|臺東市", 8), ("臺東縣|卑南鄉", 4), ("臺東縣|金峰鄉", 3),
+                ("臺東縣|達仁鄉", 3), ("臺東縣|太麻里鄉", 3), ("臺東縣|延平鄉", 3),
+                ("臺東縣|海端鄉", 3), ("臺東縣|蘭嶼鄉", 3), ("臺東縣|東河鄉", 3),
+                ("花蓮縣|秀林鄉", 4), ("花蓮縣|萬榮鄉", 3), ("花蓮縣|卓溪鄉", 3),
+                ("花蓮縣|光復鄉", 3), ("花蓮縣|瑞穗鄉", 2), ("花蓮縣|花蓮市", 3),
+                ("屏東縣|三地門鄉", 3), ("屏東縣|霧台鄉", 2), ("屏東縣|瑪家鄉", 2),
+                ("屏東縣|泰武鄉", 2), ("屏東縣|來義鄉", 2), ("屏東縣|屏東市", 3),
+                ("南投縣|仁愛鄉", 4), ("南投縣|信義鄉", 4), ("南投縣|埔里鎮", 2),
+                ("新北市|烏來區", 3), ("新北市|新店區", 3), ("新北市|三峽區", 2),
+                ("新北市|汐止區", 2), ("新北市|板橋區", 2),
+                ("桃園市|復興區", 3), ("桃園市|中壢區", 3), ("桃園市|平鎮區", 2),
+                ("桃園市|八德區", 2),
+                ("高雄市|那瑪夏區", 2), ("高雄市|桃源區", 2), ("高雄市|茂林區", 2),
+                ("宜蘭縣|南澳鄉", 2), ("宜蘭縣|大同鄉", 2),
+                ("新竹縣|尖石鄉", 2), ("新竹縣|五峰鄉", 2),
+                ("苗栗縣|泰安鄉", 1),
+            ]
+            _new_key = _rng.choices(
+                [k for k, _ in _ind_pool],
+                weights=[w for _, w in _ind_pool], k=1,
+            )[0]
+            _new_county, _new_town = _new_key.split("|", 1)
+            row["township"] = _new_key
+            row["county"] = _new_county
+            row["district"] = f"{_new_county}{_new_town}"
+
+    # ── 原住民族別預分配（依鄉鎮推斷最可能族別）──
+    if row.get("ethnicity") == "原住民" and not row.get("tribal_affiliation"):
+        _township_key = row.get("township", "")
+        _town_part = _township_key.split("|", 1)[1] if "|" in _township_key else ""
+
+        # 原鄉部落 → 明確族別對照
+        _TOWNSHIP_TRIBE: dict[str, str] = {
+            # 臺東
+            "蘭嶼鄉": "達悟族",
+            "金峰鄉": "排灣族", "達仁鄉": "排灣族", "太麻里鄉": "排灣族",
+            "延平鄉": "布農族", "海端鄉": "布農族",
+            "東河鄉": "阿美族", "卑南鄉": "卑南族",
+            # 花蓮
+            "秀林鄉": "太魯閣族", "萬榮鄉": "太魯閣族",
+            "卓溪鄉": "布農族",
+            "光復鄉": "阿美族", "瑞穗鄉": "阿美族", "豐濱鄉": "阿美族",
+            # 屏東
+            "三地門鄉": "排灣族", "瑪家鄉": "排灣族", "泰武鄉": "排灣族",
+            "來義鄉": "排灣族",
+            "霧台鄉": "魯凱族",
+            # 南投
+            "仁愛鄉": "賽德克族", "信義鄉": "布農族",
+            # 高雄
+            "那瑪夏區": "布農族", "桃源區": "布農族", "茂林區": "魯凱族",
+            # 宜蘭
+            "南澳鄉": "泰雅族", "大同鄉": "泰雅族",
+            # 新竹
+            "尖石鄉": "泰雅族", "五峰鄉": "賽夏族",
+            # 苗栗
+            "泰安鄉": "泰雅族",
+            # 嘉義
+            "阿里山鄉": "鄒族",
+            # 新北
+            "烏來區": "泰雅族",
+        }
+        # 都會區原住民 — 依全國族群人口比例加權隨機
+        _NATIONAL_TRIBE_WEIGHTS: list[tuple[str, int]] = [
+            ("阿美族", 37), ("排灣族", 18), ("泰雅族", 16), ("布農族", 11),
+            ("太魯閣族", 6), ("卑南族", 3), ("魯凱族", 3), ("賽夏族", 1),
+            ("鄒族", 1), ("達悟族", 1), ("賽德克族", 2), ("噶瑪蘭族", 1),
+            ("撒奇萊雅族", 1), ("邵族", 1), ("拉阿魯哇族", 1),
+            ("卡那卡那富族", 1),
+        ]
+
+        tribe_match = _TOWNSHIP_TRIBE.get(_town_part)
+        if isinstance(tribe_match, str):
+            row["tribal_affiliation"] = tribe_match
+        else:
+            row["tribal_affiliation"] = _rng.choices(
+                [t for t, _ in _NATIONAL_TRIBE_WEIGHTS],
+                weights=[w for _, w in _NATIONAL_TRIBE_WEIGHTS], k=1,
+            )[0]
+
+    # ── 外省人祖籍預分配（依 1949 來台移民統計加權）──
+    if row.get("ethnicity") == "外省" and not row.get("origin_province"):
+        _PROVINCE_WEIGHTS: list[tuple[str, int]] = [
+            ("山東", 18), ("江蘇", 12), ("浙江", 11), ("湖南", 10),
+            ("四川", 8), ("廣東", 7), ("福建", 6), ("安徽", 5),
+            ("河南", 5), ("湖北", 4), ("江西", 3), ("河北", 2),
+            ("陝西", 2), ("貴州", 2), ("雲南", 2), ("遼寧", 1),
+            ("山西", 1), ("廣西", 1),
+        ]
+        row["origin_province"] = _rng.choices(
+            [p for p, _ in _PROVINCE_WEIGHTS],
+            weights=[w for _, w in _PROVINCE_WEIGHTS], k=1,
+        )[0]
+
+    # cross_strait: 主權 / 經濟 / 民生 issue-priority axis (TW-specific).
+    # Derived from party_lean + ethnicity when the template didn't sample it.
+    # evolver.py reads this to seed per-agent attitudes.issue_priority so
+    # agents within the same party_lean still have heterogeneous focus.
+    if not row.get("cross_strait"):
+        lean = (row.get("party_lean") or "").strip()
+        ethnicity = (row.get("ethnicity") or "").strip()
+        _lean_weights = {
+            "深綠": (55, 15, 30),
+            "偏綠": (35, 20, 45),
+            "中間": (15, 25, 60),
+            "偏藍": (10, 45, 45),
+            "深藍": (5,  55, 40),
+        }.get(lean, (20, 30, 50))  # fallback: 民生-heavy
+        w_sov, w_econ, w_live = _lean_weights
+        if ethnicity == "外省":
+            w_sov = max(0, w_sov - 10); w_econ += 10
+        elif ethnicity == "原住民":
+            w_sov += 10; w_live = max(0, w_live - 10)
+        elif ethnicity == "新住民":
+            w_sov = max(0, w_sov - 5); w_econ = max(0, w_econ - 5); w_live += 10
+        row["cross_strait"] = _rng.choices(
+            ["主權", "經濟", "民生"],
+            weights=[w_sov, w_econ, w_live], k=1,
+        )[0]

@@ -1285,6 +1285,18 @@ async def evolve_one_day(
             else:  # 中間 / Tossup / TPP-leaning
                 attitudes = {"economic_stance": 50, "social_values": 50,
                              "cross_strait": 50, "issue_priority": "民生"}
+            # Per-agent override: use persona.cross_strait (主權/經濟/民生) to
+            # refine issue_priority and nudge the cross_strait axis so agents
+            # within the same party_lean still differ.
+            _cs = (agent.get("cross_strait") or "").strip()
+            if _cs == "主權":
+                attitudes["issue_priority"] = "主權/民主"
+                attitudes["cross_strait"] = max(5, attitudes["cross_strait"] - 15)
+            elif _cs == "經濟":
+                attitudes["issue_priority"] = "經濟/兩岸"
+                attitudes["cross_strait"] = min(95, attitudes["cross_strait"] + 15)
+            elif _cs == "民生":
+                attitudes["issue_priority"] = "民生"
 
         # Convert attitude scores to Chinese descriptive labels for the LLM prompt.
         def _att_label_leftright(val: int) -> str:
@@ -1365,15 +1377,24 @@ async def evolve_one_day(
         else:
             # ── Single-call mode for commercial APIs ──
             macro_context = job.get("macro_context", "").strip() if job else ""
-            # TAIEX market snippet — only injected for agents who realistically
-            # follow the stock market (high income, mid-age white-collar, or
-            # finance-literate media habits). Low-income / young / student
-            # personas don't see it — matches real TW investor demographics.
+            # Real TW market data (TAIEX / forex / oil). Each piece is gated by
+            # its own filter so only realistic audiences see it:
+            #   · TAIEX   → ~40% (investors: high income / mid-age / finance-literate)
+            #   · Forex   → ~20% (travel / finance pros / importers)
+            #   · Oil     → ~75% (drivers age 22-72, ex urban young students)
             try:
-                from .tw_market_data import _should_see_market
-                _market_txt = (job.get("_market_zh_text") or "") if job else ""
-                if _market_txt and _should_see_market(agent):
-                    macro_context = (macro_context + "\n\n" + _market_txt).strip() if macro_context else _market_txt
+                from .tw_market_data import _should_see_market, _should_see_forex, _should_see_oil
+                _parts = [macro_context] if macro_context else []
+                _taiex = (job.get("_market_taiex_text") or "") if job else ""
+                _forex = (job.get("_market_forex_text") or "") if job else ""
+                _oil = (job.get("_market_oil_text") or "") if job else ""
+                if _taiex and _should_see_market(agent):
+                    _parts.append(_taiex)
+                if _forex and _should_see_forex(agent):
+                    _parts.append(_forex)
+                if _oil and _should_see_oil(agent):
+                    _parts.append(_oil)
+                macro_context = "\n\n".join(p for p in _parts if p).strip()
             except Exception:
                 pass
             macro_context_text = f"[Macro political & economic context]\n{macro_context}\n" if macro_context else ""
@@ -1390,6 +1411,14 @@ async def evolve_one_day(
             )
             _ag_race = _ag_ethnicity          # map onto legacy prompt slot
             _ag_hispanic = "未提供"             # Taiwan context: no hispanic field
+            _ag_tribal = (
+                agent.get("tribal_affiliation", agent.get("context", {}).get("tribal_affiliation", ""))
+                or ""
+            )
+            _ag_province = (
+                agent.get("origin_province", agent.get("context", {}).get("origin_province", ""))
+                or ""
+            )
             _ag_income = agent.get("household_income", agent.get("income_band", agent.get("context", {}).get("income_band", ""))) or "未提供"
             _ag_marital = agent.get("marital_status", agent.get("context", {}).get("marital_status", "")) or "未提供"
             _ag_household = agent.get("household_type", agent.get("context", {}).get("household_type", "")) or "未提供"
@@ -1436,10 +1465,18 @@ async def evolve_one_day(
 
             _issue_priority = attitudes.get("issue_priority", "民生")
 
+            _ethnic_detail_parts = []
+            if _ag_tribal:
+                _ethnic_detail_parts.append(f"族別：{_ag_tribal}")
+            if _ag_province:
+                _ethnic_detail_parts.append(f"祖籍：{_ag_province}")
+            _ethnic_detail = "；".join(_ethnic_detail_parts) if _ethnic_detail_parts else "無額外細節"
+
             prompt = EVOLUTION_PROMPT_TEMPLATE.format(
                 persona_desc=persona_desc,
                 political_leaning=political_leaning,
                 race=_ag_race,
+                ethnic_detail=_ethnic_detail,
                 hispanic_or_latino=_ag_hispanic,
                 household_income=_ag_income,
                 marital_status=_ag_marital,
@@ -1491,6 +1528,32 @@ async def evolve_one_day(
         diary_text = result.get("todays_diary", "")
         reasoning_text = result.get("reasoning", "")
         news_relevance = result.get("news_relevance", "medium")
+
+        # ── Parse structured diary_tags (indexing sidecar — see prompts.py) ──
+        # The LLM returns a small JSON sidecar alongside the narrative diary so
+        # downstream can query "which agents mentioned oil today" without having
+        # to NLP the free-text. Normalise defensively — LLMs sometimes return
+        # a stringified list or omit the key entirely.
+        def _norm_diary_tags(raw) -> dict:
+            if not isinstance(raw, dict):
+                return {"mentioned_topics": [], "mood_arc": "", "life_event_triggered": None}
+            _topics_raw = raw.get("mentioned_topics", [])
+            if isinstance(_topics_raw, str):
+                _topics_raw = [t.strip() for t in _topics_raw.replace("、", ",").split(",") if t.strip()]
+            elif not isinstance(_topics_raw, list):
+                _topics_raw = []
+            _topics = [str(t).strip() for t in _topics_raw if str(t).strip()][:10]
+            _mood = str(raw.get("mood_arc", "") or "").strip()[:24]
+            _life = raw.get("life_event_triggered", None)
+            if isinstance(_life, str):
+                _life = _life.strip() or None
+                if _life and _life.lower() in {"null", "none", "無", "n/a"}:
+                    _life = None
+            else:
+                _life = None
+            return {"mentioned_topics": _topics, "mood_arc": _mood, "life_event_triggered": _life}
+
+        diary_tags = _norm_diary_tags(result.get("diary_tags"))
         llm_status = result.get("_llm_status", "ok")
         llm_vendor_used = result.get("_llm_vendor", "")
         # Parse dual satisfaction — backward compat: fallback to single updated_satisfaction
@@ -1822,6 +1885,7 @@ async def evolve_one_day(
             "political_attitudes": new_attitudes,
             "candidate_awareness": dict(cand_awareness),
             "candidate_sentiment": dict(cand_sentiment),
+            "diary_tags": diary_tags,
         }
         day_entries.append(entry)
         diaries.append(entry)
@@ -2502,17 +2566,18 @@ async def start_evolution(
     }
     _jobs[job_id] = job
 
-    # Fetch real TAIEX data for the virtual round's real-date window. Only
-    # gate-eligible agents (high-income / mid-age / finance-literate) will
-    # actually see this in their macro_context — see tw_market_data._should_see_market.
+    # Fetch real TW market data (TAIEX / forex / oil) for the virtual round's
+    # real-date window. Each piece only reaches filter-passing agents via the
+    # respective _should_see_* gate in tw_market_data.
     if round_start_date and round_end_date:
         try:
-            from .tw_market_data import build_market_context
-            market_txt = await build_market_context(round_start_date, round_end_date)
-            if market_txt:
-                job["_market_zh_text"] = market_txt
-                logger.info(f"[{job_id}] Market ctx injected ({round_start_date}~{round_end_date}), "
-                            f"{market_txt.splitlines()[1] if len(market_txt.splitlines()) > 1 else ''}")
+            from .tw_market_data import build_full_market_context
+            contexts = await build_full_market_context(round_start_date, round_end_date)
+            job["_market_taiex_text"] = contexts.get("taiex", "") or ""
+            job["_market_forex_text"] = contexts.get("forex", "") or ""
+            job["_market_oil_text"] = contexts.get("oil", "") or ""
+            logger.info(f"[{job_id}] Market ctx: taiex={bool(job['_market_taiex_text'])} "
+                        f"forex={bool(job['_market_forex_text'])} oil={bool(job['_market_oil_text'])}")
         except Exception as e:
             logger.warning(f"[{job_id}] Market fetch failed: {e}")
 

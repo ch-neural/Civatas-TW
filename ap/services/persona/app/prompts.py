@@ -91,7 +91,11 @@ TW_MEDIA_OPTIONS = (
 )
 
 
-def build_persona_prompt_en(county_or_region: str = "臺北市") -> str:
+def build_persona_prompt_en(
+    county_or_region: str = "臺北市",
+    tribal_affiliation: str = "",
+    origin_province: str = "",
+) -> str:
     """Return the Taiwan persona-generation system prompt (繁體中文).
 
     The function name is kept as ``build_persona_prompt_en`` for backward
@@ -100,6 +104,8 @@ def build_persona_prompt_en(county_or_region: str = "臺北市") -> str:
 
     ``county_or_region`` is the geographic anchor — accepts county name or
     admin_key "縣市|鄉鎮". Defaults to 臺北市.
+    ``tribal_affiliation`` — 原住民族別 (e.g. "阿美族"), injected into prompt.
+    ``origin_province`` — 外省祖籍 (e.g. "山東"), injected into prompt.
     """
     region = county_or_region or "臺北市"
     if "|" in region:
@@ -114,6 +120,16 @@ def build_persona_prompt_en(county_or_region: str = "臺北市") -> str:
         "- 每位 agent 的 user content 會以「地理定錨 — 必要」區塊開頭，指定 agent 實際居住的縣市 "
         "與一份真實的鄉鎮/區清單。你**必須**把 persona 錨定在其中一地；不要自創或借用其他縣市的地點。"
         "若定錨段缺失，預設使用與其他人口特徵一致的台灣情境。"
+    )
+
+    _indigenous_hint = (
+        f"此人的族別是「{tribal_affiliation}」。persona 必須以此族別為核心，"
+        if tribal_affiliation
+        else "必須具體提到所屬族別（阿美/排灣/泰雅/布農/太魯閣/賽德克/賽夏/鄒/卑南/魯凱/達悟/撒奇萊雅/噶瑪蘭/邵/拉阿魯哇/卡那卡那富 16 族擇一），"
+    )
+    _waishengren_hint = (
+        f"此人祖籍「{origin_province}」。" if origin_province
+        else "提大陸老家（湖南/山東/江浙/四川/河南…）、"
     )
 
     return (
@@ -136,8 +152,15 @@ def build_persona_prompt_en(county_or_region: str = "臺北市") -> str:
         "- 避免八股（「我關心社會」）。展現具體意見與生活牢騷。\n"
         "- 政治必須自然融入日常敘述，**不要**直接說「我支持 X 黨」。透過他們看的新聞、困擾他們的事、"
         "信任誰來暗示。\n"
-        "- 族群特徵（若資料有提供）要融入語言、飲食、家庭傳統：閩南人台語慣用語、客家人提客家庄/義民爺/擂茶、"
-        "外省人提大陸老家/眷村、原住民提部落/族人/獵人文化、新住民提娘家/夾雜母語/跨文化家庭。\n\n"
+        "- 族群特徵（若資料有提供）要融入語言、飲食、家庭傳統：\n"
+        "  · 閩南人：台語慣用語（「拍勢」「阿祖」「厝」「甲意」）、祭祖、吃粿/米粉湯\n"
+        "  · 客家人：提客家庄/義民爺/擂茶/薑絲炒大腸、桐花季、客家話夾國語\n"
+        f"  · 外省人：{_waishengren_hint}眷村菜（牛肉麵/餃子/燒餅）、祖輩軍公教背景\n"
+        f"  · **原住民：{_indigenous_hint}\n"
+        "    部落名稱或地理錨（如 都蘭/東河/烏來/三地門/桃源/蘭嶼/霧台）、族語詞彙（mama/ina/malikuda/kakita'an/pulima 等）、\n"
+        "    傳統活動（豐年祭/祖靈祭/小米祭/狩獵/織布/採藤）、或當代議題（傳統領域/轉型正義/部落學校/族語復振）\n"
+        "    —— 即使是移居都市的原住民也要保留族群認同元素。不可寫成通用都市 persona。**\n"
+        "  · 新住民：提娘家（越南/印尼/泰國/菲律賓/大陸/柬埔寨等）、夾雜母語、跨文化家庭、媽媽教室、新二代孩子\n\n"
 
         "[開場範例 — 僅供風格參考，不可照抄]\n"
         "- 「老實說，在台北開車行這 22 年，我看過的政黨輪替比路上的車還多。」\n"
