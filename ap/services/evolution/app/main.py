@@ -671,6 +671,8 @@ def evolution_dashboard(job_id: str = "", workspace_id: str = ""):
         "candidate_trends": candidate_trends,
         "candidate_breakdown": candidate_breakdown,
         "tracked_candidate_names": tracked_candidate_names or list(_cand_names_seen),
+        "party_detection": job.get("_party_detection", {}) if job else {},
+        "candidate_descriptions": job.get("candidate_descriptions", {}) if job else {},
         "live_messages": (job.get("live_messages", [])[-30:]) if job else [],
         "agent_count": len(set(d.get("agent_id") for d in diaries)),
     }

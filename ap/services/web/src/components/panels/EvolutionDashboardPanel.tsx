@@ -36,8 +36,16 @@ const TW_PARTY_COLORS: Record<string, string> = {
   "IND": "#94a3b8",   // 無黨籍 gray
 };
 
-/** Detect party code from candidate name or description */
-function detectCandParty(name: string, desc?: string): string {
+/** Detect party code from candidate name or description.
+ *  Priority: party_detection lookup (from job data) → keyword regex fallback. */
+function detectCandParty(name: string, desc?: string, partyDetection?: Record<string, string[]>): string {
+  // 1) Authoritative: check job's party_detection table (e.g. {"DPP": ["賴清德", ...], "KMT": ["鄭麗文", ...]})
+  if (partyDetection) {
+    for (const [party, keywords] of Object.entries(partyDetection)) {
+      if (keywords.some((kw) => kw === name)) return party;
+    }
+  }
+  // 2) Fallback: keyword regex on name + description
   const s = `${name} ${desc || ""}`;
   if (/民進黨|DPP|綠營|民進/.test(s)) return "DPP";
   if (/國民黨|KMT|藍營|國民/.test(s)) return "KMT";
@@ -569,17 +577,18 @@ export default function EvolutionDashboardPanel({ wsId }: { wsId: string }) {
               if (!hasTrends && !hasBreakdown) return null;
               const CAND_FALLBACK_COLORS = ["#8b5cf6", "#f59e0b", "#ec4899", "#22c55e", "#ef4444", "#06b6d4"];
               const candDescs = (data.candidate_descriptions || {}) as Record<string, string>;
+              const partyDetection = (data.party_detection || {}) as Record<string, string[]>;
               // Derive candidate names: prefer tracked list → trends → breakdown.overall
               let candNames: string[] = (data.tracked_candidate_names || []) as string[];
               if (candNames.length === 0 && hasBreakdown) {
                 candNames = Object.keys(breakdown.overall || {}).filter((k) => k !== "Undecided");
               }
               if (candNames.length === 0) return null;
-              // Build party-aware color map: detect party from name/description → party color
+              // Build party-aware color map: detect party from job's party_detection → name/desc fallback
               let fallbackIdx = 0;
               const candColorMap: Record<string, string> = {};
               for (const cn of candNames) {
-                const party = detectCandParty(cn, candDescs[cn]);
+                const party = detectCandParty(cn, candDescs[cn], partyDetection);
                 candColorMap[cn] = TW_PARTY_COLORS[party] || CAND_FALLBACK_COLORS[fallbackIdx++ % CAND_FALLBACK_COLORS.length];
               }
               const latest = hasTrends ? trends[trends.length - 1] : {};
