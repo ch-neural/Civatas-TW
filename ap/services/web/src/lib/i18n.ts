@@ -1605,30 +1605,44 @@ export function useTrWithLocale(override?: Locale | null): (key: StringKey, vars
 // directly to the dictionary keys defined above.
 
 const PERSONA_VALUE_KEY: Record<string, StringKey> = {
-  // Expressiveness
+  // Expressiveness — legacy keys + new Civatas-TW canonical values
   "高度表達":     "persona.dim.express_high",
+  "高度表達型":   "persona.dim.express_high",   // new TW canonical
   "中等表達":     "persona.dim.express_medium",
+  "一般":         "persona.dim.express_medium", // new TW canonical
   "沉默寡言":     "persona.dim.express_low",
+  "內斂":         "persona.dim.express_low",    // new TW canonical
   // Emotional stability
   "穩定冷靜":     "persona.dim.stable_calm",
   "一般穩定":     "persona.dim.stable_normal",
   "敏感衝動":     "persona.dim.stable_volatile",
-  // Sociability
+  // Sociability — legacy keys + new Civatas-TW canonical values
   "外向社交":     "persona.dim.social_extrovert",
+  "外向":         "persona.dim.social_extrovert",  // new TW canonical
   "適度社交":     "persona.dim.social_moderate",
+  "中度社交":     "persona.dim.social_moderate",   // new TW canonical
   "內向獨處":     "persona.dim.social_introvert",
-  // Openness
+  "內向":         "persona.dim.social_introvert",  // new TW canonical
+  // Openness — legacy keys + new Civatas-TW canonical values
   "開放多元":     "persona.dim.open_high",
   "中等開放":     "persona.dim.open_medium",
+  "中度開放":     "persona.dim.open_medium",    // new TW canonical
   "固守觀點":     "persona.dim.open_closed",
-  // Cognitive bias
+  // Cognitive bias — legacy long keys + new Civatas-TW canonical short values
   "樂觀偏向":     "persona.bias.optimistic",
+  "樂觀":         "persona.bias.optimistic",    // new TW canonical
   "悲觀偏向":     "persona.bias.pessimistic",
+  "悲觀":         "persona.bias.pessimistic",   // new TW canonical
   "理性分析":     "persona.bias.rational",
+  "理性":         "persona.bias.rational",      // new TW canonical
   "從眾型":       "persona.bias.conformist",
+  "從眾":         "persona.bias.conformist",    // new TW canonical
   "陰謀論傾向":   "persona.bias.conspiracy",
+  "陰謀論":       "persona.bias.conspiracy",    // new TW canonical
   "轉嫁怨氣":     "persona.bias.scapegoat",
+  "替罪羊":       "persona.bias.scapegoat",     // new TW canonical
   "無感冷漠":     "persona.bias.apathetic",
+  "冷感":         "persona.bias.apathetic",     // new TW canonical
   "未設定":       "persona.bias.unset",
   // Income band
   "低收入":       "persona.income.low",

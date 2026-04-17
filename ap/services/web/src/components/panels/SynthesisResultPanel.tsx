@@ -58,10 +58,14 @@ export default function SynthesisResultPanel({ wsId }: { wsId: string }) {
   const [viewTab, setViewTab] = useState<"overview" | "table">("overview");
   const t = useTr();
 
-  // The application is US-only; simulation result text always renders in
-  // English regardless of the user's UI locale toggle.
+  // Simulation result text follows the active TEMPLATE's locale first
+  // (a US template should stay English even if UI is zh-TW), falling
+  // back to the user's UI locale. null = defer to UI locale.
   const { template: activeTemplate } = useActiveTemplate(wsId);
-  const overrideLocale: Locale = "en";
+  const overrideLocale: Locale | null =
+    activeTemplate?.locale === "en-US" || activeTemplate?.country === "US"
+      ? "en"
+      : null;
   const tmpl = useTrWithLocale(overrideLocale);
   const localizeValue = useLocalizePersonaValueWithLocale(overrideLocale);
 
