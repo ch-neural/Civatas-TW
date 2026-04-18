@@ -987,3 +987,8 @@ def _enforce_logical_consistency(row: dict) -> None:
             ["主權", "經濟", "民生"],
             weights=[w_sov, w_econ, w_live], k=1,
         )[0]
+
+    # ───── 黨員身份推導（Stage 9 加） ─────
+    # 只推導一次：若 row 已有 *_member 欄位（由上游帶入）就不覆蓋
+    if row.get("kmt_member") is None:
+        _derive_party_member(row, _rng)
