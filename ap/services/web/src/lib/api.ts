@@ -976,6 +976,39 @@ export async function applyTemplateToWorkspace(wsId: string, name: string) {
   });
 }
 
+/* ===== Primary Election Types ===== */
+
+export type PrimaryMethod = "intra" | "head2head" | "mixed";
+export type SamplingFrame = "landline" | "mobile" | "dual" | "party_member";
+
+export interface RivalCandidate {
+  id: string;
+  name: string;
+  party: string;
+  party_label?: string;
+  description?: string;
+  color?: string;
+}
+
+export interface PrimaryFormula {
+  intra_poll_weight: number;
+  head2head_poll_weight: number;
+  party_member_weight: number;
+}
+
+export interface PrimarySamplingFrameCfg {
+  age_weights?: Record<string, number>;
+  filter?: string;
+  description?: string;
+}
+
+export interface PrimarySamplingCfg {
+  default_poll_days: number;
+  default_sampling_frame: SamplingFrame;
+  default_daily_n: number;
+  frames: Partial<Record<SamplingFrame, PrimarySamplingFrameCfg>>;
+}
+
 // Enriched template metadata returned by GET /api/templates.
 // Templates without an `election` block come back with election=null.
 export interface TemplateMeta {
@@ -993,6 +1026,19 @@ export interface TemplateMeta {
     cycle: number | null;
     is_generic: boolean | null;
     candidate_count: number;
+    primary_party?: "KMT" | "DPP" | "TPP" | null;
+    primary_method?: PrimaryMethod | null;
+    primary_position?: string | null;
+    constituency_name?: string | null;
+    constituency_townships?: string[];
+    rival_candidates?: RivalCandidate[];
+    primary_formula?: PrimaryFormula | Record<string, never>;
+    primary_sampling?: PrimarySamplingCfg | Record<string, never>;
+    party_member_stats?: {
+      as_of?: string;
+      source_file?: string;
+      note?: string;
+    } | Record<string, never>;
   } | null;
   metadata?: Record<string, any> | null;
 }
