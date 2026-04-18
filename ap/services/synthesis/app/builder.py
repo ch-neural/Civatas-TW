@@ -195,7 +195,7 @@ def build_population(config: ProjectConfig) -> list[Person]:
     return persons
 
 
-def build_population_flat(config: ProjectConfig) -> list[dict]:
+def build_population_flat(config: ProjectConfig, workspace_path=None) -> list[dict]:
     """Build N persons as flat dicts — only populated fields, no nulls.
 
     Sampling strategy:
@@ -203,6 +203,9 @@ def build_population_flat(config: ProjectConfig) -> list[dict]:
     2. Primary table: weighted sample N rows → fills multiple dims at once
     3. Secondary tables: condition on shared dims, then sample
     4. Remaining dims: independent marginal sampling
+
+    workspace_path: optional Path or str; if provided, writes
+    persona_generation_report.md after synthesis completes.
     """
     n = config.target_count
     joint_tables = config.joint_tables or []
@@ -493,6 +496,21 @@ def build_population_flat(config: ProjectConfig) -> list[dict]:
         flat = {k: v for k, v in row.items() if v is not None}
         flat.update(custom)
         persons.append(flat)
+
+    # Write generation report (best-effort; failures don't block synthesis)
+    try:
+        import json as _json
+        from pathlib import Path as _P
+        _stats_path = (_P(__file__).resolve().parents[3]
+                      / "shared" / "tw_data" / "party_members_2026.json")
+        if _stats_path.exists():
+            _stats = _json.loads(_stats_path.read_text(encoding="utf-8"))
+        else:
+            _stats = None
+        _tmpl = {"name": config.name, "name_zh": getattr(config, "name_zh", None)}
+        _write_generation_report(workspace_path, _tmpl, persons, _stats)
+    except Exception as ex:  # noqa: BLE001
+        print(f"[persona-report] skipped: {ex}")
 
     return persons
 
@@ -992,3 +1010,100 @@ def _enforce_logical_consistency(row: dict) -> None:
     # 只推導一次：若 row 已有 *_member 欄位（由上游帶入）就不覆蓋
     if row.get("kmt_member") is None:
         _derive_party_member(row, _rng)
+
+
+# ── Persona generation report ─────────────────────────────────────────
+
+def _write_generation_report(
+    workspace_path,
+    template: dict,
+    persons: list[dict],
+    party_member_stats: dict | None = None,
+) -> None:
+    """Write persona_generation_report.md to workspace dir.
+
+    Skip silently if workspace_path is None (legacy callers / tests).
+    """
+    from datetime import datetime
+    from pathlib import Path
+
+    if not workspace_path:
+        return
+    report_path = Path(workspace_path) / "persona_generation_report.md"
+
+    n = len(persons)
+    if n == 0:
+        return
+
+    # Party member stats reference
+    stats_section = ""
+    if party_member_stats and party_member_stats.get("parties"):
+        lines = ["## 黨員統計資料來源",
+                 "",
+                 "本次 persona 生成依據以下公開資料推導 `kmt_member` / `dpp_member` / `tpp_member`：",
+                 "",
+                 "| 黨 | 黨員數 | 截止日 | 來源 |",
+                 "|---|---|---|---|"]
+        for pc, meta in party_member_stats["parties"].items():
+            srcs = ", ".join(f"[{i+1}]({s['url']})"
+                              for i, s in enumerate(meta.get("sources", [])))
+            lines.append(f"| {pc} | {meta.get('count', 0):,} | {meta.get('as_of_date', 'N/A')} | {srcs} |")
+        lines.append("")
+        adult_pop = party_member_stats.get('adult_pop_20plus', 'N/A')
+        if isinstance(adult_pop, int):
+            lines.append(f"成人人口（20+）基準：{adult_pop:,}")
+        else:
+            lines.append(f"成人人口（20+）基準：{adult_pop}")
+        stats_section = "\n".join(lines)
+
+    # Actual distribution
+    kmt_n = sum(1 for p in persons if p.get("kmt_member"))
+    dpp_n = sum(1 for p in persons if p.get("dpp_member"))
+    tpp_n = sum(1 for p in persons if p.get("tpp_member"))
+    expected_kmt = int(n * 331410 / 19_500_000)
+    expected_dpp = int(n * 240000 / 19_500_000)
+    expected_tpp = int(n * 32546 / 19_500_000)
+
+    def _dev(actual, expected):
+        if expected == 0:
+            return "n/a (expected 0)"
+        d = (actual - expected) / expected * 100
+        return f"{d:+.1f}%"
+
+    dist_section = f"""## 產出黨員分佈
+
+| 欄位 | True | 預期 | 偏差 |
+|---|---|---|---|
+| kmt_member | {kmt_n} ({kmt_n / n * 100:.2f}%) | {expected_kmt} | {_dev(kmt_n, expected_kmt)} |
+| dpp_member | {dpp_n} ({dpp_n / n * 100:.2f}%) | {expected_dpp} | {_dev(dpp_n, expected_dpp)} |
+| tpp_member | {tpp_n} ({tpp_n / n * 100:.2f}%) | {expected_tpp} | {_dev(tpp_n, expected_tpp)} |
+
+（若偏差 > ±30% 表示乘數配置或樣本數有異常，需檢視）
+"""
+
+    workspace_name = getattr(workspace_path, "name", str(workspace_path))
+    report = f"""# Persona Generation Report
+
+**Workspace**: {workspace_name}
+**Generated**: {datetime.utcnow().isoformat()}Z
+**Template**: {template.get('name_zh') or template.get('name')}
+**Target count**: {n}
+
+{stats_section}
+
+## 推導公式
+
+基準率：`KMT 1.70% / DPP 1.23% / TPP 0.17%`
+乘數：`party_lean × age × ethnicity × county`
+實作：`ap/services/synthesis/app/builder.py:_derive_party_member`
+
+{dist_section}
+
+## 已知限制
+
+- DPP 黨員數引用 2023 年公開資料（官方 2024-25 未更新），精度受限
+- 鄉鎮級黨員濃度未反映（只有縣市級 override）
+- 跨黨員登記（同時為多黨黨員者）各自獨立抽樣，可能略高於實際
+"""
+    report_path.write_text(report, encoding="utf-8")
+    print(f"[persona-report] wrote {report_path}")
