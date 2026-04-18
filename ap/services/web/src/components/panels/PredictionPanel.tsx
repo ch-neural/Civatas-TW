@@ -1802,7 +1802,7 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
         : pollGroups.length > 0
           ? pollGroups.map(g => g.name).join(" / ")
           : "選情預測";
-      const result = await createPrediction(autoQuestion, selectedSnap, mergedScenarios, simDays, concurrency, enableKol, kolRatio, kolReach, samplingModality, pollOptions, maxChoices, enrichedPollGroups, scoringParams, predictionMacroContext, _enabledVendors, useCalibResultLeaning, useDynamicSearch ? searchInterval : 0, predLocalKeywords, predNationalKeywords, predCounty, predStartDate, predEndDate, predictionMode, enableNewsSearch, useElectoralCollege, isPrimary ? primaryMethod : undefined, isPrimary ? samplingFrame : undefined, isPrimary ? pollDays : undefined, isPrimary ? formulaWeights : undefined, isPrimary ? rivalCandidates : undefined);
+      const result = await createPrediction(autoQuestion, selectedSnap, mergedScenarios, simDays, concurrency, enableKol, kolRatio, kolReach, samplingModality, pollOptions, maxChoices, enrichedPollGroups, scoringParams, predictionMacroContext, _enabledVendors, useCalibResultLeaning, useDynamicSearch ? searchInterval : 0, predLocalKeywords, predNationalKeywords, predCounty, predStartDate, predEndDate, predictionMode, enableNewsSearch, useElectoralCollege, isPrimary ? primaryMethod : undefined, isPrimary ? samplingFrame : undefined, isPrimary ? pollDays : undefined, isPrimary ? formulaWeights : undefined, isPrimary ? rivalCandidates : undefined, (activeTemplate as any)?.election ?? undefined);
       // Auto-create a recording for this prediction run so Dashboard can pull
       // playback steps and generate a downloadable HTML replay. Reuse the
       // existing recordingId if the user manually set one, else auto-create.

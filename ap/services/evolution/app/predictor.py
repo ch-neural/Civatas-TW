@@ -153,6 +153,7 @@ def save_prediction(
     prediction_mode: str = "election",
     enable_news_search: bool = True,
     use_electoral_college: bool = False,
+    election: dict | None = None,
 ) -> dict:
     """Create a new prediction record."""
     _ensure_dir()
@@ -214,6 +215,7 @@ def save_prediction(
         "start_date": start_date,
         "end_date": end_date,
         "enable_news_search": enable_news_search,
+        "election": election or {},
         "status": "pending",
         "results": None,
         "created_at": time.time(),
