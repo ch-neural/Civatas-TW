@@ -415,6 +415,28 @@ def _run_rolling_poll(agents: list, method: str, days: int, daily_n: int,
     return avg
 
 
+def _compose_mixed_result(intra: dict, h2h: dict, member: dict,
+                          formula: dict) -> dict:
+    """Combine intra + head2head + party_member polls by weights.
+
+    formula: {"intra_poll_weight": 0.5, "head2head_poll_weight": 0.3,
+              "party_member_weight": 0.2}
+    All inputs: {cand_id: pct}
+    """
+    w_i = formula.get("intra_poll_weight", 0.0)
+    w_h = formula.get("head2head_poll_weight", 0.0)
+    w_m = formula.get("party_member_weight", 0.0)
+    total = w_i + w_h + w_m
+    if total > 0:
+        w_i, w_h, w_m = w_i / total, w_h / total, w_m / total
+
+    all_cands = set(intra) | set(h2h) | set(member)
+    return {c: intra.get(c, 0.0) * w_i +
+               h2h.get(c, 0.0) * w_h +
+               member.get(c, 0.0) * w_m
+            for c in all_cands}
+
+
 def _get_leaning_for_candidate(candidate_key: str) -> str:
     """Map a ground-truth candidate key to a political_leaning label.
 
@@ -1096,8 +1118,79 @@ async def run_prediction(
         "live_messages": [],
         "recording_id": recording_id,
         "workspace_id": workspace_id,
+        "election": pred.get("election") or {},
+        "request_body": pred.get("request_body") or {},
     }
     _pred_jobs[job_id] = job
+
+    # Primary election branch — synchronous early return, no background task needed
+    election = job.get("election", {}) or {}
+    if election.get("type") == "party_primary":
+        primary_method = election.get("primary_method")
+        primary_party = election.get("primary_party")
+        sampling = election.get("primary_sampling") or {}
+        frame_name = sampling.get("default_sampling_frame", "dual")
+        frame_cfg = sampling.get("frames", {}).get(frame_name, {})
+        poll_days = sampling.get("default_poll_days", 3)
+        daily_n = sampling.get("default_daily_n", 600)
+
+        # Allow request-level overrides (from UI)
+        req = job.get("request_body") or {}
+        if req.get("primary_method"):
+            primary_method = req["primary_method"]
+        if req.get("primary_sampling_frame"):
+            frame_name = req["primary_sampling_frame"]
+            frame_cfg = sampling.get("frames", {}).get(frame_name,
+                                                       {"age_weights": {"20-24": 1.0}})
+        if req.get("primary_poll_days"):
+            poll_days = int(req["primary_poll_days"])
+        if req.get("primary_rival_candidates"):
+            election["rival_candidates"] = req["primary_rival_candidates"]
+
+        rival_ids = [c["id"] for c in election.get("rival_candidates", [])]
+        intra_ids = [c["id"] for c in election.get("candidates", [])
+                     if c["id"] not in rival_ids]
+
+        import random
+        rng = random.Random(hash(job.get("job_id", "")) & 0xFFFFFFFF)
+
+        if primary_method == "intra":
+            result = _run_rolling_poll(
+                agents, "intra", poll_days, daily_n, frame_cfg,
+                primary_party, intra_ids, rival_ids, rng)
+        elif primary_method == "head2head":
+            result = _run_rolling_poll(
+                agents, "head2head", poll_days, daily_n, frame_cfg,
+                primary_party, intra_ids, rival_ids, rng)
+        elif primary_method == "mixed":
+            intra_res = _run_rolling_poll(
+                agents, "intra", poll_days, daily_n, frame_cfg,
+                primary_party, intra_ids, rival_ids, rng)
+            h2h_res = _run_rolling_poll(
+                agents, "head2head", poll_days, daily_n, frame_cfg,
+                primary_party, intra_ids, rival_ids, rng)
+            member_frame = sampling.get("frames", {}).get("party_member", {})
+            try:
+                member_res = _run_rolling_poll(
+                    agents, "intra", poll_days, daily_n, member_frame,
+                    primary_party, intra_ids, rival_ids, rng)
+            except ValueError as ex:
+                print(f"[primary/mixed] party_member frame empty: {ex}; "
+                      "using intra_res as fallback for member component")
+                member_res = intra_res
+            formula = req.get("primary_formula") or election.get("primary_formula", {})
+            result = _compose_mixed_result(intra_res, h2h_res, member_res, formula)
+        else:
+            raise ValueError(f"unknown primary_method: {primary_method}")
+
+        job["status"] = "done"
+        job["completed_at"] = time.time()
+        return {"primary_result": result,
+                "primary_method": primary_method,
+                "primary_party": primary_party,
+                "sampling_frame": frame_name,
+                "poll_days": poll_days,
+                "job_id": job_id}
 
     asyncio.create_task(_run_prediction_bg(
         job, pred, agents,
