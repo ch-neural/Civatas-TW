@@ -323,6 +323,14 @@ def _calibration_defaults(profile: str) -> dict:
                 "news_mix_candidate": 20, "news_mix_national": 30,
                 "news_mix_local": 45,
                 "news_mix_international": 5}
+    if profile == "primary":
+        # 黨內初選：新聞短期影響較低（選民黨員投票傾向不易撼動），
+        # 本地議題主導（選區型），現任優勢明顯。
+        return {**base, "news_impact": 1.5, "base_undecided": 0.15,
+                "shift_consecutive_days_req": 3,
+                "incumbency_bonus": 10,
+                "news_mix_candidate": 40, "news_mix_national": 10,
+                "news_mix_local": 45, "news_mix_international": 5}
     return base  # generic
 
 
