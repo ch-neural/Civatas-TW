@@ -271,6 +271,60 @@ def delete_prediction(pred_id: str) -> bool:
 # ── Prediction execution ─────────────────────────────────────────────
 
 
+def _age_to_bucket(age: int) -> str:
+    """Map integer age to age bucket string used by sampling frames."""
+    if age < 25: return "20-24"
+    if age < 35: return "25-34"
+    if age < 45: return "35-44"
+    if age < 55: return "45-54"
+    if age < 65: return "55-64"
+    return "65+"
+
+
+def _apply_sampling_frame(agents: list, frame_cfg: dict, primary_party: str | None):
+    """Filter & weight agents according to a sampling frame.
+
+    Returns (filtered_agents, weights_list).
+
+    frame_cfg can have:
+      - "filter": "is_party_member=true" -> keep only agents where
+        {primary_party.lower()}_member == True
+      - "age_weights": {"20-24": 0.3, ...} -> weight multiplier by age bucket
+    """
+    pool = agents
+
+    # Party member filter
+    filter_spec = frame_cfg.get("filter", "")
+    if filter_spec == "is_party_member=true":
+        if not primary_party:
+            raise ValueError("party_member frame needs primary_party")
+        col = f"{primary_party.lower()}_member"
+        # Duck-typed: agent may be dict or object
+        def _get_member(a):
+            if isinstance(a, dict):
+                return a.get(col)
+            return getattr(a, col, None)
+        pool = [a for a in pool if _get_member(a) is True]
+        if not pool:
+            raise ValueError(
+                f"No agents have {col}=True. "
+                "Re-run synthesis to derive party member flags."
+            )
+
+    # Age weights (default 1.0)
+    aw = frame_cfg.get("age_weights") or {}
+    weights = []
+    for a in pool:
+        if isinstance(a, dict):
+            age = a.get("age", 45)
+        else:
+            age = getattr(a, "age", 45)
+        bucket = _age_to_bucket(age)
+        weights.append(aw.get(bucket, 1.0))
+
+    return pool, weights
+
+
 def _get_leaning_for_candidate(candidate_key: str) -> str:
     """Map a ground-truth candidate key to a political_leaning label.
 
