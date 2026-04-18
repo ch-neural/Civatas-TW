@@ -345,9 +345,17 @@ def _build_primary_dimensions(township_admin_keys: list[str]) -> tuple[dict, dic
     population_total = sum(t.get("voters_18plus", t.get("population_total", 0)) for t in matched)
 
     dims: dict = {}
-    # Categorical dims (non-age)
+    # Gender needs separate handling: display names are Chinese (男/女) but census
+    # data keys are English (Male/Female), so the generic loop would always get 0.
+    dims["gender"] = {
+        "type": "categorical",
+        "categories": round_weights([
+            ("男", gender.get("Male", 0)),
+            ("女", gender.get("Female", 0)),
+        ])
+    }
+    # Generic loop for remaining categorical dims (no gender):
     for dim_name, values, raw_counts in [
-        ("gender", [v for v, _ in GENDER_VALUES], gender),
         ("education", EDU_VALUES, education),
         ("employment", EMPLOY_VALUES, employment),
         ("tenure", TENURE_VALUES, tenure),

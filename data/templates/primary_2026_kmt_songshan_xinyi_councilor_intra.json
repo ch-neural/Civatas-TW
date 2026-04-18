@@ -31,11 +31,11 @@
       "categories": [
         {
           "value": "男",
-          "weight": 0.0
+          "weight": 0.4966
         },
         {
           "value": "女",
-          "weight": 0.0
+          "weight": 0.5034
         }
       ]
     },
