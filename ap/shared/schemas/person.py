@@ -71,6 +71,12 @@ class Person(BaseModel):
     # Taiwan party membership (derived by synthesis _derive_party_member)
     # None = 未推導（舊 persona backward compat）；True/False = 推導結果
     # 台灣選民可跨黨登記，所以三個欄位各自獨立 bool（非互斥）
+    #
+    # 使用時注意 None 語義：None 在 Python `if` 中會當 falsy，但語意上是「未知」不是 False。
+    # 建議下游檢查用顯式 `is True` 比對：
+    #   if p.kmt_member is True:  ✅ agent 確定是 KMT 黨員
+    #   if p.kmt_member:          ⚠️ None 會誤判為非黨員
+    # 或在過濾時用 `bool(getattr(p, col, None) or False)` 安全包裹（Task 12 predictor 即採此法）
     kmt_member: bool | None = None
     dpp_member: bool | None = None
     tpp_member: bool | None = None
