@@ -325,6 +325,96 @@ def _apply_sampling_frame(agents: list, frame_cfg: dict, primary_party: str | No
     return pool, weights
 
 
+def _tally_intra(agent_scores: dict, intra_cand_ids: list) -> dict:
+    """Given aggregate candidate_scores, tally preference across intra candidates only.
+
+    agent_scores: {cand_id: score_float, ...} aggregate per-agent scores (averaged)
+    Returns: {cand_id: preference_pct (0-100)} using pick-the-max counting.
+    """
+    if not intra_cand_ids:
+        return {}
+    valid = {c: agent_scores.get(c, 0.0) for c in intra_cand_ids}
+    if not valid:
+        return {c: 0.0 for c in intra_cand_ids}
+    top = max(valid.values())
+    if top <= 0:
+        return {c: 100.0 / len(intra_cand_ids) for c in intra_cand_ids}
+    winners = [c for c, v in valid.items() if v == top]
+    return {c: (100.0 / len(winners) if c in winners else 0.0) for c in intra_cand_ids}
+
+
+def _tally_head2head(agent_scores: dict, intra_cand_ids: list,
+                     rival_cand_ids: list) -> dict:
+    """For each intra cand, compute %wins against all rivals (round-robin mean).
+
+    Returns {intra_cand_id: avg_win_pct (0-100)}
+    """
+    result = {}
+    for cid in intra_cand_ids:
+        wins = 0
+        total = 0
+        for rid in rival_cand_ids:
+            s_i = agent_scores.get(cid, 0.0)
+            s_r = agent_scores.get(rid, 0.0)
+            total += 1
+            if s_i > s_r:
+                wins += 1
+        result[cid] = (wins / total * 100.0) if total else 0.0
+    return result
+
+
+def _run_rolling_poll(agents: list, method: str, days: int, daily_n: int,
+                      frame_cfg: dict, primary_party: str,
+                      intra_cand_ids: list, rival_cand_ids: list,
+                      rng) -> dict:
+    """Run N-day rolling poll. Returns {cand_id: mean_pct_over_days}.
+
+    Each day: sample daily_n agents with frame weights, aggregate their
+    candidate_scores, then tally preference. Average across days.
+    """
+    import random
+    if not isinstance(rng, random.Random):
+        rng = random.Random()
+
+    pool, weights = _apply_sampling_frame(agents, frame_cfg, primary_party)
+    if not pool:
+        raise ValueError(f"sampling frame yielded empty pool for method={method}")
+
+    daily_tallies = []
+    for _ in range(days):
+        sample_idx = rng.choices(range(len(pool)), weights=weights,
+                                  k=min(daily_n, len(pool) * 3))
+        sample = [pool[i] for i in sample_idx]
+
+        # Aggregate per-agent scores into single dict
+        agg = {c: 0.0 for c in intra_cand_ids + rival_cand_ids}
+        for a in sample:
+            if isinstance(a, dict):
+                scores = a.get("candidate_scores") or {}
+            else:
+                scores = getattr(a, "candidate_scores", None) or {}
+            for cid in agg:
+                agg[cid] += scores.get(cid, 0.0)
+        if sample:
+            agg = {c: v / len(sample) for c, v in agg.items()}
+
+        if method == "intra":
+            tally = _tally_intra(agg, intra_cand_ids)
+        elif method == "head2head":
+            tally = _tally_head2head(agg, intra_cand_ids, rival_cand_ids)
+        else:
+            raise ValueError(f"rolling poll method must be intra|head2head, got {method}")
+        daily_tallies.append(tally)
+
+    # Average across days
+    avg = {c: 0.0 for c in intra_cand_ids}
+    for t in daily_tallies:
+        for c in intra_cand_ids:
+            avg[c] += t.get(c, 0.0)
+    avg = {c: v / days for c, v in avg.items()}
+    return avg
+
+
 def _get_leaning_for_candidate(candidate_key: str) -> str:
     """Map a ground-truth candidate key to a political_leaning label.
 
