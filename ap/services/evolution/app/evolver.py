@@ -92,6 +92,23 @@ def _tw_bucket(leaning) -> str:
     s = str(leaning or "").strip()
     return _BUCKET_NORMALISE.get(s, "中間")
 
+
+def _is_primary_election(job: dict) -> bool:
+    """True if this job runs a party_primary template."""
+    etype = (job.get("election") or {}).get("type", "")
+    return etype == "party_primary"
+
+
+def _get_primary_method(job: dict) -> str | None:
+    """Return 'intra' | 'head2head' | 'mixed' or None."""
+    return (job.get("election") or {}).get("primary_method")
+
+
+def _get_primary_party(job: dict) -> str | None:
+    """Return 'KMT' | 'DPP' | 'TPP' or None."""
+    return (job.get("election") or {}).get("primary_party")
+
+
 # ── Job store (persisted to disk to survive hot-reload / restart) ─────
 DATA_DIR = os.environ.get("EVOLUTION_DATA_DIR", "/data/evolution")
 JOBS_FILE = os.path.join(DATA_DIR, "jobs.json")
@@ -1999,6 +2016,22 @@ async def evolve_one_day(
             recognition_penalty = sp.get("recognition_penalty", 0.15)
             cand_descs = job.get("candidate_descriptions", {})
 
+            # ── Primary election scoring adjustments ──
+            # intra: all candidates share the same party → party_align_bonus
+            # is meaningless (everyone gets the same bonus). Disable it and
+            # instead boost charisma/visibility signals which drive intra-party
+            # differentiation (personality, local visibility, incumbency).
+            _primary_method = _get_primary_method(job)
+            _is_primary = _is_primary_election(job)
+            if _is_primary and _primary_method == "intra":
+                party_align_bonus = 0          # same-party race — bonus cancels out
+                incumbency_bonus = 15          # incumbency is especially decisive in primaries
+                _charisma_boost_mult = 1.5     # applied to score pre-visibility scaling
+                _local_vis_mult = 1.3          # applied to lv/nv awareness factor
+            else:
+                _charisma_boost_mult = 1.0
+                _local_vis_mult = 1.0
+
             # Build candidate visibility lookup from poll_groups
             _poll_groups = job.get("poll_groups", [])
             _cand_visibility: dict[str, dict] = {}  # cname -> {lv, nv, origins}
@@ -2201,6 +2234,15 @@ async def evolve_one_day(
                         # let the more-covered candidate blow out the less-
                         # covered one). Independents/minors keep the old
                         # aggressive scaling (they genuinely are unknown).
+                        # ── Primary intra charisma boost ──
+                        # In same-party races the "charisma / personality" signal
+                        # matters more than partisan alignment; amplify the score
+                        # (built from role/incumbency/satisfaction deltas) before
+                        # visibility scaling so the spread between candidates is
+                        # wider and not washed out by awareness floor.
+                        if _charisma_boost_mult != 1.0:
+                            score *= _charisma_boost_mult
+
                         _dyn_aw_src = (state_updates.get(ag_id) or states.get(ag_id) or {}).get("candidate_awareness", {})
                         _dyn_aw_val = _dyn_aw_src.get(cname)
                         _vis = _cand_visibility.get(cname)
@@ -2208,6 +2250,9 @@ async def evolve_one_day(
                         _aw_span = 1.0 - _aw_floor
                         if _dyn_aw_val is not None:
                             _aw = float(_dyn_aw_val)
+                            # Primary intra: boost local visibility weight so
+                            # regional name-recognition matters more than national.
+                            _aw = min(1.0, _aw * _local_vis_mult)
                             _ag_dist = ag.get("district", "")
                             _is_hometown = False
                             if _vis:
@@ -2219,6 +2264,8 @@ async def evolve_one_day(
                             _ag_dist = ag.get("district", "")
                             _is_hometown = any(od in _ag_dist or _ag_dist in od for od in _vis["origins"]) if _ag_dist and _vis["origins"] else False
                             _aw = _vis["lv"] if _is_hometown else _vis["nv"]
+                            # Primary intra: boost local visibility weight.
+                            _aw = min(1.0, _aw * _local_vis_mult)
                             score *= (_aw_floor + _aw_span * _aw)
                             if _is_hometown:
                                 score += 8  # hometown bonus
