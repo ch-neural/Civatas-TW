@@ -58,6 +58,14 @@ ROOT = Path(__file__).resolve().parent.parent
 CENSUS = ROOT / "data" / "census"
 ELEC = ROOT / "data" / "elections"
 TPL = ROOT / "data" / "templates"
+SHARED_TW = ROOT / "ap" / "shared" / "tw_data"
+
+
+def _load_party_member_stats() -> dict:
+    path = SHARED_TW / "party_members_2026.json"
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 # ─────────────────────────── helpers ───────────────────────────
@@ -391,6 +399,124 @@ def _build_primary_dimensions(township_admin_keys: list[str]) -> tuple[dict, dic
         "bucket_counts": bucket_counts,
     }
     return dims, summary
+
+
+def _generate_primary_templates(args) -> None:
+    """Generate 3 template variants for a party primary (intra/head2head/mixed)."""
+    if not args.party:
+        raise SystemExit("--primary requires --party")
+    if not args.townships:
+        raise SystemExit("--primary requires --townships")
+    if not args.candidates:
+        raise SystemExit("--primary requires --candidates JSON path")
+    if not args.constituency_slug:
+        raise SystemExit("--primary requires --constituency-slug")
+
+    # Load candidates / rivals
+    cands = json.loads(Path(args.candidates).read_text(encoding="utf-8"))
+    rivals = (json.loads(Path(args.rivals).read_text(encoding="utf-8"))
+              if args.rivals else [])
+
+    # Parse townships
+    township_keys = [t.strip() for t in args.townships.split(",") if t.strip()]
+
+    # Formula
+    formula = PRIMARY_FORMULA_DEFAULTS.get(args.party, PRIMARY_FORMULA_DEFAULTS["KMT"]).copy()
+    if args.formula:
+        for part in args.formula.split(","):
+            k, v = part.split("=")
+            k = k.strip()
+            v = float(v.strip())
+            if k in ("intra", "intra_poll"):
+                formula["intra_poll_weight"] = v
+            elif k in ("head2head", "h2h"):
+                formula["head2head_poll_weight"] = v
+            elif k in ("member", "party_member"):
+                formula["party_member_weight"] = v
+        # Normalize
+        s = sum(formula.values())
+        if s > 0:
+            formula = {k: round(v / s, 4) for k, v in formula.items()}
+
+    # Sampling config
+    sampling_cfg = {
+        "default_poll_days": args.poll_days,
+        "default_sampling_frame": args.sampling_frame,
+        "default_daily_n": 600,
+        "frames": PRIMARY_SAMPLING_FRAMES_DEFAULT,
+    }
+
+    # Party member stats ref
+    stats = _load_party_member_stats()
+    stats_ref = {
+        "as_of": stats.get("as_of"),
+        "source_file": "ap/shared/tw_data/party_members_2026.json",
+        "note": "推導 is_party_member 使用的黨員數與來源見 source_file",
+    }
+
+    # Aggregate dimensions
+    dims, summary = _build_primary_dimensions(township_keys)
+
+    methods = [m.strip() for m in args.output_methods.split(",") if m.strip()]
+
+    for method in methods:
+        if method not in ("intra", "head2head", "mixed"):
+            print(f"[skip] unknown method: {method}")
+            continue
+
+        # Candidates for this variant
+        if method == "intra":
+            vcands = cands
+        elif method == "head2head":
+            vcands = cands + rivals
+        else:  # mixed
+            vcands = cands + rivals
+
+        macro_zh = (f"{args.cycle} 年 {args.party} "
+                    f"{args.constituency_name or args.constituency_slug} "
+                    f"{args.position} 黨內初選（{method}）")
+        macro_en = (f"{args.cycle} {args.party} primary for {args.position} "
+                    f"in {args.constituency_name or args.constituency_slug} ({method})")
+
+        election = _build_election_block(
+            etype="party_primary",
+            scope="constituency",
+            cycle=args.cycle,
+            is_generic=False,
+            candidates=vcands,
+            calib_profile="primary",
+            macro_en=macro_en,
+            macro_zh=macro_zh,
+            local_keywords=[],
+            national_keywords=[],
+            primary_party=args.party,
+            primary_method=method,
+            primary_position=args.position,
+            constituency_name=args.constituency_name,
+            constituency_townships=township_keys,
+            rival_candidates=rivals if method != "intra" else [],
+            primary_formula=formula if method == "mixed" else {},
+            primary_sampling=sampling_cfg,
+            party_member_stats_ref=stats_ref,
+        )
+
+        tmpl = compose(
+            name_en=f"{args.cycle} {args.party} {args.constituency_slug} {args.position} primary {method}",
+            name_zh=f"{args.cycle} {args.party} {args.constituency_name} {args.position} 黨內初選（{method}）",
+            region=args.constituency_name or args.constituency_slug,
+            region_code=args.constituency_slug,
+            target_count=500,
+            dims=dims,
+            summary=summary,
+            metadata_extra={"note": f"party_primary {method} variant"},
+            election=election,
+        )
+
+        fname = (f"primary_{args.cycle}_{args.party.lower()}_{args.constituency_slug}"
+                 f"_{args.position}_{method}.json")
+        out_path = TPL / fname
+        out_path.write_text(json.dumps(tmpl, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"  → {out_path}")
 
 
 def _calibration_defaults(profile: str) -> dict:
@@ -874,6 +1000,13 @@ def main() -> int:
 
     TPL.mkdir(parents=True, exist_ok=True)
     all_mode = args.all or not (args.national or args.poll or args.mayors or args.counties or args.primary)
+
+    if args.primary:
+        print(f"[primary] Generating templates for {args.cycle} {args.party} "
+              f"{args.constituency_name or args.constituency_slug} {args.position}...")
+        _generate_primary_templates(args)
+        print("Done.")
+        return 0
 
     produced: list[Path] = []
     if all_mode or args.national:
