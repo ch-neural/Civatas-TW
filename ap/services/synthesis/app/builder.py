@@ -668,6 +668,11 @@ _PARTY_MEMBER_BASE_RATES = {
 }
 
 # 乘數表：tuple = (KMT_×, DPP_×, TPP_×)
+#
+# Calibration note (2026-04-18): 初版 plan spec 乘數（深藍 6.0 / 深綠 6.0）會推出
+# 深藍 KMT 約 15% 黨員率（不合理 —— 真實 ~4-5%）。實證校準後取約 2.5× 上限，
+# 使 overall 率 1.5-3%、deep-blue KMT 5-8%、deep-green DPP 4-7%，與 2025 實際
+# 黨員數（KMT 331k / DPP 240k / TPP 32.5k）除以成人人口 19.5M 後的集中度相符。
 _PARTY_MEMBER_LEAN_BOOST = {
     "深藍":  (2.5, 0.05, 0.8),
     "偏藍":  (1.8, 0.20, 1.2),
