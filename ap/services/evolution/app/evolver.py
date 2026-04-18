@@ -2028,6 +2028,17 @@ async def evolve_one_day(
                 incumbency_bonus = 15          # incumbency is especially decisive in primaries
                 _charisma_boost_mult = 1.5     # applied to score pre-visibility scaling
                 _local_vis_mult = 1.3          # applied to lv/nv awareness factor
+            elif _is_primary and _primary_method == "head2head":
+                # 對比式：黨內參選人 vs 對手黨，沿用既有跨黨 scoring
+                # party_align_bonus 正常計算（rival candidates 屬不同黨）
+                # incumbency_bonus 保持預設
+                _charisma_boost_mult = 1.0
+                _local_vis_mult = 1.0
+            elif _is_primary and _primary_method == "mixed":
+                # 混合：主 loop 跑 head2head 分支（rival candidates 已在 candidates list）
+                # intra score 由 predictor 合成時從 agent state 重算（避免 evolver 大 refactor）
+                _charisma_boost_mult = 1.0
+                _local_vis_mult = 1.0
             else:
                 _charisma_boost_mult = 1.0
                 _local_vis_mult = 1.0
