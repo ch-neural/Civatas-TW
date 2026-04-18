@@ -1,0 +1,32 @@
+[
+  {
+    "id": "kmt_cand_a",
+    "name": "李彥秀",
+    "name_en": "Alicia Lee",
+    "party": "KMT",
+    "party_label": "國民黨",
+    "is_incumbent": true,
+    "color": "#000095",
+    "description": "國民黨籍，時任松信選區議員尋求連任，深耕地方三屆；支持者為松信鄰里長、年長公教族群。"
+  },
+  {
+    "id": "kmt_cand_b",
+    "name": "王鴻薇",
+    "name_en": "Wang Hung-wei",
+    "party": "KMT",
+    "party_label": "國民黨",
+    "is_incumbent": false,
+    "color": "#0000C8",
+    "description": "國民黨籍，媒體戰鬥力強，主打反貪腐議題；支持者為深藍中堅、政論節目觀眾。"
+  },
+  {
+    "id": "kmt_cand_c",
+    "name": "徐巧芯",
+    "name_en": "Hsu Chiao-hsin",
+    "party": "KMT",
+    "party_label": "國民黨",
+    "is_incumbent": false,
+    "color": "#1B40A4",
+    "description": "國民黨籍，年輕新生代，善用社群媒體；支持者為年輕藍營、白領專業族群。"
+  }
+]

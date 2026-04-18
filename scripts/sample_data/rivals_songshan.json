@@ -1,0 +1,22 @@
+[
+  {
+    "id": "dpp_rival_a",
+    "name": "吳沛憶",
+    "name_en": "Wu Pei-i",
+    "party": "DPP",
+    "party_label": "民進黨",
+    "is_incumbent": false,
+    "color": "#1B9431",
+    "description": "民進黨籍，松信選區耕耘中，主打青年政策；支持者為年輕綠營、進步派。"
+  },
+  {
+    "id": "tpp_rival_a",
+    "name": "林珍羽",
+    "name_en": "Lin Chen-yu",
+    "party": "TPP",
+    "party_label": "民眾黨",
+    "is_incumbent": false,
+    "color": "#28C8C8",
+    "description": "民眾黨籍，地方樁腳經營佳；支持者為白色力量、中間選民。"
+  }
+]
