@@ -349,6 +349,16 @@ def _build_election_block(
     election_window: tuple[str, str] | None = None,
     sampling_modality: str = "mixed_73",
     use_electoral: bool = False,  # Taiwan has no EC; retained for cross-template schema
+    # Primary-specific (optional; only populated for etype == "party_primary")
+    primary_party: str | None = None,
+    primary_method: str | None = None,
+    primary_position: str | None = None,
+    constituency_name: str | None = None,
+    constituency_townships: list[str] | None = None,
+    rival_candidates: list[dict] | None = None,
+    primary_formula: dict | None = None,
+    primary_sampling: dict | None = None,
+    party_member_stats_ref: dict | None = None,
 ) -> dict:
     parties_used = {c["party"] for c in candidates}
     palette = {p: PARTY_PALETTE.get(p, PARTY_PALETTE["IND"]) for p in parties_used}
@@ -379,6 +389,16 @@ def _build_election_block(
         "default_sampling_modality": sampling_modality,
         "default_evolution_window": list(election_window) if election_window else None,
         "use_electoral_college": use_electoral,  # False for TW (no EC, use county-level aggregation)
+        # Primary-specific fields (None for non-primary templates)
+        "primary_party": primary_party,
+        "primary_method": primary_method,
+        "primary_position": primary_position,
+        "constituency_name": constituency_name,
+        "constituency_townships": constituency_townships or [],
+        "rival_candidates": rival_candidates or [],
+        "primary_formula": primary_formula or {},
+        "primary_sampling": primary_sampling or {},
+        "party_member_stats": party_member_stats_ref or {},
     }
 
 
