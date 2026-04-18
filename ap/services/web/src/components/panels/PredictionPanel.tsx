@@ -69,6 +69,12 @@ import {
   saveSnapshot,
   createRecording,
 } from "@/lib/api";
+import type {
+  PrimaryMethod,
+  SamplingFrame,
+  RivalCandidate,
+  PrimaryFormula,
+} from "@/lib/api";
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -255,6 +261,26 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
   const [combineMode, setCombineMode] = useState<"independent" | "weighted">("weighted");
   const [predictionMacroContext, setPredictionMacroContext] = useState("");
   const [macroContextGenerating, setMacroContextGenerating] = useState(false);
+
+  // ── 初選模式 (party_primary) ────────────────────────────────────────
+  const isPrimary = activeTemplate?.election?.type === "party_primary";
+  const primaryMethodDefault = (activeTemplate?.election?.primary_method ?? "intra") as PrimaryMethod;
+  const [primaryMethod, setPrimaryMethod] = useState<PrimaryMethod>(primaryMethodDefault);
+  const [samplingFrame, setSamplingFrame] = useState<SamplingFrame>(
+    (activeTemplate?.election?.primary_sampling?.default_sampling_frame ?? "dual") as SamplingFrame
+  );
+  const [pollDays, setPollDays] = useState<number>(
+    activeTemplate?.election?.primary_sampling?.default_poll_days ?? 3
+  );
+  const [formulaWeights, setFormulaWeights] = useState<PrimaryFormula>(
+    (activeTemplate?.election?.primary_formula as PrimaryFormula | undefined) ?? {
+      intra_poll_weight: 0.5, head2head_poll_weight: 0.3, party_member_weight: 0.2,
+    }
+  );
+  const [rivalCandidates, setRivalCandidates] = useState<RivalCandidate[]>(
+    activeTemplate?.election?.rival_candidates ?? []
+  );
+
   // Stage 1.8: when active template loads, seed empty macro context + keyword
   // textareas with template defaults. Skip if user has already typed into them.
   // Stage 1.8.2: ALSO replace any stale TW seed values when a US template
@@ -881,6 +907,14 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
       if (cfg.predCounty) setPredCounty(cfg.predCounty);
       if (cfg.predStartDate) setPredStartDate(cfg.predStartDate);
       if (cfg.predEndDate) setPredEndDate(cfg.predEndDate);
+      // Restore primary election settings (Stage 8.15: type guards on all paths)
+      if (typeof cfg.primaryMethod === "string") setPrimaryMethod(cfg.primaryMethod as PrimaryMethod);
+      if (typeof cfg.primarySamplingFrame === "string") setSamplingFrame(cfg.primarySamplingFrame as SamplingFrame);
+      if (typeof cfg.primaryPollDays === "number") setPollDays(cfg.primaryPollDays);
+      if (cfg.primaryFormulaWeights && typeof cfg.primaryFormulaWeights === "object" && !Array.isArray(cfg.primaryFormulaWeights)) {
+        setFormulaWeights(cfg.primaryFormulaWeights as PrimaryFormula);
+      }
+      if (Array.isArray(cfg.primaryRivalCandidates)) setRivalCandidates(cfg.primaryRivalCandidates as RivalCandidate[]);
       // Migrate old pollGroups with groupType to new weight-based model
       if (cfg.pollGroups) {
         const migrated = cfg.pollGroups.map((g: any, i: number) => ({
@@ -1035,6 +1069,8 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
         combineMode,
         useDynamicSearch, enableNewsSearch, searchInterval, predLocalKeywords, predNationalKeywords, predCounty, predStartDate, predEndDate,
         predictionMode, surveyItems,
+        primaryMethod, primarySamplingFrame: samplingFrame, primaryPollDays: pollDays,
+        primaryFormulaWeights: formulaWeights, primaryRivalCandidates: rivalCandidates,
         jobId, running
       };
       localStorage.setItem(`pred_config_${wsId}`, JSON.stringify(cfg));
@@ -1044,7 +1080,7 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
         saveUiSettings(wsId, "prediction", cfg).catch(() => {});
       }, 3000);
     } catch {}
-  }, [wsId, question, selectedSnap, baseNews, scenarios, simDays, predEventsData, enableKol, useCalibResultLeaning, kolRatio, kolReach, newsImpact, deltaCapMult, enableDynamicLeaning, shiftSatLow, shiftAnxHigh, shiftDaysReq, baseUndecided, maxUndecided, profileMatchMult, keywordBonusCap, anxietySensitivityMult, anxietyDecay, satisfactionDecay, individualityMult, sentimentMult, charmMult, crossAppealMult, closeRaceWeight, samePartyPenalty, noMatchPenalty, samplingModality, pollOptions, pollGroups, maxChoices, concurrency, pinCategory, pinnedPersonaIds, predictionMacroContext, predFetchQuery, predFetchNationalQuery, predFetchLocalRatio, predAgentMode, predSampleRate, partyBaseScores, spAlignBonus, spIncumbBonus, spDivergenceMult, candidateTraits, combineMode, predictionMode, surveyItems, jobId, running]);
+  }, [wsId, question, selectedSnap, baseNews, scenarios, simDays, predEventsData, enableKol, useCalibResultLeaning, kolRatio, kolReach, newsImpact, deltaCapMult, enableDynamicLeaning, shiftSatLow, shiftAnxHigh, shiftDaysReq, baseUndecided, maxUndecided, profileMatchMult, keywordBonusCap, anxietySensitivityMult, anxietyDecay, satisfactionDecay, individualityMult, sentimentMult, charmMult, crossAppealMult, closeRaceWeight, samePartyPenalty, noMatchPenalty, samplingModality, pollOptions, pollGroups, maxChoices, concurrency, pinCategory, pinnedPersonaIds, predictionMacroContext, predFetchQuery, predFetchNationalQuery, predFetchLocalRatio, predAgentMode, predSampleRate, partyBaseScores, spAlignBonus, spIncumbBonus, spDivergenceMult, candidateTraits, combineMode, predictionMode, surveyItems, primaryMethod, samplingFrame, pollDays, formulaWeights, rivalCandidates, jobId, running]);
 
   const loadSnapshots = useCallback(async () => {
     try {
@@ -1766,7 +1802,7 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
         : pollGroups.length > 0
           ? pollGroups.map(g => g.name).join(" / ")
           : "選情預測";
-      const result = await createPrediction(autoQuestion, selectedSnap, mergedScenarios, simDays, concurrency, enableKol, kolRatio, kolReach, samplingModality, pollOptions, maxChoices, enrichedPollGroups, scoringParams, predictionMacroContext, _enabledVendors, useCalibResultLeaning, useDynamicSearch ? searchInterval : 0, predLocalKeywords, predNationalKeywords, predCounty, predStartDate, predEndDate, predictionMode, enableNewsSearch, useElectoralCollege);
+      const result = await createPrediction(autoQuestion, selectedSnap, mergedScenarios, simDays, concurrency, enableKol, kolRatio, kolReach, samplingModality, pollOptions, maxChoices, enrichedPollGroups, scoringParams, predictionMacroContext, _enabledVendors, useCalibResultLeaning, useDynamicSearch ? searchInterval : 0, predLocalKeywords, predNationalKeywords, predCounty, predStartDate, predEndDate, predictionMode, enableNewsSearch, useElectoralCollege, isPrimary ? primaryMethod : undefined, isPrimary ? samplingFrame : undefined, isPrimary ? pollDays : undefined, isPrimary ? formulaWeights : undefined, isPrimary ? rivalCandidates : undefined);
       // Auto-create a recording for this prediction run so Dashboard can pull
       // playback steps and generate a downloadable HTML replay. Reuse the
       // existing recordingId if the user manually set one, else auto-create.
@@ -2837,6 +2873,79 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* 初選模式設定 (only shown when election.type === "party_primary") */}
+              {isPrimary && (
+                <div style={{ ...card, marginBottom: 16, background: "linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.03))", border: "1px solid rgba(245,158,11,0.25)" }}>
+                  <h3 style={{ color: "#fbbf24", fontSize: 16, fontWeight: 700, margin: "0 0 14px 0", fontFamily: "var(--font-cjk)" }}>🗳️ 初選模式設定</h3>
+
+                  {/* 初選方法 */}
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 8, fontFamily: "var(--font-cjk)" }}>初選方法</div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {(["intra", "head2head", "mixed"] as PrimaryMethod[]).map(m => (
+                        <button key={m}
+                          onClick={() => setPrimaryMethod(m)}
+                          style={{
+                            padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                            fontFamily: "var(--font-cjk)",
+                            background: primaryMethod === m ? "#d97706" : "rgba(255,255,255,0.04)",
+                            color: primaryMethod === m ? "#fff" : "rgba(255,255,255,0.55)",
+                            border: primaryMethod === m ? "none" : "1px solid rgba(255,255,255,0.12)",
+                          }}>
+                          {m === "intra" ? "互比式（黨內同室）" : m === "head2head" ? "對比式（vs 對手黨）" : "混合式"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 採樣方式 + 連續天數 */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+                    <div>
+                      <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 6, fontFamily: "var(--font-cjk)" }}>採樣方式</div>
+                      <select value={samplingFrame}
+                        onChange={e => setSamplingFrame(e.target.value as SamplingFrame)}
+                        style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid rgba(245,158,11,0.25)", background: "rgba(0,0,0,0.35)", color: "#fff", fontSize: 12, fontFamily: "var(--font-cjk)" }}>
+                        <option value="landline">市話（偏高齡）</option>
+                        <option value="mobile">手機（偏年輕）</option>
+                        <option value="dual">雙軌 50/50</option>
+                        <option value="party_member">純黨員名冊</option>
+                      </select>
+                    </div>
+                    <div>
+                      <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 6, fontFamily: "var(--font-cjk)" }}>連續天數（1–7 天）</div>
+                      <input type="number" min={1} max={7}
+                        value={pollDays}
+                        onChange={e => setPollDays(Math.max(1, Math.min(7, Number(e.target.value) || 1)))}
+                        style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid rgba(245,158,11,0.25)", background: "rgba(0,0,0,0.35)", color: "#fff", fontSize: 12 }} />
+                    </div>
+                  </div>
+
+                  {/* 混合公式滑桿 */}
+                  {primaryMethod === "mixed" && (
+                    <div style={{ padding: "12px 14px", marginBottom: 14, borderRadius: 8, background: "rgba(0,0,0,0.2)", border: "1px solid rgba(245,158,11,0.15)" }}>
+                      <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 10, fontFamily: "var(--font-cjk)" }}>混合公式（三者自動 normalize 到 100%）</div>
+                      {(["intra_poll_weight", "head2head_poll_weight", "party_member_weight"] as const).map(k => (
+                        <div key={k} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                          <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, width: 120, flexShrink: 0, fontFamily: "var(--font-cjk)" }}>
+                            {k === "intra_poll_weight" ? "互比式民調 %" : k === "head2head_poll_weight" ? "對比式民調 %" : "黨員投票 %"}
+                          </span>
+                          <input type="range" min={0} max={100} step={5}
+                            value={formulaWeights[k] * 100}
+                            onChange={e => setFormulaWeights(prev => ({ ...prev, [k]: Number(e.target.value) / 100 }))}
+                            style={{ flex: 1, accentColor: "#d97706" }} />
+                          <span style={{ color: "#fbbf24", fontSize: 11, width: 36, textAlign: "right", fontFamily: "var(--font-mono)" }}>{Math.round(formulaWeights[k] * 100)}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 對手黨候選人 */}
+                  {(primaryMethod === "head2head" || primaryMethod === "mixed") && (
+                    <RivalCandidatesEditor value={rivalCandidates} onChange={setRivalCandidates} />
+                  )}
                 </div>
               )}
 
@@ -6373,6 +6482,64 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
             </div>
           </div>
         )}
+    </div>
+  );
+}
+
+/* ── RivalCandidatesEditor ────────────────────────────────────────── */
+
+function RivalCandidatesEditor({
+  value,
+  onChange,
+}: {
+  value: RivalCandidate[];
+  onChange: (v: RivalCandidate[]) => void;
+}) {
+  const add = () =>
+    onChange([
+      ...value,
+      { id: `rival_${value.length + 1}`, name: "", party: "DPP", description: "" },
+    ]);
+  const update = (idx: number, patch: Partial<RivalCandidate>) => {
+    onChange(value.map((c, i) => (i === idx ? { ...c, ...patch } : c)));
+  };
+  const remove = (idx: number) => onChange(value.filter((_, i) => i !== idx));
+
+  return (
+    <div style={{ padding: "12px 14px", borderRadius: 8, background: "rgba(0,0,0,0.2)", border: "1px solid rgba(245,158,11,0.15)" }}>
+      <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 10, fontFamily: "var(--font-cjk)" }}>
+        對手黨候選人（對比式／混合式使用）
+      </div>
+      {value.map((c, idx) => (
+        <div key={idx} style={{ display: "grid", gridTemplateColumns: "3fr 2fr 5fr 1fr", gap: 6, marginBottom: 6 }}>
+          <input
+            style={{ padding: "6px 8px", borderRadius: 6, border: "1px solid rgba(245,158,11,0.2)", background: "rgba(0,0,0,0.3)", color: "#fff", fontSize: 11, fontFamily: "var(--font-cjk)" }}
+            placeholder="姓名" value={c.name}
+            onChange={e => update(idx, { name: e.target.value })} />
+          <select
+            style={{ padding: "6px 8px", borderRadius: 6, border: "1px solid rgba(245,158,11,0.2)", background: "rgba(0,0,0,0.3)", color: "#fff", fontSize: 11, fontFamily: "var(--font-cjk)" }}
+            value={c.party}
+            onChange={e => update(idx, { party: e.target.value })}>
+            <option value="DPP">民進黨</option>
+            <option value="KMT">國民黨</option>
+            <option value="TPP">民眾黨</option>
+            <option value="IND">無黨籍</option>
+          </select>
+          <input
+            style={{ padding: "6px 8px", borderRadius: 6, border: "1px solid rgba(245,158,11,0.2)", background: "rgba(0,0,0,0.3)", color: "#fff", fontSize: 11, fontFamily: "var(--font-cjk)" }}
+            placeholder="描述（例：民進黨籍，深耕青年族群…）"
+            value={c.description ?? ""}
+            onChange={e => update(idx, { description: e.target.value })} />
+          <button
+            style={{ padding: "4px 6px", borderRadius: 4, border: "1px solid rgba(239,68,68,0.25)", background: "transparent", color: "#ef4444", fontSize: 13, cursor: "pointer" }}
+            onClick={() => remove(idx)}>✕</button>
+        </div>
+      ))}
+      <button
+        onClick={add}
+        style={{ marginTop: 4, padding: "5px 12px", borderRadius: 6, border: "1px solid rgba(245,158,11,0.3)", background: "transparent", color: "#fbbf24", fontSize: 11, cursor: "pointer", fontFamily: "var(--font-cjk)", fontWeight: 600 }}>
+        + 新增對手
+      </button>
     </div>
   );
 }
