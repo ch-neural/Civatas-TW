@@ -268,6 +268,131 @@ def party_code_to_lean_bucket(code: str) -> str:
     return {"DPP": "深綠", "KMT": "深藍", "TPP": "中間", "IND": "中間"}.get(code, "中間")
 
 
+PRIMARY_SAMPLING_FRAMES_DEFAULT = {
+    "landline": {
+        "age_weights": {"20-24": 0.3, "25-34": 0.3, "35-44": 0.6,
+                         "45-54": 1.1, "55-64": 1.7, "65+": 2.2},
+        "description": "市話抽樣偏高齡"
+    },
+    "mobile": {
+        "age_weights": {"20-24": 1.8, "25-34": 1.8, "35-44": 1.3,
+                         "45-54": 1.0, "55-64": 0.5, "65+": 0.2},
+        "description": "手機抽樣偏年輕"
+    },
+    "dual": {
+        "age_weights": {"20-24": 1.0, "25-34": 1.0, "35-44": 1.0,
+                         "45-54": 1.0, "55-64": 1.0, "65+": 1.0},
+        "description": "市話手機各 50%"
+    },
+    "party_member": {
+        "filter": "is_party_member=true",  # predictor 層解析成 {party}_member=True
+        "description": "只有黨員可投"
+    },
+}
+
+PRIMARY_FORMULA_DEFAULTS = {
+    # KMT 歷次初選常見：5 互比 / 3 對比 / 2 黨員
+    "KMT": {"intra_poll_weight": 0.5, "head2head_poll_weight": 0.3, "party_member_weight": 0.2},
+    # DPP 近年偏 100% 對比
+    "DPP": {"intra_poll_weight": 0.2, "head2head_poll_weight": 0.8, "party_member_weight": 0.0},
+    # TPP 新黨無固定 formula，均分
+    "TPP": {"intra_poll_weight": 0.4, "head2head_poll_weight": 0.4, "party_member_weight": 0.2},
+}
+
+
+def _build_primary_dimensions(township_admin_keys: list[str]) -> tuple[dict, dict]:
+    """Aggregate dimensions from specified townships into a constituency-scope block.
+
+    township_admin_keys: ["臺北市|松山區", "臺北市|信義區"]
+    回傳 (dims_dict, summary_dict)
+    """
+    townships_data = json.loads((CENSUS / "townships.json").read_text(encoding="utf-8"))
+    leaning = json.loads((ELEC / "leaning_profile_tw.json").read_text(encoding="utf-8"))
+
+    # townships.json is a dict keyed by admin_key
+    matched = [v for k, v in townships_data.items() if k in township_admin_keys]
+    if not matched:
+        raise ValueError(f"No townships matched: {township_admin_keys}")
+
+    # 加總每個 categorical 維度的 bucket counts
+    gender = sum_dim(matched, "gender")
+    age = sum_dim(matched, "age")
+    education = sum_dim(matched, "education_15plus")
+    employment = sum_dim(matched, "employment_15plus")
+    tenure = sum_dim(matched, "tenure")
+    household_type = sum_dim(matched, "household_type")
+    household_income = sum_dim(matched, "household_income")
+    ethnicity = sum_dim(matched, "ethnicity")
+
+    # party_lean 從 leaning profile 推導（依 voters_18plus 加權）
+    pvi_towns = leaning["townships"]
+    bucket_pop: dict[str, float] = {k: 0.0 for k in PARTY_LEAN_VALUES}
+    for t in matched:
+        ak = t.get("admin_key") or f"{t.get('county', '')}|{t.get('township', '')}"
+        pop = t.get("voters_18plus", t.get("population_total", 0))
+        if ak in pvi_towns:
+            bucket = pvi_towns[ak]["bucket"]
+            bucket_pop[bucket] = bucket_pop.get(bucket, 0.0) + pop
+
+    population_total = sum(t.get("voters_18plus", t.get("population_total", 0)) for t in matched)
+
+    dims: dict = {}
+    # Categorical dims (non-age)
+    for dim_name, values, raw_counts in [
+        ("gender", [v for v, _ in GENDER_VALUES], gender),
+        ("education", EDU_VALUES, education),
+        ("employment", EMPLOY_VALUES, employment),
+        ("tenure", TENURE_VALUES, tenure),
+        ("household_type", HOUSEHOLD_TYPE_VALUES, household_type),
+        ("household_income", INCOME_VALUES, household_income),
+        ("ethnicity", ETHNICITY_VALUES, ethnicity),
+        ("party_lean", PARTY_LEAN_VALUES, bucket_pop),
+    ]:
+        dims[dim_name] = {
+            "type": "categorical",
+            "categories": round_weights([(v, raw_counts.get(v, 0)) for v in values])
+        }
+
+    # Age range dim — note: census age keys use "18-24" not "20-24"
+    dims["age"] = {
+        "type": "range",
+        "bins": [
+            {"range": v, "weight": w["weight"]}
+            for v, w in zip(AGE_VALUES,
+                             round_weights([(v, age.get(v, 0)) for v in AGE_VALUES]))
+        ]
+    }
+
+    # Media habit — national prior
+    dims["media_habit"] = {
+        "type": "categorical",
+        "categories": round_weights(list(zip(MEDIA_HABIT_VALUES, MEDIA_HABIT_DEFAULT))),
+    }
+
+    # county / township 維度收斂到選區內
+    townships_block = round_weights([
+        (k, sum(t.get("voters_18plus", t.get("population_total", 0)) for t in matched
+                if (t.get("admin_key") or f"{t.get('county', '')}|{t.get('township', '')}") == k))
+        for k in township_admin_keys
+    ])
+    counties_in = sorted({k.split("|")[0] for k in township_admin_keys})
+    dims["county"] = {
+        "type": "categorical",
+        "categories": [{"value": c, "weight": round(1.0 / len(counties_in), 4)}
+                        for c in counties_in]
+    }
+    dims["township"] = {"type": "categorical", "categories": townships_block}
+
+    bucket_counts = {k: bucket_pop.get(k, 0) for k in PARTY_LEAN_VALUES}
+    summary = {
+        "population_total": population_total,
+        "township_count": len(matched),
+        "county_count": len(counties_in),
+        "bucket_counts": bucket_counts,
+    }
+    return dims, summary
+
+
 def _calibration_defaults(profile: str) -> dict:
     """Differentiated calibration params by template type.
 
@@ -719,10 +844,36 @@ def main() -> int:
     g.add_argument("--poll", action="store_true", help="Only build the 2028 poll template")
     g.add_argument("--mayors", action="store_true", help="Only build the 3 2026 municipal mayor templates")
     g.add_argument("--counties", action="store_true", help="Only build the 22 single-county presidential templates")
+
+    ap = p  # alias for readability of primary flags
+    ap.add_argument("--primary", action="store_true",
+                    help="Generate party primary templates (3 variants: intra/head2head/mixed)")
+    ap.add_argument("--party", choices=["KMT", "DPP", "TPP"],
+                    help="Primary party (required with --primary)")
+    ap.add_argument("--cycle", type=int, default=2026, help="Election year")
+    ap.add_argument("--position", default="councilor",
+                    choices=["councilor", "legislator", "mayor", "magistrate", "president"])
+    ap.add_argument("--constituency-name", help="Human-readable constituency name, e.g. 松信區")
+    ap.add_argument("--constituency-slug",
+                    help="Slug for filename (Pinyin), e.g. songshan_xinyi")
+    ap.add_argument("--townships",
+                    help='Comma-separated admin_keys, e.g. "臺北市|松山區,臺北市|信義區"')
+    ap.add_argument("--candidates",
+                    help="Path to JSON file with intra-party candidates list")
+    ap.add_argument("--rivals",
+                    help="Path to JSON file with rival-party candidates (for head2head/mixed)")
+    ap.add_argument("--formula",
+                    help='Mixed formula override, e.g. "intra=0.5,head2head=0.3,member=0.2"')
+    ap.add_argument("--poll-days", type=int, default=3)
+    ap.add_argument("--sampling-frame", default="dual",
+                    choices=["landline", "mobile", "dual"])
+    ap.add_argument("--output-methods", default="intra,head2head,mixed",
+                    help="Comma list of method variants to output")
+
     args = p.parse_args()
 
     TPL.mkdir(parents=True, exist_ok=True)
-    all_mode = args.all or not (args.national or args.poll or args.mayors or args.counties)
+    all_mode = args.all or not (args.national or args.poll or args.mayors or args.counties or args.primary)
 
     produced: list[Path] = []
     if all_mode or args.national:
