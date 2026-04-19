@@ -37,6 +37,15 @@ class _OpenAICompatibleClient(VendorClient):
     base_url: Optional[str] = None       # subclass may override
     extra_body: Optional[dict] = None    # subclass may override
 
+    # Subset of CANONICAL_GEN_CONFIG keys this vendor's endpoint accepts.
+    # Defaults to the full set (all OpenAI-compat parameters).
+    # Gemini + a few others reject `frequency_penalty` / `presence_penalty` / `seed`.
+    supported_gen_keys: tuple[str, ...] = (
+        "temperature", "top_p", "max_tokens",
+        "frequency_penalty", "presence_penalty",
+    )
+    supports_seed: bool = True
+
     def _build_client(self) -> AsyncOpenAI:
         kwargs: dict = {"api_key": self.api_key, "timeout": 60.0}
         if self.base_url:
@@ -51,15 +60,19 @@ class _OpenAICompatibleClient(VendorClient):
         for attempt_num in range(4):
             attempt = attempt_num + 1
             try:
+                # Filter CANONICAL_GEN_CONFIG to keys this vendor accepts
+                gen_cfg = {k: v for k, v in CANONICAL_GEN_CONFIG.items()
+                           if k in self.supported_gen_keys}
                 kwargs = {
-                    **CANONICAL_GEN_CONFIG,
+                    **gen_cfg,
                     "model": self.model_id,
-                    "seed": seed,
                     "messages": [
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_prompt},
                     ],
                 }
+                if self.supports_seed:
+                    kwargs["seed"] = seed
                 if self.extra_body:
                     kwargs["extra_body"] = self.extra_body
 
@@ -140,14 +153,23 @@ class GeminiClient(_OpenAICompatibleClient):
     vendor_name = "gemini"
     model_id = "gemini-2.5-flash-lite"
     base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
-    extra_body = {"generationConfig": {"thinkingBudget": 0}}  # disable reasoning
+    # Gemini's OpenAI-compat endpoint rejects frequency_penalty / presence_penalty / seed.
+    # Supports temperature, top_p, max_tokens, messages, model.
+    supported_gen_keys = ("temperature", "top_p", "max_tokens")
+    supports_seed = False
+    # Disable reasoning via Google-specific extra_body payload.
+    extra_body = {"extra_body": {"google": {"thinking_config": {"thinking_budget": 0}}}}
     def _env_key(self): return "GEMINI_API_KEY"
 
 
 class GrokClient(_OpenAICompatibleClient):
     vendor_name = "grok"
-    model_id = "grok-4.1-fast"   # non-reasoning variant per spec
+    # Non-reasoning variant. xAI model names evolved; grok-4-fast is current as of 2026.
+    # Fallback options if this model not available: grok-3-fast, grok-3-mini.
+    model_id = "grok-4-fast-non-reasoning"
     base_url = "https://api.x.ai/v1"
+    # xAI rejects presence_penalty / frequency_penalty on grok-4-fast models.
+    supported_gen_keys = ("temperature", "top_p", "max_tokens")
     def _env_key(self): return "XAI_API_KEY"
 
 
