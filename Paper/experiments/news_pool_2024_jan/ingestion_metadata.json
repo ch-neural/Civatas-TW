@@ -1,0 +1,12 @@
+{
+  "news_pool_id": "29a4dacd0662479b",
+  "sha256_full": "29a4dacd0662479b35677cd51ece094c9b740041ccb908cfd5493315d425bcb6",
+  "created_at": "2026-04-19T08:00:57.152872+00:00",
+  "article_count": 1445,
+  "excluded_count": 51,
+  "stages_included": [
+    "A",
+    "B",
+    "C"
+  ]
+}

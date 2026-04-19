@@ -163,27 +163,53 @@ DOMAIN_LEANING_MAP: dict[str, str] = {
     # 深綠
     "ftvnews.com.tw":       "深綠",   # 民視新聞
     "setn.com":             "深綠",   # 三立新聞網
+    "cmmedia.com.tw":       "深綠",   # 民報/雲論（DPP 側翼）
     # 偏綠
     "ltn.com.tw":           "偏綠",   # 自由時報
     "newtalk.tw":           "偏綠",   # Newtalk
     "thenewslens.com":      "偏綠",   # 關鍵評論網
+    "rwnews.tw":            "偏綠",   # 放言
+    "watchout.tw":          "偏綠",   # 沃草
+    "taisounds.com":        "偏綠",   # Taisounds
     # 中間
     "cna.com.tw":           "中間",   # 中央社
     "pts.org.tw":           "中間",   # 公視
     "newsroom.cw.com.tw":   "中間",   # 天下雜誌
     "commonwealth.tw":      "中間",   # 天下 alt
+    "cw.com.tw":            "中間",   # 天下 short domain
     "bnext.com.tw":         "中間",   # 數位時代
     "businesstoday.com.tw": "中間",   # 今周刊
+    "businessweekly.com.tw":"中間",   # 商業周刊
+    "wealth.com.tw":        "中間",   # 財訊
+    "gvm.com.tw":           "中間",   # 遠見
+    "twreporter.org":       "中間",   # 報導者
+    "mirrormedia.mg":       "中間",   # 鏡週刊
     "ettoday.net":          "中間",   # ETtoday
     "taiwanhot.net":        "中間",   # 台灣好新聞
     "tw.news.yahoo.com":    "中間",   # Yahoo 聚合
+    "today.line.me":        "中間",   # LINE TODAY 聚合
+    "news.ttv.com.tw":      "中間",   # 台視
+    "hakkanews.tw":         "中間",   # 客家電視
+    "rti.org.tw":           "中間",   # 中央廣播電台
+    "bbc.com":              "中間",   # BBC 中文
+    "rfa.org":              "中間",   # 自由亞洲電台
+    "hk01.com":             "中間",   # 香港01
+    "dailyview.tw":         "中間",   # 網路溫度計
+    "anntw.com":            "中間",   # 台灣新聞通訊社
+    "focusnews.com.tw":     "中間",   # 焦點新聞
+    "i-meihua.com":         "中間",   # 梅花新聞網
+    "kamalan-news.com":     "中間",   # 噶瑪蘭新聞網
     # 偏藍
     "chinatimes.com":       "偏藍",   # 中時
     "udn.com":              "偏藍",   # 聯合
     "tvbs.com.tw":          "偏藍",   # TVBS
     "ebc.net.tw":           "偏藍",   # 東森
     "storm.mg":             "偏藍",   # 風傳媒
-    # 深藍: structural vacuum. Use DEEP_BLUE_FALLBACK_DOMAINS for those agents.
+    "ctee.com.tw":          "偏藍",   # 工商時報（中時系）
+    "ntdtv.com.tw":         "偏藍",   # 新唐人電視（反共藍營）
+    "epochtimes.com":       "偏藍",   # 大紀元
+    # 深藍: structural vacuum (網路); 中評社 親中被視為深藍評論管道
+    "crntt.com":            "深藍",   # 中評社
 }
 
 # For 深藍 agents — no online 深藍 source exists (中天 TV revoked, no successor).
@@ -201,14 +227,25 @@ MEDIA_HABIT_EXPOSURE_MIX: dict[str, dict[str, float]] = {
     # 深藍 の 深藍 = 0 (structural). 85% 偏藍 routed through top-partisan fallback.
 }
 
-# Non-news domains (party offices, fact-checkers) — excluded from news pool per spec §A2.
+# Non-news domains (party offices, fact-checkers, social/hobbyist sites) —
+# excluded from news pool per spec §A2 (pilot surfaced additional domains
+# that don't belong in political news feed).
 NON_NEWS_DOMAINS: frozenset[str] = frozenset({
+    # Party offices
     "dpp.org.tw",
     "kmt.org.tw",
     "tpp.org.tw",
+    # Fact-checkers
     "tfc-taiwan.org.tw",
     "mygopen.com",
     "cofacts.org",
+    # Social platforms (not primary news)
+    "facebook.com",
+    "youtube.com",
+    # Non-political content sites
+    "uho.com.tw",          # 健康新知
+    "e-info.org.tw",       # 環境資訊中心
+    "cool3c.com",          # 3C 科技
 })
 
 
