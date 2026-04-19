@@ -7,6 +7,12 @@ Schema mirrors the US module so ``feed_engine`` consumes it identically:
     DEFAULT_DIET_MAP         — {media_habit_zh: [source_name_zh, ...]}
     sources_by_bucket()      — grouping helper for the UI
 
+New in PR-1 (2026-04-18):
+    DOMAIN_LEANING_MAP       — {domain: 5-tier bucket} for URL-based resolution
+    DEEP_BLUE_FALLBACK_DOMAINS — set of fallback domains for 深藍 agents
+    MEDIA_HABIT_EXPOSURE_MIX — per-agent target exposure distribution matrix
+    domain_to_leaning()      — resolve a domain or URL → 5-bucket leaning
+
 Leaning buckets use the canonical TW 5-tier spectrum:
     深綠 / 偏綠 / 中間 / 偏藍 / 深藍
 
@@ -162,6 +168,77 @@ DEFAULT_DIET_MAP: dict[str, list[str]] = {
 # Probability that a feed item leaks across media bubbles (matches feed_engine
 # default; tunable per workspace via scoring_params).
 SERENDIPITY_RATE = 0.05
+
+
+# ── Domain → leaning map ──────────────────────────────────────────────
+# Derived from 3-stage pilot verification (Stage A/B/C 2026-04-18).
+# setn.com = 深綠 per NCC / 媒觀教育基金會 academic consensus.
+# ETtoday = 中間 despite some academic dispute (mostly non-political content).
+# ctitv.com.tw / peoplenews.tw verified dead / non-indexed.
+DOMAIN_LEANING_MAP: dict[str, str] = {
+    # 深綠
+    "ftvnews.com.tw":       "深綠",   # 民視新聞
+    "setn.com":             "深綠",   # 三立新聞網
+    # 偏綠
+    "ltn.com.tw":           "偏綠",   # 自由時報
+    "newtalk.tw":           "偏綠",   # Newtalk
+    "thenewslens.com":      "偏綠",   # 關鍵評論網
+    # 中間
+    "cna.com.tw":           "中間",   # 中央社
+    "pts.org.tw":           "中間",   # 公視
+    "newsroom.cw.com.tw":   "中間",   # 天下雜誌
+    "commonwealth.tw":      "中間",   # 天下 alt
+    "bnext.com.tw":         "中間",   # 數位時代
+    "businesstoday.com.tw": "中間",   # 今周刊
+    "ettoday.net":          "中間",   # ETtoday
+    "taiwanhot.net":        "中間",   # 台灣好新聞
+    "tw.news.yahoo.com":    "中間",   # Yahoo 聚合
+    # 偏藍
+    "chinatimes.com":       "偏藍",   # 中時
+    "udn.com":              "偏藍",   # 聯合
+    "tvbs.com.tw":          "偏藍",   # TVBS
+    "ebc.net.tw":           "偏藍",   # 東森
+    "storm.mg":             "偏藍",   # 風傳媒
+    # 深藍: structural vacuum. Use DEEP_BLUE_FALLBACK_DOMAINS for those agents.
+}
+
+# For 深藍 agents — no online 深藍 source exists (中天 TV revoked, no successor).
+# Route deep-blue agents to the most-right partisan subset of 偏藍 media.
+DEEP_BLUE_FALLBACK_DOMAINS: set[str] = {"chinatimes.com", "tvbs.com.tw", "udn.com"}
+
+# Per-agent exposure matrix: for each media_habit, what leaning distribution
+# their daily article pool should follow. Values are proportions (sum ≈ 1.0).
+#
+# Calibration note: Initial values based on expert judgement. Paper-ready
+# version should re-calibrate to TEDS 2024 post-election media consumption
+# questionnaire. See `docs/superpowers/specs/.../news-exposure-calibration.md`.
+MEDIA_HABIT_EXPOSURE_MIX: dict[str, dict[str, float]] = {
+    "深綠": {"深綠": 0.50, "偏綠": 0.35, "中間": 0.15, "偏藍": 0.00, "深藍": 0.00},
+    "偏綠": {"深綠": 0.15, "偏綠": 0.45, "中間": 0.30, "偏藍": 0.10, "深藍": 0.00},
+    "中間": {"深綠": 0.05, "偏綠": 0.20, "中間": 0.50, "偏藍": 0.20, "深藍": 0.05},
+    "偏藍": {"深綠": 0.00, "偏綠": 0.10, "中間": 0.30, "偏藍": 0.45, "深藍": 0.15},
+    "深藍": {"深綠": 0.00, "偏綠": 0.00, "中間": 0.15, "偏藍": 0.85, "深藍": 0.00},
+    # 深藍 の 深藍 = 0 (structural). 85% 偏藍 routed through top-partisan fallback.
+}
+
+
+def domain_to_leaning(domain: str) -> str | None:
+    """Resolve a bare domain (or URL) to its 5-bucket leaning. Returns None if unknown."""
+    if not domain:
+        return None
+    # Strip protocol / path if URL was passed
+    from urllib.parse import urlparse
+    if "://" in domain:
+        domain = urlparse(domain).netloc or domain
+    # Strip leading www.
+    domain = domain.lower().removeprefix("www.")
+    if domain in DOMAIN_LEANING_MAP:
+        return DOMAIN_LEANING_MAP[domain]
+    # Try suffix match (e.g., news.ltn.com.tw → ltn.com.tw)
+    for mapped_domain, leaning in DOMAIN_LEANING_MAP.items():
+        if domain.endswith("." + mapped_domain):
+            return leaning
+    return None
 
 
 # ── Grouping helper for the UI ───────────────────────────────────────

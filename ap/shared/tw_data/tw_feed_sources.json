@@ -1,6 +1,5 @@
 {
   "country": "TW",
-  "schema": "5-tier Blue-Green bucket (深綠/偏綠/中間/偏藍/深藍)",
   "buckets": {
     "深綠": [
       "台灣蘋果日報",
@@ -229,5 +228,68 @@
       "X（Twitter）",
       "LINE Today"
     ]
+  },
+  "domain_leaning_map": {
+    "ftvnews.com.tw": "深綠",
+    "setn.com": "深綠",
+    "ltn.com.tw": "偏綠",
+    "newtalk.tw": "偏綠",
+    "thenewslens.com": "偏綠",
+    "cna.com.tw": "中間",
+    "pts.org.tw": "中間",
+    "newsroom.cw.com.tw": "中間",
+    "commonwealth.tw": "中間",
+    "bnext.com.tw": "中間",
+    "businesstoday.com.tw": "中間",
+    "ettoday.net": "中間",
+    "taiwanhot.net": "中間",
+    "tw.news.yahoo.com": "中間",
+    "chinatimes.com": "偏藍",
+    "udn.com": "偏藍",
+    "tvbs.com.tw": "偏藍",
+    "ebc.net.tw": "偏藍",
+    "storm.mg": "偏藍"
+  },
+  "deep_blue_fallback_domains": [
+    "chinatimes.com",
+    "tvbs.com.tw",
+    "udn.com"
+  ],
+  "media_habit_exposure_mix": {
+    "深綠": {
+      "深綠": 0.5,
+      "偏綠": 0.35,
+      "中間": 0.15,
+      "偏藍": 0.0,
+      "深藍": 0.0
+    },
+    "偏綠": {
+      "深綠": 0.15,
+      "偏綠": 0.45,
+      "中間": 0.3,
+      "偏藍": 0.1,
+      "深藍": 0.0
+    },
+    "中間": {
+      "深綠": 0.05,
+      "偏綠": 0.2,
+      "中間": 0.5,
+      "偏藍": 0.2,
+      "深藍": 0.05
+    },
+    "偏藍": {
+      "深綠": 0.0,
+      "偏綠": 0.1,
+      "中間": 0.3,
+      "偏藍": 0.45,
+      "深藍": 0.15
+    },
+    "深藍": {
+      "深綠": 0.0,
+      "偏綠": 0.0,
+      "中間": 0.15,
+      "偏藍": 0.85,
+      "深藍": 0.0
+    }
   }
 }
