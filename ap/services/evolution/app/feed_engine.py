@@ -24,11 +24,19 @@ try:
     from .tw_feed_sources import (  # type: ignore
         DEFAULT_SOURCE_LEANINGS as _TW_SOURCE_LEANINGS,
         DEFAULT_DIET_MAP as _TW_DIET_MAP,
+        DOMAIN_LEANING_MAP,
+        DEEP_BLUE_FALLBACK_DOMAINS,
+        MEDIA_HABIT_EXPOSURE_MIX,
+        domain_to_leaning,
     )
 except ImportError:
     from tw_feed_sources import (  # type: ignore
         DEFAULT_SOURCE_LEANINGS as _TW_SOURCE_LEANINGS,
         DEFAULT_DIET_MAP as _TW_DIET_MAP,
+        DOMAIN_LEANING_MAP,
+        DEEP_BLUE_FALLBACK_DOMAINS,
+        MEDIA_HABIT_EXPOSURE_MIX,
+        domain_to_leaning,
     )
 
 # 5-tier Taiwan Blue-Green spectrum (analogous to US Cook PVI)
@@ -119,7 +127,8 @@ def _recency_score(crawled_at: str | None, now: datetime | None = None) -> float
 
 # ── Irrelevant article filter ────────────────────────────────────────
 
-# Source patterns that indicate non-political content
+# Source / board patterns that indicate non-political content.
+# Matched case-insensitively against title and source_tag.
 _IRRELEVANT_BOARD_PATTERNS = [
     # Entertainment / Lifestyle
     "joke", "food", "beauty", "recipe", "celebrity", "gossip",
@@ -133,20 +142,43 @@ _IRRELEVANT_BOARD_PATTERNS = [
     "fashion", "travel", "diy", "fitness",
 ]
 
+# Same intent as `_IRRELEVANT_BOARD_PATTERNS` but in 繁中 — needed because
+# the English-only list was a no-op against TW news (e.g. PTT/Dcard board
+# names, 食譜 / 棒球 / 追星 titles), so non-political noise leaked into
+# the agent feed and crowded out the actual political coverage.
+_IRRELEVANT_BOARD_PATTERNS_ZH = [
+    # 娛樂 / 八卦 / 生活
+    "八卦", "閒聊", "笑話", "美食", "食譜", "美妝", "追星", "明星",
+    # 運動
+    "棒球", "中職", "籃球", "足球", "MLB", "PLG", "T1聯盟", "運動",
+    # 影劇 / 遊戲
+    "電影", "影劇", "戲劇", "韓劇", "日劇", "動漫", "遊戲", "電玩",
+    # 3C / 汽車
+    "汽車", "機車", "3C", "開箱", "評測", "硬體", "手機評",
+    # 旅遊 / 健身 / 寵物
+    "旅遊", "出國", "健身", "減肥", "寵物", "貓咪", "毛孩",
+]
+
 _IRRELEVANT_TITLE_KEYWORDS = [
-    # Non-political content markers
+    # Non-political content markers (EN)
     "[ad]", "[sponsored]", "[quiz]", "[video]", "[gallery]",
     # Product / consumer content
     "product review", "best deals", "gift guide", "coupon",
     # Entertainment
     "celebrity", "kardashian", "reality tv", "box office",
+    # 繁中
+    "[廣告]", "[業配]", "[抽獎]", "[影片]", "[圖輯]",
+    "團購", "限時優惠", "折扣碼", "開箱文",
 ]
 
-# Content-level keywords that indicate non-political articles even if title looks political
+# Content-level keywords that indicate non-political articles even if the
+# title looks political. Combined EN + ZH for parity across locales.
 _NOISE_CONTENT_KEYWORDS = [
-    # Product reviews / consumer content
+    # EN
     "product review", "best buy", "amazon deal",
     "coupon code", "promo code", "affiliate link",
+    # ZH
+    "蝦皮", "momo購物", "團購優惠", "業配文", "聯盟行銷",
 ]
 
 
@@ -156,20 +188,30 @@ def _is_relevant_article(article: dict) -> bool:
     source = article.get("source_tag", "")
     summary = article.get("summary", "")
 
-    # Check board patterns
+    # English board / source patterns (case-insensitive)
+    title_l = title.lower()
+    source_l = source.lower()
     for pattern in _IRRELEVANT_BOARD_PATTERNS:
-        if pattern.lower() in title.lower() or pattern.lower() in source.lower():
+        p_l = pattern.lower()
+        if p_l in title_l or p_l in source_l:
             return False
 
-    # Check title keywords
+    # 繁中 board / source patterns (case-sensitive — Chinese has no case)
+    for pattern in _IRRELEVANT_BOARD_PATTERNS_ZH:
+        if pattern in title or pattern in source:
+            return False
+
+    # Title keywords (EN markers are bracketed and case-sensitive; ZH is
+    # case-sensitive by nature)
     for kw in _IRRELEVANT_TITLE_KEYWORDS:
-        if kw in title:
+        if kw in title or kw.lower() in title_l:
             return False
 
     # Check content-level noise (title + summary)
     text = title + " " + summary
+    text_l = text.lower()
     for kw in _NOISE_CONTENT_KEYWORDS:
-        if kw in text:
+        if kw in text or kw.lower() in text_l:
             return False
 
     return True
@@ -178,51 +220,84 @@ def _is_relevant_article(article: dict) -> bool:
 # ── Semantic Categorization ──────────────────────────────────────────
 
 def _categorize_article(title: str, summary: str) -> str:
-    """Classify the article into a primary demographic impact category."""
-    text = (title + " " + summary).lower()
-    
-    cat_keywords = {
+    """Classify the article into a primary demographic impact category.
+
+    Keywords intentionally cover both 繁中 and English so the
+    classifier works on TW news (the original list was English-only,
+    which silently labelled every Chinese article as "General" and
+    disabled the demographic-affinity multiplier downstream).
+    """
+    text_l = (title + " " + summary).lower()
+    text_zh = title + " " + summary
+
+    cat_keywords_en = {
         "Economy": ["inflation", "economy", "stock", "wages", "gas price", "housing", "jobs", "unemployment", "gdp", "recession", "interest rate", "cost of living", "minimum wage"],
         "ForeignPolicy": ["china", "russia", "ukraine", "nato", "tariff", "trade war", "immigration", "border", "defense", "military", "sanctions", "diplomacy"],
         "Livelihood": ["traffic", "infrastructure", "school", "transit", "power outage", "childcare", "crime", "gun violence", "police", "scam", "fentanyl", "opioid"],
         "GenderSocial": ["abortion", "roe", "dobbs", "lgbtq", "gender", "metoo", "dei", "civil rights", "affirmative action", "voting rights"],
-        "Politics": ["election", "congress", "senate", "supreme court", "president", "corruption", "impeach", "primary", "polling", "campaign", "legislation"]
+        "Politics": ["election", "congress", "senate", "supreme court", "president", "corruption", "impeach", "primary", "polling", "campaign", "legislation"],
     }
-    
-    # Simple highest-match logic
+    cat_keywords_zh = {
+        "Economy": ["通膨", "通貨膨脹", "經濟", "股市", "台積電", "薪資", "薪水", "加薪", "油價", "房價", "房市", "就業", "失業", "GDP", "衰退", "利率", "升息", "降息", "物價", "基本工資", "電費", "匯率", "央行"],
+        "ForeignPolicy": ["中共", "中國", "兩岸", "美中", "美國", "日本", "韓國", "烏克蘭", "俄羅斯", "北約", "關稅", "貿易戰", "軍演", "國防", "軍購", "外交", "制裁", "AIT", "晶片戰"],
+        "Livelihood": ["交通", "捷運", "高鐵", "停電", "供電", "停水", "學校", "教育部", "兒童", "托育", "治安", "詐騙", "毒品", "酒駕", "食安", "颱風", "地震", "豪雨", "醫療", "健保", "長照"],
+        "GenderSocial": ["性別", "同婚", "同志", "LGBT", "MeToo", "性騷", "性侵", "婦女", "墮胎", "人權", "原住民", "新住民", "移工", "勞權"],
+        "Politics": ["選舉", "立委", "立法院", "總統", "罷免", "公投", "貪污", "弊案", "民調", "政黨", "藍綠", "藍白合", "提名", "初選", "黨主席", "行政院"],
+    }
+
+    # Simple highest-match logic — combine EN + ZH hit counts per category
     best_cat = "General"
     max_hits = 0
-    for cat, kws in cat_keywords.items():
-        hits = sum(1 for kw in kws if kw in text)
+    for cat in cat_keywords_en.keys():
+        hits = sum(1 for kw in cat_keywords_en[cat] if kw in text_l)
+        hits += sum(1 for kw in cat_keywords_zh.get(cat, []) if kw in text_zh)
         if hits > max_hits:
             max_hits = hits
             best_cat = cat
-            
+
     return best_cat
 
 
 def _demographic_affinity(agent: dict, category: str) -> float:
-    """Calculate how strongly this agent cares about this category. Returns 0.0 to 1.5 multiplier."""
+    """Calculate how strongly this agent cares about this category. Returns 0.0 to 1.5 multiplier.
+
+    Accepts BOTH the legacy US 5-tier leaning labels and the TW 5-bucket
+    labels (深綠 / 偏綠 / 中間 / 偏藍 / 深藍). The original code only
+    matched US labels, which silently disabled every partisan-affinity
+    boost for Taiwan agents. Occupation keywords likewise gained 繁中
+    aliases (服務業 / 業務 / 金融 / 主管 …) so TW occupations contribute
+    to economic-news affinity instead of falling through.
+    """
     affinity = 1.0
-    
+
     age_str = agent.get("context", {}).get("age", "40")
     try:
         age_num = int("".join(c for c in str(age_str) if c.isdigit()))
     except ValueError:
         age_num = 40
-        
+
     gender = agent.get("context", {}).get("gender", "")
     occupation = agent.get("context", {}).get("occupation", "")
     leaning = agent.get("political_leaning", "Tossup")
 
+    _strong_partisan = leaning in (
+        "Solid Dem", "Solid Rep", "Lean Dem", "Lean Rep",   # legacy US
+        "深綠", "偏綠", "深藍", "偏藍",                        # TW 5-bucket
+    )
+
     if category == "Economy":
         if age_num > 40: affinity += 0.2
-        occ_lower = occupation.lower()
-        if any(w in occ_lower for w in ["business", "finance", "manager", "sales", "service"]): affinity += 0.3
+        occ_lower = (occupation or "").lower()
+        en_hit = any(w in occ_lower for w in ["business", "finance", "manager", "sales", "service"])
+        zh_hit = any(w in (occupation or "") for w in [
+            "商", "業務", "金融", "銀行", "保險", "證券", "會計",
+            "經理", "主管", "老闆", "服務業", "店員", "業務員",
+        ])
+        if en_hit or zh_hit: affinity += 0.3
 
     elif category == "ForeignPolicy":
         # Strong partisans and older generations track foreign policy more closely
-        if leaning in ("Solid Dem", "Solid Rep", "Lean Dem", "Lean Rep"): affinity += 0.3
+        if _strong_partisan: affinity += 0.3
         if age_num > 50: affinity += 0.2
 
     elif category == "Livelihood":
@@ -230,12 +305,121 @@ def _demographic_affinity(agent: dict, category: str) -> float:
 
     elif category == "GenderSocial":
         if age_num < 35: affinity += 0.4
-        if gender and gender.lower().startswith("f"): affinity += 0.3
+        # Female agents care more on gender-social (TW persona uses "女" too)
+        _g = (gender or "").strip()
+        if _g and (_g.lower().startswith("f") or _g.startswith("女")):
+            affinity += 0.3
 
     elif category == "Politics":
-        if leaning in ("Solid Dem", "Solid Rep", "Lean Dem", "Lean Rep"): affinity += 0.2
-        
+        if _strong_partisan: affinity += 0.2
+
     return min(affinity, 1.8)  # Cap the multiplier
+
+
+# ── Domain-aware article helpers (PR-1: 2026-04-18) ─────────────────
+
+def _article_domain(article: dict) -> str:
+    """Extract the domain of an article's source URL.
+
+    Prefers explicit ``source_domain`` if set by upstream (e.g. site_scoped_search);
+    falls back to parsing ``link`` / ``url`` field.
+    """
+    if article.get("source_domain"):
+        return article["source_domain"].lower().removeprefix("www.")
+    from urllib.parse import urlparse
+    url = article.get("link") or article.get("url") or ""
+    if not url:
+        return ""
+    return (urlparse(url).netloc or "").lower().removeprefix("www.")
+
+
+def _article_leaning(article: dict) -> str:
+    """Resolve an article's leaning using (in order):
+       1. explicit ``source_leaning`` field if already set (and not legacy 'Tossup')
+       2. domain → DOMAIN_LEANING_MAP (preferred, authoritative)
+       3. source name → DEFAULT_SOURCE_LEANINGS (legacy, Chinese source_tag)
+       4. fallback '中間'
+    """
+    if article.get("source_leaning") and article["source_leaning"] != "Tossup":
+        return article["source_leaning"]
+    domain = _article_domain(article)
+    if domain:
+        by_domain = domain_to_leaning(domain)
+        if by_domain:
+            return by_domain
+    source_tag = article.get("source") or article.get("source_tag") or ""
+    by_name = DEFAULT_SOURCE_LEANINGS.get(source_tag)
+    if by_name:
+        return by_name
+    return "中間"
+
+
+def sample_k_from(pool: list, k: int, rng) -> list:
+    """Sample up to ``k`` items from ``pool`` using ``rng``. Safe for empty/small pools."""
+    if not pool or k <= 0:
+        return []
+    k = min(k, len(pool))
+    return rng.sample(pool, k)
+
+
+def resolve_feed_for_agent(
+    agent: dict,
+    news_pool: list[dict],
+    day: int,
+    replication_seed: int = 0,
+    target_n: int = 30,
+) -> list[dict]:
+    """Return the candidate article pool for an agent on a given simulation day.
+
+    Uses MEDIA_HABIT_EXPOSURE_MIX as the target exposure distribution.
+    For each leaning bucket, takes ``proportion × target_n`` articles
+    (rounded, at most what the bucket has available), so the final list
+    has the requested leaning mix regardless of pool-bucket size imbalances.
+
+    RNG is seeded by (agent.id or person_id, day, replication_seed) so the
+    same simulation can be reproduced exactly.
+
+    Special case: 深藍 agents have no online 深藍 source; the 偏藍 bucket
+    is restricted to DEEP_BLUE_FALLBACK_DOMAINS (chinatimes, tvbs, udn).
+
+    Note: This is an additive, opinionated alternative to ``select_feed``.
+    Evolution callers can opt in; existing code remains unchanged.
+    """
+    agent_id = agent.get("id") or agent.get("person_id") or agent.get("agent_id") or ""
+    rng = random.Random(hash((str(agent_id), day, replication_seed)))
+
+    media_habit = (
+        agent.get("media_habit")
+        or agent.get("party_lean")        # fallback: use party_lean as habit proxy
+        or "中間"
+    )
+    mix = MEDIA_HABIT_EXPOSURE_MIX.get(media_habit)
+    if not mix:
+        # Unknown leaning → return full pool (no filtering)
+        return list(news_pool)
+
+    # Pre-bucket articles by leaning once
+    by_leaning: dict[str, list[dict]] = {l: [] for l in ("深綠", "偏綠", "中間", "偏藍", "深藍")}
+    for a in news_pool:
+        l = _article_leaning(a)
+        if l in by_leaning:
+            by_leaning[l].append(a)
+
+    # For 深藍 agent: restrict their 偏藍 pool to DEEP_BLUE_FALLBACK_DOMAINS
+    selected: list[dict] = []
+    for leaning, proportion in mix.items():
+        if proportion <= 0:
+            continue
+        pool = by_leaning.get(leaning, [])
+        if media_habit == "深藍" and leaning == "偏藍":
+            pool = [a for a in pool if _article_domain(a) in DEEP_BLUE_FALLBACK_DOMAINS]
+        if not pool:
+            continue
+        # Determine count: proportion of target_n (min 1 when proportion > 0)
+        k = max(1, round(proportion * target_n))
+        selected.extend(sample_k_from(pool, k, rng))
+
+    return selected
 
 
 # ── Feed generation ──────────────────────────────────────────────────
