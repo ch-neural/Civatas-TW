@@ -241,11 +241,15 @@ async def search_news_for_window(
 
 
 # ── Source tag mapping for social platform URLs ──
+# Leanings use the canonical TW 5-bucket (deepgreen / lightgreen / 中間 / lightblue
+# / deepblue) so feed_engine's `_leaning_affinity` can score them correctly.
+# 偏左派 / 中立 (legacy 3-tier) silently mapped to "Tossup" downstream and
+# disabled the leaning component of news scoring on social posts.
 _SOCIAL_SOURCE_MAP = [
-    ("ptt.cc", "PTT八卦版", "偏左派"),
-    ("dcard.tw", "Dcard時事", "中立"),
-    ("mobile01.com", "Mobile01", "中立"),
-    ("lihkg.com", "LIHKG", "中立"),
+    ("ptt.cc",       "PTT八卦版", "中間"),
+    ("dcard.tw",     "Dcard時事", "中間"),
+    ("mobile01.com", "Mobile01",  "中間"),
+    ("lihkg.com",    "LIHKG",     "中間"),
 ]
 
 
@@ -257,15 +261,17 @@ def _classify_social_source(link: str, title: str) -> tuple[str, str]:
         if domain in link_lower:
             # Refine PTT: detect board from URL or title
             if domain == "ptt.cc":
+                # 政黑/HatePolitics 板長期偏綠基調
                 if "hatepolitics" in link_lower or "政黑" in title_lower:
-                    return "PTT政黑版", "偏左派"
+                    return "PTT政黑版", "偏綠"
                 if "tech_job" in link_lower or "科技" in title_lower:
-                    return "PTT科技版", "中立"
+                    return "PTT科技版", "中間"
+                # 八卦版整體 mix 偏綠多
                 if "gossiping" in link_lower or "八卦" in title_lower:
-                    return "PTT八卦版", "偏左派"
+                    return "PTT八卦版", "偏綠"
                 return tag, leaning
             return tag, leaning
-    return "社群論壇", "中立"
+    return "社群論壇", "中間"
 
 
 async def _search_social_platforms(
@@ -347,6 +353,91 @@ async def _search_social_platforms(
 
     logger.info(f"Social search {start_date}~{end_date}: {len(results)} forum posts")
     return results
+
+
+def _load_serper_key() -> str:
+    """Load SERPER_API_KEY from shared/settings.json (fallback to env).
+
+    Mirrors the pattern in crawler.py so the same onboarding-wizard key
+    reaches both the API gateway and evolution services.
+    """
+    try:
+        from shared.global_settings import load_settings  # type: ignore
+        key = (load_settings() or {}).get("serper_api_key", "")
+    except Exception:
+        key = ""
+    if not key:
+        key = os.getenv("SERPER_API_KEY", "") or ""
+    return key.strip()
+
+
+def site_scoped_search(
+    domain: str,
+    keywords: list[str],
+    date_range: str | None = None,  # e.g. "cdr:1,cd_min:1/1/2024,cd_max:1/13/2024"
+    max_pages: int = 5,
+    api_key: str | None = None,
+    gl: str = "tw",
+    hl: str = "zh-tw",
+) -> list[dict]:
+    """Run ``site:<domain>`` Serper news queries for each keyword.
+
+    Returns list of raw Serper article dicts (deduped by link within this call).
+    Leverages Google's site: operator to force results from a specific domain,
+    bypassing SEO ranking bias against paywalled / low-SEO media.
+
+    Caller is responsible for dedup against any pre-existing article pool.
+    """
+    import requests
+    import time as _time
+
+    key = api_key or _load_serper_key()
+    if not key:
+        raise RuntimeError("Serper API key not configured")
+
+    seen_urls: set[str] = set()
+    articles: list[dict] = []
+
+    for kw in keywords:
+        for page in range(max_pages):
+            try:
+                r = requests.post(
+                    "https://google.serper.dev/news",
+                    headers={"X-API-KEY": key, "Content-Type": "application/json"},
+                    json={
+                        "q": f"{kw} site:{domain}",
+                        "tbs": date_range or "",
+                        "gl": gl,
+                        "hl": hl,
+                        "page": page + 1,
+                    },
+                    timeout=20,
+                )
+                r.raise_for_status()
+                data = r.json()
+            except Exception:
+                break
+
+            news = data.get("news", [])
+            if not news:
+                break
+
+            new_count = 0
+            for n in news:
+                url = n.get("link", "")
+                if not url or url in seen_urls:
+                    continue
+                seen_urls.add(url)
+                # Tag with effective domain + leaning at pickup time
+                n.setdefault("source_domain", domain)
+                articles.append(n)
+                new_count += 1
+
+            if new_count == 0:
+                break
+            _time.sleep(0.1)
+
+    return articles
 
 
 async def score_news_impact(
