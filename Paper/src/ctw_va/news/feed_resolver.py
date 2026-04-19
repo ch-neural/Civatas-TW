@@ -1,13 +1,13 @@
 """Feed resolver: deterministic per-agent article sampling.
 
-Ported from ap/services/evolution/app/feed_engine.py (commit 171b7c51).
-Standalone version with imports from ..data.feed_sources instead of main Civatas.
+Ported from ap/services/evolution/app/feed_engine.py (commit 171b7c51),
+refactored to match CTW-VA-2026 spec §A4 signature for research purity.
 
 Key functions:
-    resolve_feed_for_agent — main entry point (MEDIA_HABIT_EXPOSURE_MIX-driven)
-    _article_domain        — extract bare domain from article dict
-    _article_leaning       — resolve article leaning (domain → source_tag → fallback)
-    sample_k_from          — safe k-sample helper
+    resolve_feed_for_agent — main entry point (spec §A4)
+    _article_leaning        — resolve article leaning (fallback chain)
+    _article_domain         — extract bare domain from article dict
+    sample_k_from           — safe k-sample helper
 """
 from __future__ import annotations
 
@@ -22,45 +22,47 @@ from ..data.feed_sources import (
     domain_to_leaning,
 )
 
+# Top-partisan 偏藍 source_tag whitelist for 深藍 fallback when articles
+# lack a resolvable domain (e.g. manual-inject). Paper pool has URLs so
+# this is used only as belt-and-suspenders defense.
+_DEEP_BLUE_SOURCE_TAGS = {
+    "中時新聞網", "中時電子報", "TVBS 新聞", "TVBS新聞", "聯合新聞網", "聯合報",
+}
+
+_BUCKET_LABELS = ("深綠", "偏綠", "中間", "偏藍", "深藍")
+
 
 def _article_domain(article: dict) -> str:
-    """Extract the domain of an article's source URL.
-
-    Prefers explicit ``source_domain`` if set by upstream (e.g. site_scoped_search);
-    falls back to parsing ``link`` / ``url`` field.
-    """
+    """Extract the domain of an article's source URL."""
     if article.get("source_domain"):
         return article["source_domain"].lower().removeprefix("www.")
-    url = article.get("link") or article.get("url") or ""
+    url = article.get("url") or article.get("link") or ""
     if not url:
         return ""
     return (urlparse(url).netloc or "").lower().removeprefix("www.")
 
 
 def _article_leaning(article: dict) -> str:
-    """Resolve an article's leaning using (in order, authoritative first):
-       1. domain → DOMAIN_LEANING_MAP (authoritative, derived from Stage A-C pilots)
-       2. source_tag → DEFAULT_SOURCE_LEANINGS (Chinese source name mapping)
-       3. explicit ``source_leaning`` field (legacy; stale "中間" default in pre-Stage 8.3
-          injected articles means this is only used as last resort before fallback)
-       4. fallback '中間'
+    """Resolve article leaning (priority: explicit source_leaning → domain → source_tag → fallback).
+
+    Paper's A1 merge pre-computes `source_leaning` via domain_to_leaning() so
+    the explicit field is authoritative. Other paths are defensive fallbacks.
     """
-    # 1. Domain lookup (most authoritative)
+    # 1. Explicit source_leaning (Paper A1 merge writes this)
+    explicit = article.get("source_leaning")
+    if explicit and explicit in _BUCKET_LABELS:
+        return explicit
+    # 2. Domain lookup
     domain = _article_domain(article)
     if domain:
         by_domain = domain_to_leaning(domain)
         if by_domain:
             return by_domain
-    # 2. Chinese source name lookup
+    # 3. Chinese source_tag lookup
     source_tag = article.get("source_tag") or article.get("source") or ""
     by_name = DEFAULT_SOURCE_LEANINGS.get(source_tag)
     if by_name:
         return by_name
-    # 3. Explicit source_leaning (last resort — may be stale default)
-    explicit = article.get("source_leaning")
-    if explicit and explicit not in ("Tossup", "中間"):
-        return explicit
-    # 4. Fallback
     return "中間"
 
 
@@ -73,79 +75,83 @@ def sample_k_from(pool: list, k: int, rng: random.Random) -> list:
 
 
 def resolve_feed_for_agent(
-    agent: dict,
+    agent_id: str,
+    agent_media_habit: str,
     news_pool: list[dict],
-    day: int,
-    replication_seed: int = 0,
-    target_n: int = 30,
+    sim_day: int,
+    replication_seed: int,
+    k: int = 3,
 ) -> list[dict]:
-    """Return the candidate article pool for an agent on a given simulation day.
+    """Deterministic stratified sampling of daily articles for one agent.
 
-    Uses MEDIA_HABIT_EXPOSURE_MIX as the target exposure distribution.
-    For each leaning bucket, takes ``proportion × target_n`` articles
-    (rounded, at most what the bucket has available), so the final list
-    has the requested leaning mix regardless of pool-bucket size imbalances.
+    Per CTW-VA-2026 spec §A4. Same (agent_id, sim_day, replication_seed) →
+    identical output. All five vendors must call this with the same args →
+    all five see identical articles.
 
-    RNG is seeded by (agent.id or person_id, day, replication_seed) so the
-    same simulation can be reproduced exactly.
-
-    Special case: 深藍 agents have no online 深藍 source; the 偏藍 bucket
-    is restricted to DEEP_BLUE_FALLBACK_DOMAINS (chinatimes, tvbs, udn).
+    Algorithm:
+      1. For each leaning bucket in MEDIA_HABIT_EXPOSURE_MIX[agent_media_habit]:
+         a. Filter news_pool to that bucket (respecting excluded=True).
+         b. For 深藍 agents' 偏藍 bucket: further restrict to DEEP_BLUE_FALLBACK_DOMAINS.
+         c. Oversample proportion × k × 3 articles from the bucket.
+      2. Concatenate all bucket samples into candidates.
+      3. If candidates ≤ k → return all; else rng.sample(candidates, k).
 
     Args:
-        agent: Dict with keys id/person_id/agent_id, party_lean, media_habit.
-        news_pool: List of article dicts from the merged pool.
-        day: Simulation day integer (used for RNG seeding).
-        replication_seed: Experiment-level seed (all vendors use same value).
-        target_n: Target articles per agent per day.
+        agent_id: Unique persona identifier (stringifiable).
+        agent_media_habit: Political leaning bucket label — one of
+            {"深綠", "偏綠", "中間", "偏藍", "深藍"}. Despite the name
+            "media_habit" (legacy), this is the political exposure class
+            used to index MEDIA_HABIT_EXPOSURE_MIX.
+        news_pool: List of article dicts. Each should have either
+            `source_leaning` (preferred, pre-computed during A1 merge) or
+            `source_domain` / `url` for fallback resolution.
+            Articles with `excluded=True` are filtered out.
+        sim_day: Simulation day integer (seed input).
+        replication_seed: Experiment-level seed (all vendors same value).
+        k: Target articles per agent per day. Default 3 per spec.
 
     Returns:
-        List of article dicts (may be shorter than target_n if pool is thin).
+        List of ≤ k article dicts, deterministic for given args.
+
+    Raises:
+        KeyError: If agent_media_habit is not a valid bucket.
     """
-    agent_id = agent.get("id") or agent.get("person_id") or agent.get("agent_id") or ""
-    rng = random.Random(hash((str(agent_id), day, replication_seed)))
+    rng = random.Random(hash((str(agent_id), sim_day, replication_seed)))
+    mix = MEDIA_HABIT_EXPOSURE_MIX[agent_media_habit]
 
-    # MEDIA_HABIT_EXPOSURE_MIX is keyed by 5-bucket political leaning (深綠/偏綠/
-    # 中間/偏藍/深藍). Read party_lean first; only fall back to media_habit if
-    # its value happens to be a 5-bucket label (legacy / custom data).
-    _bucket_labels = {"深綠", "偏綠", "中間", "偏藍", "深藍"}
-    _raw_habit = agent.get("party_lean") or agent.get("media_habit") or "中間"
-    leaning_bucket = _raw_habit if _raw_habit in _bucket_labels else "中間"
-    mix = MEDIA_HABIT_EXPOSURE_MIX.get(leaning_bucket)
-    if not mix:
-        # Unknown leaning → return full pool (no filtering)
-        return list(news_pool)
-
-    # Pre-bucket articles by leaning once
-    by_leaning: dict[str, list[dict]] = {l: [] for l in ("深綠", "偏綠", "中間", "偏藍", "深藍")}
-    for a in news_pool:
-        l = _article_leaning(a)
-        if l in by_leaning:
-            by_leaning[l].append(a)
-
-    # Deep-blue source tag whitelist (for manual-inject articles without URLs)
-    _deep_blue_source_tags = {
-        "中時新聞網", "中時電子報", "TVBS 新聞", "TVBS新聞", "聯合新聞網", "聯合報",
-    }
-
-    selected: list[dict] = []
+    candidates: list[dict] = []
     for leaning, proportion in mix.items():
         if proportion <= 0:
             continue
-        pool = by_leaning.get(leaning, [])
-        if leaning_bucket == "深藍" and leaning == "偏藍":
-            # 深藍 fallback: accept if domain is in DEEP_BLUE_FALLBACK_DOMAINS
-            # OR source_tag matches top-partisan Chinese source name.
-            # This handles manual-inject articles without URLs (no domain available).
+
+        # Build the per-bucket candidate pool
+        if agent_media_habit == "深藍" and leaning == "偏藍":
+            # Deep-blue fallback: accept domain in whitelist OR source_tag match
             pool = [
-                a for a in pool
-                if _article_domain(a) in DEEP_BLUE_FALLBACK_DOMAINS
-                or (a.get("source_tag") or a.get("source") or "") in _deep_blue_source_tags
+                a for a in news_pool
+                if not a.get("excluded", False)
+                and _article_leaning(a) == leaning
+                and (
+                    _article_domain(a) in DEEP_BLUE_FALLBACK_DOMAINS
+                    or (a.get("source_tag") or a.get("source") or "") in _DEEP_BLUE_SOURCE_TAGS
+                )
             ]
+        else:
+            pool = [
+                a for a in news_pool
+                if not a.get("excluded", False)
+                and _article_leaning(a) == leaning
+            ]
+
         if not pool:
             continue
-        # Determine count: proportion of target_n (min 1 when proportion > 0)
-        k = max(1, round(proportion * target_n))
-        selected.extend(sample_k_from(pool, k, rng))
 
-    return selected
+        # Oversample (spec: k × proportion × 3), bounded by pool size
+        target_k = max(1, int(k * proportion * 3))
+        target_k = min(target_k, len(pool))
+        candidates.extend(rng.sample(pool, target_k))
+
+    # Final trim to k
+    if len(candidates) <= k:
+        return candidates
+    return rng.sample(candidates, k)
