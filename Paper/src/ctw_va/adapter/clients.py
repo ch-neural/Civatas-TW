@@ -182,7 +182,9 @@ class DeepSeekClient(_OpenAICompatibleClient):
 
 class KimiClient(_OpenAICompatibleClient):
     vendor_name = "kimi"
-    model_id = "kimi-k2-0905"
+    # Spec wrote "kimi-k2-0905" but Moonshot exposes it as "-preview" suffix.
+    # Verified via GET /v1/models 2026-04-19.
+    model_id = "kimi-k2-0905-preview"
     base_url = "https://api.moonshot.ai/v1"   # International (.ai), not .cn
     extra_body = {"thinking": {"type": "disabled"}}   # disable reasoning
     def _env_key(self): return "MOONSHOT_API_KEY"

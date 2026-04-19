@@ -62,7 +62,7 @@ PRICING_TABLE: dict[str, VendorPricing] = {
     ),
     "kimi": VendorPricing(
         vendor="kimi",
-        model_id="kimi-k2-0905",
+        model_id="kimi-k2-0905-preview",
         input_per_1m=0.60,
         output_per_1m=2.50,
         cached_per_1m=0.15,
