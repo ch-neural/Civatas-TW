@@ -334,23 +334,33 @@ def _article_domain(article: dict) -> str:
 
 
 def _article_leaning(article: dict) -> str:
-    """Resolve an article's leaning using (in order):
-       1. explicit ``source_leaning`` field if already set (and not legacy 'Tossup')
-       2. domain → DOMAIN_LEANING_MAP (preferred, authoritative)
-       3. source name → DEFAULT_SOURCE_LEANINGS (legacy, Chinese source_tag)
+    """Resolve an article's leaning using (in order, authoritative first):
+       1. domain → DOMAIN_LEANING_MAP (authoritative, derived from Stage A-C pilots)
+       2. source_tag → DEFAULT_SOURCE_LEANINGS (Chinese source name mapping)
+       3. explicit ``source_leaning`` field (legacy; stale "中間" default in pre-Stage 8.3
+          injected articles means this is only used as last resort before fallback)
        4. fallback '中間'
+
+    Priority rationale: injected-article pools predating Stage 8.3 carry
+    `source_leaning="中間"` as a hard default regardless of actual leaning.
+    Domain / source_tag are more reliable because they reflect the real source.
     """
-    if article.get("source_leaning") and article["source_leaning"] != "Tossup":
-        return article["source_leaning"]
+    # 1. Domain lookup (most authoritative)
     domain = _article_domain(article)
     if domain:
         by_domain = domain_to_leaning(domain)
         if by_domain:
             return by_domain
-    source_tag = article.get("source") or article.get("source_tag") or ""
+    # 2. Chinese source name lookup
+    source_tag = article.get("source_tag") or article.get("source") or ""
     by_name = DEFAULT_SOURCE_LEANINGS.get(source_tag)
     if by_name:
         return by_name
+    # 3. Explicit source_leaning (last resort — may be stale default)
+    explicit = article.get("source_leaning")
+    if explicit and explicit not in ("Tossup", "中間"):
+        return explicit
+    # 4. Fallback
     return "中間"
 
 
@@ -388,12 +398,15 @@ def resolve_feed_for_agent(
     agent_id = agent.get("id") or agent.get("person_id") or agent.get("agent_id") or ""
     rng = random.Random(hash((str(agent_id), day, replication_seed)))
 
-    media_habit = (
-        agent.get("media_habit")
-        or agent.get("party_lean")        # fallback: use party_lean as habit proxy
-        or "中間"
-    )
-    mix = MEDIA_HABIT_EXPOSURE_MIX.get(media_habit)
+    # MEDIA_HABIT_EXPOSURE_MIX is keyed by 5-bucket political leaning (深綠/偏綠/
+    # 中間/偏藍/深藍) — despite the legacy name. Real personas have `media_habit`
+    # as consumption channel ("網路新聞"/"電視新聞"/...) and `party_lean` as the
+    # political bucket. Read party_lean first; only fall back to media_habit if
+    # its value happens to be a 5-bucket label (legacy / custom data).
+    _bucket_labels = {"深綠", "偏綠", "中間", "偏藍", "深藍"}
+    _raw_habit = agent.get("party_lean") or agent.get("media_habit") or "中間"
+    leaning_bucket = _raw_habit if _raw_habit in _bucket_labels else "中間"
+    mix = MEDIA_HABIT_EXPOSURE_MIX.get(leaning_bucket)
     if not mix:
         # Unknown leaning → return full pool (no filtering)
         return list(news_pool)
@@ -411,8 +424,17 @@ def resolve_feed_for_agent(
         if proportion <= 0:
             continue
         pool = by_leaning.get(leaning, [])
-        if media_habit == "深藍" and leaning == "偏藍":
-            pool = [a for a in pool if _article_domain(a) in DEEP_BLUE_FALLBACK_DOMAINS]
+        if leaning_bucket == "深藍" and leaning == "偏藍":
+            # 深藍 fallback accepts article if EITHER:
+            #   - its domain is in DEEP_BLUE_FALLBACK_DOMAINS (chinatimes/tvbs/udn), OR
+            #   - its source_tag matches a top-partisan Chinese source name
+            # This handles manual-inject articles without URLs (no domain available).
+            _deep_blue_source_tags = {"中時新聞網", "中時電子報", "TVBS 新聞", "TVBS新聞", "聯合新聞網", "聯合報"}
+            pool = [
+                a for a in pool
+                if _article_domain(a) in DEEP_BLUE_FALLBACK_DOMAINS
+                or (a.get("source_tag") or a.get("source") or "") in _deep_blue_source_tags
+            ]
         if not pool:
             continue
         # Determine count: proportion of target_n (min 1 when proportion > 0)
