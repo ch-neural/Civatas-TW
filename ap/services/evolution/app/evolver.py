@@ -865,7 +865,7 @@ async def evolve_one_day(
         agent_vendors = {a.get("llm_vendor") for a in agents if a.get("llm_vendor")}
         if agent_vendors:
             enabled_vendors = list(agent_vendors)
-    from .feed_engine import select_feed, get_diet_rules
+    from .feed_engine import select_feed, get_diet_rules, resolve_feed_for_agent
     from .life_events import roll_life_event
     import asyncio
 
@@ -1034,7 +1034,15 @@ async def evolve_one_day(
 
         # Select personalised feed (with read dedup + temporal causality filter)
         read_hist = agent_read_history.get(aid)
-        feed = select_feed(agent, news_pool, rules=_feed_rules, read_history=read_hist, current_day=day)
+        # Optional: pre-filter pool via MEDIA_HABIT_EXPOSURE_MIX for stratified
+        # per-agent leaning distribution. See PR 1 (commit 3e9c238) for rationale.
+        _use_mix = bool((job or {}).get("use_exposure_mix", False))
+        if _use_mix:
+            _rep_seed = int((job or {}).get("replication_seed", 0))
+            _pool_for_agent = resolve_feed_for_agent(agent, news_pool, day=day, replication_seed=_rep_seed)
+            feed = select_feed(agent, _pool_for_agent, rules=_feed_rules, read_history=read_hist, current_day=day)
+        else:
+            feed = select_feed(agent, news_pool, rules=_feed_rules, read_history=read_hist, current_day=day)
 
         # Inject KOL posts if enabled
         if job is not None and job.get("enable_kol"):
@@ -2633,6 +2641,8 @@ async def start_evolution(
     candidate_incumbent_map: dict | None = None,
     round_start_date: str | None = None,
     round_end_date: str | None = None,
+    use_exposure_mix: bool = False,
+    replication_seed: int = 0,
 ) -> dict:
     """Start a multi-day evolution run as a background job.
 
@@ -2641,6 +2651,10 @@ async def start_evolution(
     assignment takes precedence over description-keyword heuristics — this
     prevents KMT candidates whose descriptions mention 民進黨 (as a target of
     criticism) from being misclassified as DPP.
+
+    use_exposure_mix: when True, pre-filters each agent's news pool via
+    MEDIA_HABIT_EXPOSURE_MIX before select_feed. Controlled by replication_seed
+    for cross-run reproducibility (0 = random per run).
     """
     from .news_pool import get_pool
 
@@ -2672,6 +2686,8 @@ async def start_evolution(
         "enabled_vendors": enabled_vendors or [],
         "round_start_date": round_start_date,
         "round_end_date": round_end_date,
+        "use_exposure_mix": use_exposure_mix,
+        "replication_seed": replication_seed,
     }
     # Extract agent demographics for dashboard cross-analysis
     _info: dict[str, dict] = {}
@@ -2717,6 +2733,9 @@ async def start_evolution(
             logger.warning(f"[{job_id}] Market fetch failed: {e}")
 
     _save_jobs()
+
+    if job.get("use_exposure_mix"):
+        _push_live(job, f"🎯 Using MEDIA_HABIT_EXPOSURE_MIX for per-agent feed (seed={job.get('replication_seed', 0)})")
 
     asyncio.create_task(_run_evolution_bg(job, agents, pool, days, concurrency, enabled_vendors=enabled_vendors))
     return {"job_id": job_id, "status": "pending", "total_days": days, "concurrency": concurrency}

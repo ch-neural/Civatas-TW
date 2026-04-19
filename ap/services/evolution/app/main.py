@@ -94,6 +94,11 @@ class StartEvolutionRequest(BaseModel):
     round_start_date: str | None = None
     round_end_date: str | None = None
     workspace_id: str = ""  # scope state + news pool to this workspace
+    # Feed stratification: when True, resolve_feed_for_agent pre-filters each
+    # agent's pool by MEDIA_HABIT_EXPOSURE_MIX before select_feed runs.
+    # Default False for backward compat. replication_seed=0 → random per run.
+    use_exposure_mix: bool = False
+    replication_seed: int = 0
 
 
 class MemorySearchRequest(BaseModel):
@@ -1114,6 +1119,8 @@ async def start_evolve(req: StartEvolutionRequest):
         candidate_incumbent_map=req.candidate_incumbent_map,
         round_start_date=req.round_start_date,
         round_end_date=req.round_end_date,
+        use_exposure_mix=req.use_exposure_mix,
+        replication_seed=req.replication_seed,
     )
     return result
 
