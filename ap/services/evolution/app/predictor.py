@@ -153,6 +153,7 @@ def save_prediction(
     prediction_mode: str = "election",
     enable_news_search: bool = True,
     use_electoral_college: bool = False,
+    election: dict | None = None,
 ) -> dict:
     """Create a new prediction record."""
     _ensure_dir()
@@ -214,6 +215,7 @@ def save_prediction(
         "start_date": start_date,
         "end_date": end_date,
         "enable_news_search": enable_news_search,
+        "election": election or {},
         "status": "pending",
         "results": None,
         "created_at": time.time(),
@@ -269,6 +271,172 @@ def delete_prediction(pred_id: str) -> bool:
 
 
 # ── Prediction execution ─────────────────────────────────────────────
+
+
+def _age_to_bucket(age: int) -> str:
+    """Map integer age to age bucket string used by sampling frames."""
+    if age < 25: return "20-24"
+    if age < 35: return "25-34"
+    if age < 45: return "35-44"
+    if age < 55: return "45-54"
+    if age < 65: return "55-64"
+    return "65+"
+
+
+def _apply_sampling_frame(agents: list, frame_cfg: dict, primary_party: str | None):
+    """Filter & weight agents according to a sampling frame.
+
+    Returns (filtered_agents, weights_list).
+
+    frame_cfg can have:
+      - "filter": "is_party_member=true" -> keep only agents where
+        {primary_party.lower()}_member == True
+      - "age_weights": {"20-24": 0.3, ...} -> weight multiplier by age bucket
+    """
+    pool = agents
+
+    # Party member filter
+    filter_spec = frame_cfg.get("filter", "")
+    if filter_spec == "is_party_member=true":
+        if not primary_party:
+            raise ValueError("party_member frame needs primary_party")
+        col = f"{primary_party.lower()}_member"
+        # Duck-typed: agent may be dict or object
+        def _get_member(a):
+            if isinstance(a, dict):
+                return a.get(col)
+            return getattr(a, col, None)
+        pool = [a for a in pool if _get_member(a) is True]
+        if not pool:
+            raise ValueError(
+                f"No agents have {col}=True. "
+                "Re-run synthesis to derive party member flags."
+            )
+
+    # Age weights (default 1.0)
+    aw = frame_cfg.get("age_weights") or {}
+    weights = []
+    for a in pool:
+        if isinstance(a, dict):
+            age = a.get("age", 45)
+        else:
+            age = getattr(a, "age", 45)
+        bucket = _age_to_bucket(age)
+        weights.append(aw.get(bucket, 1.0))
+
+    return pool, weights
+
+
+def _tally_intra(agent_scores: dict, intra_cand_ids: list) -> dict:
+    """Given aggregate candidate_scores, tally preference across intra candidates only.
+
+    agent_scores: {cand_id: score_float, ...} aggregate per-agent scores (averaged)
+    Returns: {cand_id: preference_pct (0-100)} using pick-the-max counting.
+    """
+    if not intra_cand_ids:
+        return {}
+    valid = {c: agent_scores.get(c, 0.0) for c in intra_cand_ids}
+    if not valid:
+        return {c: 0.0 for c in intra_cand_ids}
+    top = max(valid.values())
+    if top <= 0:
+        return {c: 100.0 / len(intra_cand_ids) for c in intra_cand_ids}
+    winners = [c for c, v in valid.items() if v == top]
+    return {c: (100.0 / len(winners) if c in winners else 0.0) for c in intra_cand_ids}
+
+
+def _tally_head2head(agent_scores: dict, intra_cand_ids: list,
+                     rival_cand_ids: list) -> dict:
+    """For each intra cand, compute %wins against all rivals (round-robin mean).
+
+    Returns {intra_cand_id: avg_win_pct (0-100)}
+    """
+    result = {}
+    for cid in intra_cand_ids:
+        wins = 0
+        total = 0
+        for rid in rival_cand_ids:
+            s_i = agent_scores.get(cid, 0.0)
+            s_r = agent_scores.get(rid, 0.0)
+            total += 1
+            if s_i > s_r:
+                wins += 1
+        result[cid] = (wins / total * 100.0) if total else 0.0
+    return result
+
+
+def _run_rolling_poll(agents: list, method: str, days: int, daily_n: int,
+                      frame_cfg: dict, primary_party: str,
+                      intra_cand_ids: list, rival_cand_ids: list,
+                      rng) -> dict:
+    """Run N-day rolling poll. Returns {cand_id: mean_pct_over_days}.
+
+    Each day: sample daily_n agents with frame weights, aggregate their
+    candidate_scores, then tally preference. Average across days.
+    """
+    import random
+    if not isinstance(rng, random.Random):
+        rng = random.Random()
+
+    pool, weights = _apply_sampling_frame(agents, frame_cfg, primary_party)
+    if not pool:
+        raise ValueError(f"sampling frame yielded empty pool for method={method}")
+
+    daily_tallies = []
+    for _ in range(days):
+        sample_idx = rng.choices(range(len(pool)), weights=weights,
+                                  k=min(daily_n, len(pool) * 3))
+        sample = [pool[i] for i in sample_idx]
+
+        # Aggregate per-agent scores into single dict
+        agg = {c: 0.0 for c in intra_cand_ids + rival_cand_ids}
+        for a in sample:
+            if isinstance(a, dict):
+                scores = a.get("candidate_scores") or {}
+            else:
+                scores = getattr(a, "candidate_scores", None) or {}
+            for cid in agg:
+                agg[cid] += scores.get(cid, 0.0)
+        if sample:
+            agg = {c: v / len(sample) for c, v in agg.items()}
+
+        if method == "intra":
+            tally = _tally_intra(agg, intra_cand_ids)
+        elif method == "head2head":
+            tally = _tally_head2head(agg, intra_cand_ids, rival_cand_ids)
+        else:
+            raise ValueError(f"rolling poll method must be intra|head2head, got {method}")
+        daily_tallies.append(tally)
+
+    # Average across days
+    avg = {c: 0.0 for c in intra_cand_ids}
+    for t in daily_tallies:
+        for c in intra_cand_ids:
+            avg[c] += t.get(c, 0.0)
+    avg = {c: v / days for c, v in avg.items()}
+    return avg
+
+
+def _compose_mixed_result(intra: dict, h2h: dict, member: dict,
+                          formula: dict) -> dict:
+    """Combine intra + head2head + party_member polls by weights.
+
+    formula: {"intra_poll_weight": 0.5, "head2head_poll_weight": 0.3,
+              "party_member_weight": 0.2}
+    All inputs: {cand_id: pct}
+    """
+    w_i = formula.get("intra_poll_weight", 0.0)
+    w_h = formula.get("head2head_poll_weight", 0.0)
+    w_m = formula.get("party_member_weight", 0.0)
+    total = w_i + w_h + w_m
+    if total > 0:
+        w_i, w_h, w_m = w_i / total, w_h / total, w_m / total
+
+    all_cands = set(intra) | set(h2h) | set(member)
+    return {c: intra.get(c, 0.0) * w_i +
+               h2h.get(c, 0.0) * w_h +
+               member.get(c, 0.0) * w_m
+            for c in all_cands}
 
 
 def _get_leaning_for_candidate(candidate_key: str) -> str:
@@ -952,8 +1120,79 @@ async def run_prediction(
         "live_messages": [],
         "recording_id": recording_id,
         "workspace_id": workspace_id,
+        "election": pred.get("election") or {},
+        "request_body": pred.get("request_body") or {},
     }
     _pred_jobs[job_id] = job
+
+    # Primary election branch — synchronous early return, no background task needed
+    election = job.get("election", {}) or {}
+    if election.get("type") == "party_primary":
+        primary_method = election.get("primary_method")
+        primary_party = election.get("primary_party")
+        sampling = election.get("primary_sampling") or {}
+        frame_name = sampling.get("default_sampling_frame", "dual")
+        frame_cfg = sampling.get("frames", {}).get(frame_name, {})
+        poll_days = sampling.get("default_poll_days", 3)
+        daily_n = sampling.get("default_daily_n", 600)
+
+        # Allow request-level overrides (from UI)
+        req = job.get("request_body") or {}
+        if req.get("primary_method"):
+            primary_method = req["primary_method"]
+        if req.get("primary_sampling_frame"):
+            frame_name = req["primary_sampling_frame"]
+            frame_cfg = sampling.get("frames", {}).get(frame_name,
+                                                       {"age_weights": {"20-24": 1.0}})
+        if req.get("primary_poll_days"):
+            poll_days = int(req["primary_poll_days"])
+        if req.get("primary_rival_candidates"):
+            election["rival_candidates"] = req["primary_rival_candidates"]
+
+        rival_ids = [c["id"] for c in election.get("rival_candidates", [])]
+        intra_ids = [c["id"] for c in election.get("candidates", [])
+                     if c["id"] not in rival_ids]
+
+        import random
+        rng = random.Random(hash(job.get("job_id", "")) & 0xFFFFFFFF)
+
+        if primary_method == "intra":
+            result = _run_rolling_poll(
+                agents, "intra", poll_days, daily_n, frame_cfg,
+                primary_party, intra_ids, rival_ids, rng)
+        elif primary_method == "head2head":
+            result = _run_rolling_poll(
+                agents, "head2head", poll_days, daily_n, frame_cfg,
+                primary_party, intra_ids, rival_ids, rng)
+        elif primary_method == "mixed":
+            intra_res = _run_rolling_poll(
+                agents, "intra", poll_days, daily_n, frame_cfg,
+                primary_party, intra_ids, rival_ids, rng)
+            h2h_res = _run_rolling_poll(
+                agents, "head2head", poll_days, daily_n, frame_cfg,
+                primary_party, intra_ids, rival_ids, rng)
+            member_frame = sampling.get("frames", {}).get("party_member", {})
+            try:
+                member_res = _run_rolling_poll(
+                    agents, "intra", poll_days, daily_n, member_frame,
+                    primary_party, intra_ids, rival_ids, rng)
+            except ValueError as ex:
+                print(f"[primary/mixed] party_member frame empty: {ex}; "
+                      "using intra_res as fallback for member component")
+                member_res = intra_res
+            formula = req.get("primary_formula") or election.get("primary_formula", {})
+            result = _compose_mixed_result(intra_res, h2h_res, member_res, formula)
+        else:
+            raise ValueError(f"unknown primary_method: {primary_method}")
+
+        job["status"] = "done"
+        job["completed_at"] = time.time()
+        return {"primary_result": result,
+                "primary_method": primary_method,
+                "primary_party": primary_party,
+                "sampling_frame": frame_name,
+                "poll_days": poll_days,
+                "job_id": job_id}
 
     asyncio.create_task(_run_prediction_bg(
         job, pred, agents,

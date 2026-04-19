@@ -3252,6 +3252,7 @@ class CreatePredictionRequest(BaseModel):
     prediction_mode: str = "election"   # "election" or "satisfaction"
     enable_news_search: bool = True    # if False, skip cycle search and run on snapshot state alone
     use_electoral_college: bool = False  # US presidential: compute state-level winner-take-all EV
+    election: dict | None = None         # template election block (carries primary_method, party_detection, etc.)
 
 
 class RunPredictionRequest(BaseModel):
@@ -3279,6 +3280,7 @@ def prediction_create(req: CreatePredictionRequest):
         prediction_mode=req.prediction_mode,
         enable_news_search=req.enable_news_search,
         use_electoral_college=req.use_electoral_college,
+        election=req.election,
     )
 
 

@@ -45,6 +45,16 @@ def _load_template_meta(filename: str) -> dict | None:
             "is_generic": election.get("is_generic"),
             "candidate_count": len(election.get("candidates") or []),
             "default_age_range": election.get("default_age_range"),
+            # Primary-specific fields (None for non-primary templates)
+            "primary_party": election.get("primary_party"),
+            "primary_method": election.get("primary_method"),
+            "primary_position": election.get("primary_position"),
+            "constituency_name": election.get("constituency_name"),
+            "constituency_townships": election.get("constituency_townships", []),
+            "rival_candidates": election.get("rival_candidates", []),
+            "primary_formula": election.get("primary_formula", {}),
+            "primary_sampling": election.get("primary_sampling", {}),
+            "party_member_stats": election.get("party_member_stats", {}),
         } if election else None,
         "metadata": data.get("metadata"),
     }

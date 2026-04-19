@@ -20,6 +20,8 @@ class Person(BaseModel):
       - cross_strait 主權 / 經濟 / 民生   (attitude axis for TW context)
       - tribal_affiliation  阿美族 / 排灣族 / 泰雅族 ... (原住民 16 族)
       - origin_province     山東 / 湖南 / 江蘇 ... (外省祖籍)
+      - kmt_member / dpp_member / tpp_member
+                     黨員身份（synthesis 推導，新 workspace 才有；None = 未推導）
 
     Legacy US fields (race / hispanic_or_latino) are kept for backward
     compatibility with the US-era snapshots stored on disk; new personas
@@ -65,5 +67,18 @@ class Person(BaseModel):
     tribal_affiliation: str | None = None
     # 外省人 → 祖籍省份 (e.g. "山東", "湖南")
     origin_province: str | None = None
+
+    # Taiwan party membership (derived by synthesis _derive_party_member)
+    # None = 未推導（舊 persona backward compat）；True/False = 推導結果
+    # 台灣選民可跨黨登記，所以三個欄位各自獨立 bool（非互斥）
+    #
+    # 使用時注意 None 語義：None 在 Python `if` 中會當 falsy，但語意上是「未知」不是 False。
+    # 建議下游檢查用顯式 `is True` 比對：
+    #   if p.kmt_member is True:  ✅ agent 確定是 KMT 黨員
+    #   if p.kmt_member:          ⚠️ None 會誤判為非黨員
+    # 或在過濾時用 `bool(getattr(p, col, None) or False)` 安全包裹（Task 12 predictor 即採此法）
+    kmt_member: bool | None = None
+    dpp_member: bool | None = None
+    tpp_member: bool | None = None
 
     custom_fields: dict[str, str] = {}

@@ -483,13 +483,15 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                 const isCountyScope =
                   (meta?.election?.scope === "county" || meta?.election?.scope === "state") &&
                   !!meta?.region_code;
-                // Constituency templates (黨內初選) 跨多個 township，用第一個 township 的縣市來 highlight
+                // TW: 黨內初選跨鄉鎮選區 (scope === "constituency")
+                // Derive the parent county from the first township admin_key ("臺北市|松山區" → "臺北市")
+                // to highlight the general area on the county-level choropleth.
                 const isConstituencyScope = meta?.election?.scope === "constituency";
                 const constituencyCounty = isConstituencyScope
-                  ? (((meta?.election as any)?.constituency_townships?.[0] as string | undefined)?.split("|")[0] ?? "")
+                  ? (meta?.election?.constituency_townships?.[0]?.split("|")[0] ?? "")
                   : "";
                 const constituencyDisplayName = isConstituencyScope
-                  ? ((meta?.election as any)?.constituency_name || meta?.region || "")
+                  ? (meta?.election?.constituency_name || meta?.region || "")
                   : "";
                 // TW template 沒有 fips 欄位；region_code 直接是縣市名稱 (e.g. "臺北市")
                 const countyKey = isCountyScope
@@ -735,9 +737,10 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                 {(() => {
                   const sc = selectedTemplateMeta?.election?.scope;
                   const regionName = sc === "constituency"
-                    ? (((selectedTemplateMeta?.election as any)?.constituency_name) || selectedTemplateMeta?.region || "")
+                    ? (selectedTemplateMeta?.election?.constituency_name || selectedTemplateMeta?.region || "")
                     : (selectedTemplateMeta?.region || selectedTemplateMeta?.region_code || "");
                   const isRegional = sc === "state" || sc === "county" || sc === "constituency";
+
                   if (generating) return `${genPhase}`;
                   if (existingPersonas.length > 0) {
                     return isRegional

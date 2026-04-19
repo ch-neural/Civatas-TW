@@ -1,0 +1,51 @@
+{
+  "as_of": "2026-04-18",
+  "adult_pop_20plus": 19500000,
+  "adult_pop_source": "國發會 2026 人口推估中位估計",
+  "parties": {
+    "KMT": {
+      "count": 331410,
+      "voting_eligible": 331410,
+      "as_of_date": "2025-09-10",
+      "label": "繳費黨員（2025 第 11 屆主席及黨代表投票人數）",
+      "sources": [
+        {
+          "url": "https://www.kmt.org.tw/2025/09/blog-post_25.html",
+          "fetched": "2026-04-18",
+          "note": "KMT 中央黨部公告"
+        },
+        {
+          "url": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%9C%8B%E5%9C%8B%E6%B0%91%E9%BB%A8",
+          "fetched": "2026-04-18",
+          "note": "維基 2025 資訊框 331145，與官網相符"
+        }
+      ]
+    },
+    "DPP": {
+      "count": 240000,
+      "voting_eligible": 240000,
+      "as_of_date": "2023-01-01",
+      "label": "具完整黨權黨員（2023 年維基百科引用）",
+      "sources": [
+        {
+          "url": "https://zh.wikipedia.org/wiki/%E6%B0%91%E4%B8%BB%E9%80%B2%E6%AD%A5%E9%BB%A8",
+          "fetched": "2026-04-18"
+        }
+      ],
+      "estimate_note": "2024-25 官方未公開更新；以 2023 年值為基準，假設 ±10% 年波動（區間 [216000, 264000]）"
+    },
+    "TPP": {
+      "count": 32546,
+      "voting_eligible": 32546,
+      "as_of_date": "2025-08-10",
+      "label": "有效黨員（黃國昌 6 週年黨慶公布）",
+      "sources": [
+        {
+          "url": "https://www.cna.com.tw/news/aipl/202508100030.aspx",
+          "fetched": "2026-04-18",
+          "note": "中央社報導"
+        }
+      ]
+    }
+  }
+}

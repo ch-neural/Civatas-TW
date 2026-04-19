@@ -686,10 +686,10 @@ export interface PredictionRecord {
   created_at: number;
 }
 
-export async function createPrediction(question: string, snapshotId: string, scenarios: any[], simDays = 30, concurrency = 5, enableKol = false, kolRatio = 0.05, kolReach = 0.40, samplingModality = "unweighted", pollOptions: { name: string, description: string }[] = [], maxChoices = 1, pollGroups: { name: string, candidates: { name: string, description: string }[] }[] = [], scoringParams?: Record<string, any>, macroContext?: string, enabledVendors?: string[], useCalibResultLeaning = true, searchInterval = 0, localKeywords = "", nationalKeywords = "", county = "", startDate = "", endDate = "", predictionMode = "election", enableNewsSearch = true, useElectoralCollege = false) {
+export async function createPrediction(question: string, snapshotId: string, scenarios: any[], simDays = 30, concurrency = 5, enableKol = false, kolRatio = 0.05, kolReach = 0.40, samplingModality = "unweighted", pollOptions: { name: string, description: string }[] = [], maxChoices = 1, pollGroups: { name: string, candidates: { name: string, description: string }[] }[] = [], scoringParams?: Record<string, any>, macroContext?: string, enabledVendors?: string[], useCalibResultLeaning = true, searchInterval = 0, localKeywords = "", nationalKeywords = "", county = "", startDate = "", endDate = "", predictionMode = "election", enableNewsSearch = true, useElectoralCollege = false, primaryMethod?: PrimaryMethod, primarySamplingFrame?: SamplingFrame, primaryPollDays?: number, primaryFormula?: PrimaryFormula, primaryRivalCandidates?: RivalCandidate[], election?: Record<string, any>) {
   return apiFetch("/api/pipeline/evolution/predictions", {
     method: "POST",
-    body: JSON.stringify({ question, snapshot_id: snapshotId, scenarios, sim_days: simDays, concurrency, enable_kol: enableKol, kol_ratio: kolRatio, kol_reach: kolReach, sampling_modality: samplingModality, poll_options: pollOptions, max_choices: maxChoices, poll_groups: pollGroups, scoring_params: scoringParams, macro_context: macroContext, enabled_vendors: enabledVendors || null, use_calibration_result_leaning: useCalibResultLeaning, search_interval: searchInterval, local_keywords: localKeywords, national_keywords: nationalKeywords, county, start_date: startDate, end_date: endDate, prediction_mode: predictionMode, enable_news_search: enableNewsSearch, use_electoral_college: useElectoralCollege }),
+    body: JSON.stringify({ question, snapshot_id: snapshotId, scenarios, sim_days: simDays, concurrency, enable_kol: enableKol, kol_ratio: kolRatio, kol_reach: kolReach, sampling_modality: samplingModality, poll_options: pollOptions, max_choices: maxChoices, poll_groups: pollGroups, scoring_params: scoringParams, macro_context: macroContext, enabled_vendors: enabledVendors || null, use_calibration_result_leaning: useCalibResultLeaning, search_interval: searchInterval, local_keywords: localKeywords, national_keywords: nationalKeywords, county, start_date: startDate, end_date: endDate, prediction_mode: predictionMode, enable_news_search: enableNewsSearch, use_electoral_college: useElectoralCollege, primary_method: primaryMethod, primary_sampling_frame: primarySamplingFrame, primary_poll_days: primaryPollDays, primary_formula: primaryFormula, primary_rival_candidates: primaryRivalCandidates, election }),
   });
 }
 
@@ -1001,6 +1001,39 @@ export async function applyTemplateToWorkspace(wsId: string, name: string) {
   });
 }
 
+/* ===== Primary Election Types ===== */
+
+export type PrimaryMethod = "intra" | "head2head" | "mixed";
+export type SamplingFrame = "landline" | "mobile" | "dual" | "party_member";
+
+export interface RivalCandidate {
+  id: string;
+  name: string;
+  party: string;
+  party_label?: string;
+  description?: string;
+  color?: string;
+}
+
+export interface PrimaryFormula {
+  intra_poll_weight: number;
+  head2head_poll_weight: number;
+  party_member_weight: number;
+}
+
+export interface PrimarySamplingFrameCfg {
+  age_weights?: Record<string, number>;
+  filter?: string;
+  description?: string;
+}
+
+export interface PrimarySamplingCfg {
+  default_poll_days: number;
+  default_sampling_frame: SamplingFrame;
+  default_daily_n: number;
+  frames: Partial<Record<SamplingFrame, PrimarySamplingFrameCfg>>;
+}
+
 // Enriched template metadata returned by GET /api/templates.
 // Templates without an `election` block come back with election=null.
 export interface TemplateMeta {
@@ -1019,6 +1052,19 @@ export interface TemplateMeta {
     is_generic: boolean | null;
     candidate_count: number;
     default_age_range?: [number, number] | null;
+    primary_party?: "KMT" | "DPP" | "TPP" | null;
+    primary_method?: PrimaryMethod | null;
+    primary_position?: string | null;
+    constituency_name?: string | null;
+    constituency_townships?: string[];
+    rival_candidates?: RivalCandidate[];
+    primary_formula?: PrimaryFormula | Record<string, never>;
+    primary_sampling?: PrimarySamplingCfg | Record<string, never>;
+    party_member_stats?: {
+      as_of?: string;
+      source_file?: string;
+      note?: string;
+    } | Record<string, never>;
   } | null;
   metadata?: Record<string, any> | null;
 }
