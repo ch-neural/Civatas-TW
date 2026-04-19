@@ -1686,7 +1686,14 @@ async def _run_prediction_bg(
                                 _role_lower = desc.lower()
                                 is_national = any(k in _role_lower for k in ["總統", "行政院", "中央", "院長", "部長", "國家元首"])
                                 is_local = any(k in _role_lower for k in ["市長", "縣長", "副市長", "副縣長", "議長", "地方"])
-                                is_incumbent = group_cands[ci].get("isIncumbent", False) or "現任" in desc
+                                # Accept both camelCase (frontend hydration) and
+                                # snake_case (raw template JSON). "現任" alone is
+                                # an unambiguous TW marker; "尋求連任" is a stronger
+                                # signal but covered by the broader 現任 substring.
+                                is_incumbent = bool(
+                                    group_cands[ci].get("isIncumbent", False)
+                                    or group_cands[ci].get("is_incumbent", False)
+                                ) or ("現任" in desc) or ("尋求連任" in desc)
 
                                 # Detect party
                                 _cand_party = ""
@@ -3417,7 +3424,13 @@ def _compute_day_record(
                 _role_lower = desc.lower()
                 is_national = any(k in _role_lower for k in ["總統", "行政院", "中央", "院長", "部長", "國家元首"])
                 is_local = any(k in _role_lower for k in ["市長", "縣長", "副市長", "副縣長", "議長", "地方"])
-                is_incumbent = group_cands[ci].get("isIncumbent", False) or "現任" in desc
+                # Accept both camelCase and snake_case incumbent flags so raw
+                # template JSON loaded server-side classifies the same way as
+                # frontend-hydrated payloads.
+                is_incumbent = bool(
+                    group_cands[ci].get("isIncumbent", False)
+                    or group_cands[ci].get("is_incumbent", False)
+                ) or ("現任" in desc) or ("尋求連任" in desc)
 
                 _cand_party = ""
                 if any(k in desc for k in ["國民黨", "藍"]): _cand_party = "kmt"

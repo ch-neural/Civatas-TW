@@ -327,10 +327,18 @@ async def _call_llm(prompt: str, vendor: str | None = None, enabled_vendors: lis
         if "reasoner" in model_lower or "reasoning" in model_lower or any(model_lower.startswith(p) for p in ("gpt-5", "o1", "o3", "o4")):
             resp_format_kwargs = {}
 
-        # Newer OpenAI models (gpt-5, o1, o3) use max_completion_tokens instead of max_tokens
+        # Newer OpenAI models (gpt-5, o1, o3, o4) use max_completion_tokens
+        # instead of max_tokens. Reasoning models spend most of their budget
+        # on internal chain-of-thought BEFORE emitting any content — observed
+        # usage for a realistic evolution prompt was 3.7k reasoning tokens
+        # just to produce ~400 tokens of content. A 4096 budget routinely
+        # truncated o4-mini before it wrote anything, which manifested as
+        # the "system-llm → openai-1" fallback cascade on 50% of agents and
+        # wasted an equal volume of reasoning tokens on the OpenAI bill.
+        # 16384 leaves enough headroom for the full diary + scores + tags JSON.
         token_kwargs: dict = {}
         if any(model_lower.startswith(p) for p in ("gpt-5", "o1", "o3", "o4")):
-            token_kwargs["max_completion_tokens"] = 4096
+            token_kwargs["max_completion_tokens"] = 16384
             temperature = 1.0  # gpt-5/o-series only support temperature=1
         elif attempt_vendor and attempt_vendor.lower().startswith("ollama"):
             # Ollama qwen3.5 uses thinking mode that shares the token budget
@@ -1144,6 +1152,17 @@ async def evolve_one_day(
                 _cand_awareness_floor[_pcn] = _floor
                 if _pcn not in cand_awareness:
                     cand_awareness[_pcn] = _loc_vis if _is_home else _nat_vis
+
+        # Fallback: templates without poll_groups (most TW templates) still have
+        # a `candidate_names` list. Seed those at a modest 0.3 so every daily
+        # entry reports a numeric awareness and downstream charts don't go blank
+        # (the UI rendered 賴清德 / 鄭麗文 awareness as a broken line from day 19
+        # onwards when this field stayed empty post-restart).
+        if job:
+            for _cn_seed in job.get("candidate_names", []) or []:
+                if _cn_seed and _cn_seed not in cand_awareness:
+                    cand_awareness[_cn_seed] = 0.30
+                    _cand_awareness_floor.setdefault(_cn_seed, 0.10)
 
         # Count candidate mentions in today's feed + district news + social posts
         _all_text_today = " ".join(
@@ -2022,6 +2041,19 @@ async def evolve_one_day(
             def _resolve_base(party_name: str) -> float:
                 if party_name in party_base: return float(party_base[party_name])
                 pn = party_name.upper()
+                # Accept TW party codes / 繁中 keywords too — the original
+                # English-only fallback returned 30.0 (default) for every
+                # TW candidate, flattening the major-vs-minor distinction.
+                if any(k in party_name for k in ("民進黨", "國民黨", "綠營", "藍營")):
+                    return 50.0
+                if "DPP" in pn or "KMT" in pn:
+                    return 50.0
+                if any(k in party_name for k in ("民眾黨", "白營", "白色力量")):
+                    return 30.0
+                if "TPP" in pn:
+                    return 30.0
+                if any(k in party_name for k in ("無黨籍", "獨立參選")):
+                    return 5.0
                 if any(k.upper() in pn for k in _major_keywords): return 50.0
                 if any(k.upper() in pn for k in _minor_keywords): return 30.0
                 if any(k.upper() in pn for k in _indep_keywords): return 5.0
@@ -2091,28 +2123,74 @@ async def evolve_one_day(
                         desc = cand_descs.get(cname, cname)
                         _pm = _re.search(r'[（(](.+?)[）)]', cname)
                         cand_party = _pm.group(1) if _pm else ""
+                        # If the candidate name has no parenthesised party
+                        # label (typical of TW templates — just "賴清德"),
+                        # derive cand_party from the augmented party_detection
+                        # so `_resolve_base(cand_party)` later picks up the
+                        # template's party_base score (DPP / KMT / TPP / IND)
+                        # instead of falling back to the 30.0 default.
+                        if not cand_party and job:
+                            _pd_lookup = job.get("_party_detection", {}) or {}
+                            for _bucket in ("DPP", "KMT", "TPP", "IND"):
+                                if cname in (_pd_lookup.get(_bucket, []) or []):
+                                    cand_party = _bucket
+                                    break
 
-                        # ── US Party detection ──
+                        # ── Party detection (TW + US aware) ──
                         # NOTE: Use only candidate name + explicit party, NOT the full
                         # description which may mention other candidates' names.
                         party_src = (cand_party or cname).upper()
-                        is_dem = any(k in party_src for k in ["DEMOCRAT", "DEMOCRATIC", "DEM ", " DEM", "(D)"])
-                        is_rep = any(k in party_src for k in ["REPUBLICAN", "REP ", " REP", "GOP", "(R)"])
-                        is_ind = any(k in party_src for k in ["INDEPENDENT", "IND ", " IND", "LIBERTARIAN", "GREEN", "(I)"])
+                        party_src_zh = (cand_party or cname)
+                        # `is_dem` = green / DPP (incumbent-favoring axis when TW).
+                        # `is_rep` = blue / KMT (challenger / anti-incumbent axis).
+                        # `is_ind` = third party / 無黨籍 / TPP.
+                        # We accept legacy US labels AND TW party codes/names so a
+                        # candidate whose `party` field is just "DPP" / "KMT" / "TPP"
+                        # — without parens, without Chinese — still classifies.
+                        is_dem = (
+                            any(k in party_src for k in ["DEMOCRAT", "DEMOCRATIC", "DEM ", " DEM", "(D)", "DPP"])
+                            or any(k in party_src_zh for k in ["民進黨", "綠營", "民進"])
+                        )
+                        is_rep = (
+                            any(k in party_src for k in ["REPUBLICAN", "REP ", " REP", "GOP", "(R)", "KMT"])
+                            or any(k in party_src_zh for k in ["國民黨", "藍營"])
+                        )
+                        is_ind = (
+                            any(k in party_src for k in ["INDEPENDENT", "IND ", " IND", "LIBERTARIAN", "GREEN", "(I)", "TPP"])
+                            or any(k in party_src_zh for k in ["民眾黨", "白營", "無黨籍", "獨立參選"])
+                        )
                         is_major = is_dem or is_rep
 
-                        # Use template party_detection patterns if available
-                        # NOTE: Only match against name + explicit party label, NOT the
-                        # full description — descriptions may mention OTHER candidates'
-                        # names (e.g. Harris's desc says "Trump won 312 EV"), which would
-                        # cause cross-contamination (Harris tagged as Republican).
+                        # Use template party_detection patterns if available.
+                        # The augmented `_party_detection` map is keyed by the
+                        # full bucket names (DPP/KMT/TPP/IND), not single-letter
+                        # US codes — earlier code probed `_pd.get("D")` etc.
+                        # which always returned `[]` for TW templates, so this
+                        # entire authoritative override silently no-op'd and
+                        # the party-alignment bonus never fired for 賴 / 鄭.
                         if job:
                             _pd = job.get("_party_detection", {})
                             if _pd:
-                                _cand_id = f"{cname} {cand_party}".lower()
-                                is_dem = any(p.lower() in _cand_id for p in _pd.get("D", []))
-                                is_rep = any(p.lower() in _cand_id for p in _pd.get("R", []))
-                                is_ind = any(p.lower() in _cand_id for p in _pd.get("I", []))
+                                _cand_id_l = f"{cname} {cand_party}".lower()
+                                _cand_id = f"{cname} {cand_party}"
+                                def _pd_match(bucket: str) -> bool:
+                                    pats = _pd.get(bucket, []) or []
+                                    return any(
+                                        (str(p).lower() in _cand_id_l) or (str(p) in _cand_id)
+                                        for p in pats if p
+                                    )
+                                # Prefer modern bucket keys (DPP/KMT/TPP/IND);
+                                # fall through to single-letter aliases (D/R/I)
+                                # only if a caller is still on the legacy schema.
+                                _has_modern = any(k in _pd for k in ("DPP", "KMT", "TPP", "IND"))
+                                if _has_modern:
+                                    is_dem = _pd_match("DPP") or is_dem
+                                    is_rep = _pd_match("KMT") or is_rep
+                                    is_ind = _pd_match("TPP") or _pd_match("IND") or is_ind
+                                else:
+                                    is_dem = _pd_match("D") or is_dem
+                                    is_rep = _pd_match("R") or is_rep
+                                    is_ind = _pd_match("I") or is_ind
                                 is_major = is_dem or is_rep
 
                         score = _resolve_base(cand_party) if cand_party else (_resolve_base(desc) if not is_ind else 5.0)
@@ -2145,8 +2223,25 @@ async def evolve_one_day(
                         if is_major and ag_is_tossup: score += 3
 
                         # ── Role detection ──
+                        # TW templates use 繁中 descriptions that don't contain
+                        # the US keywords below. Two TW signals:
+                        #   (1) authoritative `candidate_incumbent_map` passed
+                        #       from the template's `is_incumbent` field,
+                        #   (2) unambiguous Chinese phrases ("尋求連任",
+                        #       "現任總統", etc). We deliberately do NOT use
+                        #       bare "時任" or "現任", because those phrases
+                        #       appear in non-incumbent descriptions too
+                        #       (e.g. 侯友宜 "時任新北市長" in 2024
+                        #       presidential — he isn't the incumbent president).
+                        _inc_map = job.get("_candidate_incumbent_map", {}) if job else {}
+                        _tpl_is_incumbent = bool(_inc_map.get(cname)) if _inc_map else False
                         desc_lower = desc.lower()
-                        is_incumbent = any(k in desc_lower for k in ["incumbent", "sitting president", "current president", "vice president"])
+                        _zh_incumbent_kws = ["尋求連任", "現任總統", "現任副總統"]
+                        is_incumbent = (
+                            _tpl_is_incumbent
+                            or any(k in desc_lower for k in ["incumbent", "sitting president", "current president", "vice president"])
+                            or any(k in desc for k in _zh_incumbent_kws)
+                        )
                         is_governor = any(k in desc_lower for k in ["governor", "gov."])
                         is_senator = any(k in desc_lower for k in ["senator", "sen."])
                         is_house = any(k in desc_lower for k in ["representative", "rep.", "congress"])
@@ -2535,6 +2630,7 @@ async def start_evolution(
     party_detection: dict | None = None,
     enabled_vendors: list[str] | None = None,
     candidate_party_map: dict | None = None,
+    candidate_incumbent_map: dict | None = None,
     round_start_date: str | None = None,
     round_end_date: str | None = None,
 ) -> dict:
@@ -2572,6 +2668,7 @@ async def start_evolution(
         "scoring_params": scoring_params or {},
         "candidate_descriptions": candidate_descriptions or {},
         "_party_detection": augmented_pd,
+        "_candidate_incumbent_map": candidate_incumbent_map or {},
         "enabled_vendors": enabled_vendors or [],
         "round_start_date": round_start_date,
         "round_end_date": round_end_date,

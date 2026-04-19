@@ -44,6 +44,7 @@ def _load_template_meta(filename: str) -> dict | None:
             "cycle": election.get("cycle"),
             "is_generic": election.get("is_generic"),
             "candidate_count": len(election.get("candidates") or []),
+            "default_age_range": election.get("default_age_range"),
         } if election else None,
         "metadata": data.get("metadata"),
     }

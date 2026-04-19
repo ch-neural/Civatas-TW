@@ -251,10 +251,24 @@ def replace_pool(articles: list[CrawledArticle]):
     logger.info(f"News pool updated: {len(_pool)} articles")
 
 
-def inject_article(title: str, summary: str, source_tag: str = "人工注入", source_leaning: str = "中間") -> dict:
-    """Manually inject a breaking-news event into the pool (God mode)."""
+def inject_article(title: str, summary: str, source_tag: str = "人工注入", source_leaning: str | None = None) -> dict:
+    """Manually inject a breaking-news event into the pool (God mode).
+
+    When ``source_leaning`` is not explicitly provided, look up the
+    ``source_tag`` against ``DEFAULT_SOURCE_LEANINGS`` so articles tagged
+    "自由時報" / "中時新聞網" / "中天新聞網" etc. get their correct 5-tier
+    bucket (偏綠 / 偏藍 / 深藍) instead of defaulting every injected row
+    to "中間" — which made the media_habit filter useless and let every
+    agent see the same mixed pool regardless of leaning.
+    """
     if not _pool:
         _load_pool()
+    if not source_leaning:
+        try:
+            from .tw_feed_sources import DEFAULT_SOURCE_LEANINGS
+            source_leaning = DEFAULT_SOURCE_LEANINGS.get(source_tag, "中間")
+        except Exception:
+            source_leaning = "中間"
     article = {
         "article_id": uuid.uuid4().hex[:12],
         "title": title,

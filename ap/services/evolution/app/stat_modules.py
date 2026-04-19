@@ -72,7 +72,10 @@ async def analyze_module_data(filename: str, data: dict,
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
         }
-        if any(m in model.lower() for m in ["o1", "o3", "gpt-5"]):
+        # Reasoning models (o1/o3/o4/gpt-5) — use `max_completion_tokens` and
+        # let temperature default. `o4` was missing from the original list.
+        _ml = (model or "").lower()
+        if any(_ml.startswith(p) for p in ("o1", "o3", "o4", "gpt-5")):
             kwargs["max_completion_tokens"] = 4096
             kwargs["temperature"] = 1.0
         else:

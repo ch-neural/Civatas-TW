@@ -886,7 +886,10 @@ async def api_primary_simulate(ws_id: str, req: PrimarySimulateRequest):
                 person_id = str(person.get("person_id", ""))
                 p_api_base, p_api_key, p_model = _get_api_config(person_id)
                 async with httpx.AsyncClient(timeout=600.0) as client:
-                        if any(m in p_model.lower() for m in ["o1", "o3", "gpt-5"]):
+                        # Reasoning models — o4 was missing from the original list,
+                        # so o4-mini calls fell into the `else` branch and 400'd
+                        # on the unsupported `max_tokens` parameter.
+                        if any((p_model or "").lower().startswith(p) for p in ("o1", "o3", "o4", "gpt-5")):
                             messages = [{"role": "user", "content": f"{system_prompt}\n\n{user_prompt}"}]
                             payload = {
                                 "model": p_model,

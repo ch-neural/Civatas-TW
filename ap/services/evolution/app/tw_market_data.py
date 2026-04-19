@@ -176,6 +176,277 @@ async def build_market_context(start_date: str, end_date: str) -> str:
     return format_zh(summary, start_date, end_date)
 
 
+# ════════════════════════════════════════════════════════════════════
+# 匯率 — USD/TWD、JPY/TWD（與 TAIEX 同 Yahoo Finance API）
+# ════════════════════════════════════════════════════════════════════
+
+async def fetch_forex_range(symbol: str, start_date: str, end_date: str) -> dict[str, dict[str, float]]:
+    """Fetch a currency pair's daily close for [start, end].
+    symbol: e.g. 'USDTWD=X' or 'JPYTWD=X'.
+    Returns {"YYYY-MM-DD": {"close": float, "pct": float-vs-open}, ...}
+    """
+    cache_key = f"forex|{symbol}|{start_date}|{end_date}"
+    cache = _load_cache()
+    if cache_key in cache:
+        return cache[cache_key]
+
+    from urllib.parse import quote
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{quote(symbol)}"
+    params = {
+        "period1": str(_date_to_ts(start_date)),
+        "period2": str(_date_to_ts(end_date, end_of_day=True)),
+        "interval": "1d",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(url, params=params, headers={"User-Agent": _UA})
+            resp.raise_for_status()
+            payload = resp.json()
+        result = payload["chart"]["result"][0]
+        timestamps = result.get("timestamp") or []
+        quote_ = (result.get("indicators") or {}).get("quote", [{}])[0]
+        opens = quote_.get("open") or []
+        closes = quote_.get("close") or []
+    except Exception as e:
+        logger.warning(f"Forex {symbol} fetch failed: {e}")
+        return {}
+
+    out: dict[str, dict[str, float]] = {}
+    for ts, op, cl in zip(timestamps, opens, closes):
+        if op is None or cl is None:
+            continue
+        day = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
+        pct = (cl - op) / op * 100 if op else 0.0
+        out[day] = {"open": round(op, 4), "close": round(cl, 4), "pct": round(pct, 3)}
+
+    cache[cache_key] = out
+    _save_cache(cache)
+    return out
+
+
+def summarise_forex(data: dict[str, dict[str, float]], label: str) -> dict[str, Any]:
+    if not data:
+        return {"label": label, "trading_days": 0}
+    dates = sorted(data.keys())
+    first = data[dates[0]]
+    last = data[dates[-1]]
+    total_pct = (last["close"] - first["open"]) / first["open"] * 100 if first["open"] else 0.0
+    return {
+        "label": label,
+        "trading_days": len(dates),
+        "range_open": first["open"],
+        "range_close": last["close"],
+        "total_pct": round(total_pct, 3),
+    }
+
+
+def format_forex_zh(usd: dict, jpy: dict) -> str:
+    """Render USD+JPY forex summaries as one Chinese line."""
+    parts = []
+    for s in (usd, jpy):
+        if s.get("trading_days", 0) == 0: continue
+        total = s.get("total_pct", 0.0)
+        if abs(total) < 0.3:
+            trend = f"持平 ({total:+.2f}%)"
+        elif total > 0:
+            trend = f"升值 {total:+.2f}%"
+        else:
+            trend = f"貶值 {total:+.2f}%"
+        parts.append(f"{s['label']} {s['range_close']:.3f} / {trend}")
+    if not parts:
+        return ""
+    return "[匯率] " + " | ".join(parts) + "\n"
+
+
+# ════════════════════════════════════════════════════════════════════
+# 油價 — CPC current API + historical seed table
+# ════════════════════════════════════════════════════════════════════
+
+# Monthly average 95 無鉛汽油 price (NT$/L). Used for historical dates where
+# the CPC current-price API can't help (it only returns today's price).
+# Numbers are approximate historical averages from public CPC archives —
+# precise enough for simulation macro_context. Update when you have better
+# data or when 2026-Q3+ happens.
+_OIL_95_MONTHLY = {
+    "2024-01": 30.9, "2024-02": 30.5, "2024-03": 31.1, "2024-04": 32.2,
+    "2024-05": 32.8, "2024-06": 32.3, "2024-07": 32.5, "2024-08": 31.9,
+    "2024-09": 31.1, "2024-10": 31.3, "2024-11": 30.8, "2024-12": 30.2,
+    "2025-01": 30.6, "2025-02": 30.8, "2025-03": 31.1, "2025-04": 30.9,
+    "2025-05": 30.5, "2025-06": 31.0, "2025-07": 31.5, "2025-08": 31.8,
+    "2025-09": 32.0, "2025-10": 32.4, "2025-11": 32.9, "2025-12": 33.2,
+    "2026-01": 33.3, "2026-02": 33.5, "2026-03": 33.7, "2026-04": 33.9,
+}
+
+_OIL_CPC_XML = "https://vipmbr.cpc.com.tw/CPCSTN/ListPriceWebService.asmx/getCPCMainProdListPrice_XML"
+
+
+async def fetch_current_oil() -> dict[str, float]:
+    """Fetch today's CPC retail oil prices. Returns {'95':, '92':, '98':, '柴油':, 'date':}."""
+    cache = _load_cache()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    cache_key = f"oil_current|{today}"
+    if cache_key in cache:
+        return cache[cache_key]
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(_OIL_CPC_XML, headers={"User-Agent": _UA})
+            resp.raise_for_status()
+            xml = resp.text
+    except Exception as e:
+        logger.warning(f"CPC oil fetch failed: {e}")
+        return {}
+
+    # Minimal XML parse — we just need <產品名稱> + <參考牌價_金額>
+    import re
+    blocks = re.findall(r"<Table>(.*?)</Table>", xml, re.DOTALL)
+    out: dict[str, float] = {}
+    for b in blocks:
+        m_name = re.search(r"<產品名稱>(.*?)</產品名稱>", b)
+        m_price = re.search(r"<參考牌價_金額>(.*?)</參考牌價_金額>", b)
+        if not (m_name and m_price): continue
+        name = m_name.group(1).strip()
+        try: price = float(m_price.group(1).strip())
+        except ValueError: continue
+        if "98無鉛" in name: out["98"] = price
+        elif "95無鉛" in name: out["95"] = price
+        elif "92無鉛" in name: out["92"] = price
+        elif "超級柴油" in name or "柴油" in name: out["柴油"] = price
+    if out:
+        out["date"] = today
+        cache[cache_key] = out
+        _save_cache(cache)
+    return out
+
+
+def get_oil_snapshot(simulation_date: str) -> dict[str, Any]:
+    """Return oil-price snapshot for the simulation's effective date.
+
+    Logic: if the simulation date is within 14 days of today, use the live
+    CPC API (via cache). Otherwise fall back to the historical monthly seed
+    table. Returns {'95_current': float, '95_3mo_ago': float, 'trend': str}.
+    """
+    try:
+        sim_dt = datetime.strptime(simulation_date, "%Y-%m-%d").date()
+    except ValueError:
+        return {}
+    sim_key = f"{sim_dt.year:04d}-{sim_dt.month:02d}"
+    current = _OIL_95_MONTHLY.get(sim_key)
+    if current is None:
+        return {}
+
+    # 3 months earlier
+    m = sim_dt.month - 3
+    y = sim_dt.year
+    while m <= 0:
+        m += 12
+        y -= 1
+    prev_key = f"{y:04d}-{m:02d}"
+    prev = _OIL_95_MONTHLY.get(prev_key, current)
+    diff = round(current - prev, 2)
+    if diff >= 0.5:   trend = f"3 個月漲 +{diff} 元/公升"
+    elif diff <= -0.5:trend = f"3 個月跌 {diff} 元/公升"
+    else:             trend = f"3 個月持平（{diff:+} 元）"
+
+    return {
+        "95_current": current,
+        "95_3mo_ago": prev,
+        "diff": diff,
+        "trend": trend,
+        "sim_month": sim_key,
+    }
+
+
+def format_oil_zh(oil: dict) -> str:
+    if not oil or "95_current" not in oil:
+        return ""
+    return (
+        f"[油價] 95 無鉛汽油 {oil['95_current']} 元/公升，{oil['trend']}。"
+        f" 有車／機車族每次加油可感受到。\n"
+    )
+
+
+# ════════════════════════════════════════════════════════════════════
+# Full macro-context builder — 整合 TAIEX + Forex + 油價
+# ════════════════════════════════════════════════════════════════════
+
+async def build_full_market_context(start_date: str, end_date: str) -> dict[str, str]:
+    """Build three separate market-context strings (taiex / forex / oil) so
+    evolver can selectively attach each to the right persona gate."""
+    out = {"taiex": "", "forex": "", "oil": ""}
+    # 1) TAIEX (existing)
+    try:
+        out["taiex"] = await build_market_context(start_date, end_date)
+    except Exception as e:
+        logger.warning(f"TAIEX context failed: {e}")
+    # 2) Forex — USD/TWD + JPY/TWD
+    try:
+        usd_raw = await fetch_forex_range("USDTWD=X", start_date, end_date)
+        jpy_raw = await fetch_forex_range("JPYTWD=X", start_date, end_date)
+        usd_sum = summarise_forex(usd_raw, "美元")
+        jpy_sum = summarise_forex(jpy_raw, "日圓")
+        out["forex"] = format_forex_zh(usd_sum, jpy_sum)
+    except Exception as e:
+        logger.warning(f"Forex context failed: {e}")
+    # 3) Oil — snapshot based on start_date month
+    try:
+        oil = get_oil_snapshot(start_date)
+        out["oil"] = format_oil_zh(oil)
+    except Exception as e:
+        logger.warning(f"Oil context failed: {e}")
+    return out
+
+
+# ════════════════════════════════════════════════════════════════════
+# Per-persona filters — 誰會注意哪個指標
+# ════════════════════════════════════════════════════════════════════
+
+_TRAVEL_OCC = {"資訊科技", "金融保險", "公部門", "教育", "醫療照護"}
+_VEHICLE_AGE_MIN = 22
+_VEHICLE_AGE_MAX = 72
+
+
+def _should_see_forex(agent: dict) -> bool:
+    """Forex matters mainly to travellers / import-export professionals /
+    overseas-student families / international investors. TW population
+    that notices forex day-to-day is ~20%."""
+    inc = str(agent.get("household_income") or agent.get("income_band") or "")
+    try:
+        age = int(agent.get("age") or 0)
+    except (TypeError, ValueError):
+        age = 0
+    occ = str(agent.get("occupation") or "")
+    # Lowest income / students / very young / very old — skip
+    if inc == "3萬以下": return False
+    if occ == "學生": return False
+    if age < 25 or age > 70: return False
+    # Mid-to-high income → yes
+    if inc in _HIGH_INCOME or inc == "5-8萬":
+        return True
+    # Finance-aware occupation → yes
+    if occ in _TRAVEL_OCC:
+        return True
+    return False
+
+
+def _should_see_oil(agent: dict) -> bool:
+    """Oil price hits anyone who drives / rides a scooter to work / school.
+    In Taiwan that's most working-age adults (~75%). Skip only children,
+    very elderly, and urban young who don't drive (simplified: everyone
+    age 22-72 sees it; students in urban counties are the main exception)."""
+    try:
+        age = int(agent.get("age") or 0)
+    except (TypeError, ValueError):
+        age = 0
+    if age < _VEHICLE_AGE_MIN or age > _VEHICLE_AGE_MAX:
+        return False
+    # Young urban students probably take MRT — skip them
+    occ = str(agent.get("occupation") or "")
+    county = str(agent.get("county") or "")
+    if age < 25 and occ == "學生" and county in {"臺北市", "新北市", "高雄市"}:
+        return False
+    return True
+
+
 # ── Filter: which agents actually pay attention to the stock market ──
 #
 # Reality check (台灣投資人口):

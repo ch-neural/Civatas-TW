@@ -48,6 +48,7 @@ class InjectArticleRequest(BaseModel):
     title: str
     summary: str
     source_tag: str = "manual"
+    source_leaning: str | None = None  # optional 5-tier override
     workspace_id: str = ""
 
 
@@ -82,6 +83,11 @@ class StartEvolutionRequest(BaseModel):
     # name -> party code ("DPP"/"KMT"/"TPP"/"IND"). Authoritative — overrides
     # description-keyword heuristics. Pass this from the template candidates.
     candidate_party_map: dict | None = None
+    # name -> bool incumbent flag. Authoritative — overrides description-keyword
+    # heuristics. Pass this from the template candidates' is_incumbent field so
+    # zh-TW descriptions ("時任總統尋求連任") correctly trigger the incumbency
+    # bonus in scoring (evolver.py previously only matched English keywords).
+    candidate_incumbent_map: dict | None = None
     # Real calendar date range this virtual round represents. Used to fetch
     # real TAIEX data (via tw_market_data) so agents' macro_context reflects
     # the actual market conditions of that period. Format: "YYYY-MM-DD".
@@ -192,7 +198,7 @@ def inject_news(req: InjectArticleRequest):
     from .news_pool import inject_article, set_active_workspace
     if req.workspace_id:
         set_active_workspace(req.workspace_id)
-    article = inject_article(req.title, req.summary, req.source_tag)
+    article = inject_article(req.title, req.summary, req.source_tag, req.source_leaning)
     return {"injected": True, "article": article}
 
 
@@ -551,16 +557,24 @@ def evolution_dashboard(job_id: str = "", workspace_id: str = ""):
     _sorted_jobs = sorted(_all_jobs.values(), key=lambda x: x.get("started_at", 0))
     _global_offset = 0
     for sj in _sorted_jobs:
-        for ds in sj.get("daily_summary", []):
+        ds_list = sj.get("daily_summary", [])
+        for ds in ds_list:
             ce = ds.get("candidate_estimate", {})
             if ce:
                 _daily_estimates[_global_offset + ds["day"]] = ce
                 for cn in ce.keys():
                     if cn != "Undecided":
                         _cand_names_seen.add(cn)
-        _total = sj.get("total_days", 0)
-        if _total > 0:
-            _global_offset += _total
+        # Advance offset by the number of days this job ACTUALLY completed,
+        # not by total_days. A job that was interrupted at current_day=2/3
+        # (or never started, current_day=0) would otherwise reserve 3 slots
+        # on the global timeline → the next job's day-1 jumps past the
+        # missing slot and candidate_trends shows a gap (e.g. day 15 / day 18
+        # permanently missing). evolver.py's history offset uses len(history)
+        # for the same reason.
+        _completed = len(ds_list) if ds_list else max(sj.get("current_day", 0), 0)
+        if _completed > 0:
+            _global_offset += _completed
 
     # Fallback: read candidate_estimate from persisted history file for days
     # not covered by in-memory jobs (e.g., after a service restart or reset).
@@ -1097,6 +1111,7 @@ async def start_evolve(req: StartEvolutionRequest):
         party_detection=req.party_detection,
         enabled_vendors=req.enabled_vendors,
         candidate_party_map=req.candidate_party_map,
+        candidate_incumbent_map=req.candidate_incumbent_map,
         round_start_date=req.round_start_date,
         round_end_date=req.round_end_date,
     )
@@ -2023,8 +2038,10 @@ def _diversify_initial_states(agents: list[dict], stance: dict | None = None) ->
             elif age <= 30:
                 base_national -= random.randint(2, 5)
 
-        # Leaning effect: partisans start slightly more satisfied with their side
-        if leaning in ("偏右派", "偏藍", "深藍"):
+        # Leaning effect: partisans start slightly more satisfied with their side.
+        # Accept BOTH legacy 3-tier (偏左派/偏右派) and US Cook PVI labels alongside
+        # the canonical TW 5-bucket so older personas don't drop their boost.
+        if leaning in ("偏右派", "偏藍", "深藍", "Solid Rep", "Lean Rep"):
             base_local += random.randint(1, 5)
         elif leaning in ("偏左派", "Solid Dem", "Lean Dem", "深綠", "偏綠"):
             base_national += random.randint(1, 5)
@@ -3425,12 +3442,28 @@ async def satisfaction_survey(request: Request):
             if cand_sent is not None:
                 base_score = base_score * 0.5 + (50 + cand_sent * 40) * 0.5
 
-        # Party alignment adjustment (US two-party + Cook PVI buckets)
+        # Party alignment adjustment (US + TW party labels, both Cook PVI
+        # and 5-bucket leaning buckets handled below). Without TW keywords
+        # here, every Chinese person_party ("民進黨" / "國民黨" / "民眾黨")
+        # silently dropped through and the alignment bonus never applied.
         if person_party:
             _pp = person_party.lower()
-            is_rep = any(k in _pp for k in ["republican", "gop", "rep ", "rep."]) or _pp.strip() in {"r", "rep"}
-            is_dem = any(k in _pp for k in ["democrat", "democratic", "dem "]) or _pp.strip() in {"d", "dem"}
-            is_ind = any(k in _pp for k in ["independent", "ind ", "third party", "libertarian", "green"]) or _pp.strip() in {"i", "ind"}
+            _pp_zh = person_party
+            is_rep = (
+                any(k in _pp for k in ["republican", "gop", "rep ", "rep.", "kmt"])
+                or _pp.strip() in {"r", "rep", "kmt"}
+                or any(k in _pp_zh for k in ["國民黨", "藍營"])
+            )
+            is_dem = (
+                any(k in _pp for k in ["democrat", "democratic", "dem ", "dpp"])
+                or _pp.strip() in {"d", "dem", "dpp"}
+                or any(k in _pp_zh for k in ["民進黨", "綠營"])
+            )
+            is_ind = (
+                any(k in _pp for k in ["independent", "ind ", "third party", "libertarian", "green", "tpp"])
+                or _pp.strip() in {"i", "ind", "tpp"}
+                or any(k in _pp_zh for k in ["民眾黨", "白營", "無黨籍", "獨立參選"])
+            )
             _lean = leaning or ""
             lean_rep = any(k in _lean for k in ["Solid Rep", "Lean Rep", "偏藍", "深藍"])
             lean_dem = any(k in _lean for k in ["Solid Dem", "Lean Dem", "偏綠", "深綠"])
@@ -3892,7 +3925,12 @@ Wikipedia content:
                 {"role": "user", "content": prompt},
             ],
         }
-        if any(m in model.lower() for m in ["o1", "o3", "gpt-5"]):
+        # Reasoning models (o1/o3/o4/gpt-5) reject `max_tokens` — must use
+        # `max_completion_tokens`. The list previously omitted `o4`, so o4-mini
+        # callers 400'd out. Use startswith to avoid the substring "o3" matching
+        # arbitrary model names that happen to contain those letters.
+        _ml = (model or "").lower()
+        if any(_ml.startswith(p) for p in ("o1", "o3", "o4", "gpt-5")):
             kwargs["max_completion_tokens"] = 4096
             kwargs["temperature"] = 1.0
         else:
@@ -4053,8 +4091,34 @@ async def auto_traits(req: AutoTraitsRequest):
             context_parts.append(f"Candidate name: {name}" + (f", party: {party}" if party else ""))
         context = "\n\n".join(context_parts)
 
+        # Pick TW vs US analyst persona by inspecting the candidate's name +
+        # description for CJK / Taiwan markers. Default to TW for Civatas-TW.
+        # The previous US-only prompt produced US-flavoured trait reasoning
+        # ("MAGA hardliner") for 賴清德 / 鄭麗文 etc.
+        def _has_cjk(s: str) -> bool:
+            return any("\u4e00" <= ch <= "\u9fff" for ch in (s or ""))
+        is_tw = _has_cjk(name) or _has_cjk(description) or _has_cjk(party)
+
         party_ctx = f" (party: {party})" if party else ""
-        prompt = f"""You are a US political analyst. Score the candidate "{name}"{party_ctx} on five trait dimensions used in a voter psychology model. Each score is an integer in 0–80.
+        if is_tw:
+            prompt = f"""你是台灣政治分析師。為候選人「{name}」{party_ctx} 在五個 voter psychology 維度上評分。每項是 0–80 的整數。
+
+## 維度說明
+1. **loc (local)** — 對縣市 / 地方議題的曝光與影響力（地方政策、捷運/交通、教育、治安、地方建設）。現任縣市長 / 市議員 / 在地深耕立委 = 高（50–75）。純中央型人物 = 低（10–30）。
+2. **nat (national)** — 對全國議題的曝光與影響力（中央政策、兩岸外交、總體經濟、立法院領導）。總統 / 行政院長 / 立法院長 / 部會首長 = 高（50–75）。純地方型 = 低（10–25）。
+3. **anx (anxiety)** — 與負面 / 爭議新聞週期的連結度。重大爭議或長期被攻擊 = 高（40–65）。形象乾淨 / 政壇新人 = 低（5–20）。
+4. **charm** — 個人魅力、親和力、群眾感染力。社群聲量大 / 街頭政治高手 = 高（50–70）。技術官僚 / 強硬派 = 低（20–40）。
+5. **cross (cross-party)** — 跨營吸票能力（吸引中間選民、白營、對方陣營軟性支持者）。中間溫和派、跨黨對話高手 = 高（40–65）。深綠 / 深藍鐵粉型強硬派 = 低（10–25）。
+
+只回傳 JSON：
+{{"loc": int, "loc_reason": "<15 字繁中", "nat": int, "nat_reason": "<15 字繁中", "anx": int, "anx_reason": "<15 字繁中", "charm": int, "charm_reason": "<15 字繁中", "cross": int, "cross_reason": "<15 字繁中"}}
+
+只回傳 JSON，不要其他文字。
+
+---
+{context}"""
+        else:
+            prompt = f"""You are a US political analyst. Score the candidate "{name}"{party_ctx} on five trait dimensions used in a voter psychology model. Each score is an integer in 0–80.
 
 ## Dimensions
 1. **loc (local)** — exposure & influence on state / local issues (state policy, schools, infrastructure, public safety, county/city services). Sitting governor / mayor / state legislator deeply rooted in their state = high (50–75). Pure federal-only figure = low (10–30).
@@ -4072,15 +4136,27 @@ JSON only — no extra text.
 {context}"""
 
         try:
+            sys_msg = (
+                "你是台灣政治分析師，專精於選民行為與候選人特質評估。"
+                if is_tw
+                else "You are a US political analyst specializing in voter behavior and candidate trait assessment."
+            )
             kwargs: dict = {
                 "model": model,
                 "messages": [
-                    {"role": "system", "content": "You are a US political analyst specializing in voter behavior and candidate trait assessment."},
+                    {"role": "system", "content": sys_msg},
                     {"role": "user", "content": prompt},
                 ],
             }
-            if any(m in model.lower() for m in ["o1", "o3", "gpt-5"]):
-                kwargs["max_completion_tokens"] = 512
+            # Reasoning models (o1 / o3 / o4 / gpt-5) reject `max_tokens` and
+            # only support `temperature=1`. The original detection list missed
+            # `o4` so o4-mini calls 400'd out. 1024 was too tight (observed:
+            # o4-mini's internal reasoning ate the entire budget and returned
+            # empty content for the longer 賴清德 prompt) — bumped to 4096 to
+            # leave headroom for reasoning + the small JSON output.
+            _ml = (model or "").lower()
+            if any(_ml.startswith(p) for p in ("o1", "o3", "o4", "gpt-5")):
+                kwargs["max_completion_tokens"] = 4096
                 kwargs["temperature"] = 1.0
             else:
                 kwargs["max_tokens"] = 512

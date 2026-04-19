@@ -344,7 +344,7 @@ G. 文化/教育/其他（1-2 組）：其他可能間接影響的面向
             "model": model,
             "messages": [{"role": "user", "content": clean_prompt}],
         }
-        if any(m in model.lower() for m in ["o1", "o3", "gpt-5"]):
+        if any((model or "").lower().startswith(p) for p in ("o1", "o3", "o4", "gpt-5")):
             kwargs["max_completion_tokens"] = 4096
         else:
             kwargs["max_tokens"] = 600
@@ -589,7 +589,7 @@ async def _llm_filter_events(
             "model": model,
             "messages": [{"role": "user", "content": clean_prompt}],
         }
-        if any(m in model.lower() for m in ["o1", "o3", "gpt-5"]):
+        if any((model or "").lower().startswith(p) for p in ("o1", "o3", "o4", "gpt-5")):
             kwargs["max_completion_tokens"] = 8192
         else:
             kwargs["max_tokens"] = 4000
@@ -747,7 +747,7 @@ D. 生活影響（2 組）：對日常生活的實際影響討論
             "model": model,
             "messages": [{"role": "user", "content": clean_prompt}],
         }
-        if any(m in model.lower() for m in ["o1", "o3", "gpt-5"]):
+        if any((model or "").lower().startswith(p) for p in ("o1", "o3", "o4", "gpt-5")):
             kwargs["max_completion_tokens"] = 4096
         else:
             kwargs["max_tokens"] = 400
@@ -895,7 +895,7 @@ async def research_social(
             "model": model,
             "messages": [{"role": "user", "content": clean_prompt}],
         }
-        if any(m in model.lower() for m in ["o1", "o3", "gpt-5"]):
+        if any((model or "").lower().startswith(p) for p in ("o1", "o3", "o4", "gpt-5")):
             kwargs["max_completion_tokens"] = 8192
         else:
             kwargs["max_tokens"] = 2000

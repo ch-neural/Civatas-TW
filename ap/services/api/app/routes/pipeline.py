@@ -492,7 +492,7 @@ Return ONLY valid JSON, no markdown fencing."""
     import httpx as _httpx
     # Reasoning models (o1/o3/o4-mini) don't support temperature or max_tokens;
     # use max_completion_tokens instead, and skip temperature.
-    _is_reasoning = any(model.startswith(p) for p in ("o1", "o3", "o4"))
+    _is_reasoning = any((model or "").lower().startswith(p) for p in ("o1", "o3", "o4", "gpt-5"))
     _llm_body: dict = {
         "model": model,
         "messages": [
@@ -1994,11 +1994,26 @@ async def fast_calibrate(payload: dict):
 
 # ── Smart Keywords (Serper + LLM) ─────────────────────────────────────
 
+def _looks_like_tw(*texts: str) -> bool:
+    """Return True if any of the given strings contain CJK characters or
+    explicit Taiwan markers — used to pick a TW vs US analyst prompt."""
+    for s in texts:
+        if not s:
+            continue
+        if any("\u4e00" <= ch <= "\u9fff" for ch in s):
+            return True
+        sl = s.lower()
+        if any(k in sl for k in ("taiwan", "tw", "roc", "republic of china")):
+            return True
+    return False
+
+
 @router.post("/generate-macro-context")
 async def generate_macro_context(payload: dict = Body(...)):
     """Generate macro political/economic context by searching recent news and using LLM.
 
-    Body: {county, start_date, end_date, candidates: [...], prediction_mode: "election"|"satisfaction"}
+    Body: {county, start_date, end_date, candidates: [...], prediction_mode,
+           country?: "TW"|"US" — autodetected from county/candidates if absent}
     """
     from ..tavily_research import _search_serper_news
     from shared.global_settings import get_system_llm_credentials
@@ -2010,33 +2025,62 @@ async def generate_macro_context(payload: dict = Body(...)):
     end_date = payload.get("end_date", "")
     candidates = payload.get("candidates", [])
     prediction_mode = payload.get("prediction_mode", "election")
+    # Pick TW vs US analyst persona. Default to TW for Civatas-TW; only
+    # fall through to the legacy US prompt if the caller looks American.
+    country = (payload.get("country") or "").upper().strip()
+    if not country:
+        country = "TW" if _looks_like_tw(county, *(candidates or [])) else "TW"
+    is_tw = country != "US"
 
     try:
-        # ── Search for US political context news ──
-        # The queries are structured around how US voters process political
-        # information: federalism (3 layers), two-party dynamics, economic
-        # kitchen-table issues, and culture-war flashpoints.
-        region = county or "United States"
-        queries = [
-            # Federal governance — the layer that drives national_satisfaction
-            '"United States" president executive order policy agenda',
-            '"United States" Congress Senate House legislation filibuster',
-            # Economy — the #1 driver of voter anxiety in US elections
-            '"United States" inflation grocery prices rent mortgage interest rates',
-            '"United States" jobs report unemployment wages economy',
-            # State-level — drives local_satisfaction
-            f'"{region}" governor state budget legislature',
-            f'"{region}" election primary poll swing state',
-            # Culture-war issues — unique to US, high emotional valence
-            '"United States" abortion immigration gun control Supreme Court',
-            # Foreign policy — secondary but matters for national mood
-            '"United States" foreign policy China tariffs Ukraine Israel',
-        ]
-        # Add candidate-specific queries
+        if is_tw:
+            # ── Taiwan political context queries ─────────────────────
+            # Cover central government / 立法院 / 兩岸 / 經濟民生 / 縣市治理
+            # / 第三勢力 / 國防外交 — the dimensions that actually shape TW
+            # voter sentiment. The previous English-only US queries returned
+            # zero TW news and produced a Trump-era US briefing for Taiwan
+            # workspaces.
+            region = county or "台灣"
+            queries = [
+                # 中央政府 / 行政院 — drives national_satisfaction
+                '台灣 總統 行政院 內閣 施政',
+                '台灣 立法院 法案 朝野 預算',
+                # 經濟民生 — #1 voter anxiety driver
+                '台灣 通膨 物價 央行 升息',
+                '台灣 失業 就業 薪資 基本工資',
+                # 兩岸 / 國防 / 外交 — TW-specific high-salience axis
+                '台灣 兩岸關係 中國 軍演 美中台',
+                '台灣 國防 軍購 兵役 漢光演習',
+                # 縣市 / 地方治理 — drives local_satisfaction
+                f'"{region}" 市政 議會 建設 預算',
+                f'"{region}" 民調 候選人 選舉',
+                # 民生 / 社福
+                '台灣 健保 長照 能源 核能',
+                # 第三勢力 / 政黨動態
+                '台灣 民進黨 國民黨 民眾黨 民調',
+            ]
+        else:
+            # ── US political context (legacy) ────────────────────────
+            region = county or "United States"
+            queries = [
+                '"United States" president executive order policy agenda',
+                '"United States" Congress Senate House legislation filibuster',
+                '"United States" inflation grocery prices rent mortgage interest rates',
+                '"United States" jobs report unemployment wages economy',
+                f'"{region}" governor state budget legislature',
+                f'"{region}" election primary poll swing state',
+                '"United States" abortion immigration gun control Supreme Court',
+                '"United States" foreign policy China tariffs Ukraine Israel',
+            ]
+
+        # Add candidate-specific queries (works for both TW and US)
         for c in candidates[:5]:
             name = c.split("(")[0].strip() if "(" in c else c.strip()
             if name:
-                queries.append(f'"{name}" campaign rally policy approval')
+                if is_tw:
+                    queries.append(f'"{name}" 政見 民調 新聞')
+                else:
+                    queries.append(f'"{name}" campaign rally policy approval')
 
         tasks = [_search_serper_news(q, start_date or "2024-01-01", end_date or "2026-04-05", num=5) for q in queries]
         all_results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -2058,10 +2102,46 @@ async def generate_macro_context(payload: dict = Body(...)):
 
         client = AsyncOpenAI(api_key=creds["api_key"], base_url=creds.get("base_url") or None)
 
-        cand_text = "\n".join(f"- {c}" for c in candidates) if candidates else "(not specified)"
-        mode_text = "satisfaction survey" if prediction_mode == "satisfaction" else "election prediction"
+        cand_text = "\n".join(f"- {c}" for c in candidates) if candidates else "(未指定)"
+        if is_tw:
+            mode_text = "民意調查（滿意度）" if prediction_mode == "satisfaction" else "選舉預測"
+            prompt = f"""你是資深台灣政治分析師，正在為一個 AI 社會模擬系統撰寫總體政經背景簡報。模擬中的虛擬選民（agents）會根據這份簡報理解他們所處的政治環境並對新聞做出反應。
 
-        prompt = f"""You are a senior US political analyst writing a briefing for an AI-driven social simulation of American voters. The simulation needs to understand the macro environment so that simulated agents (virtual voters) react realistically to news.
+## 模擬參數
+- 區域 / 縣市：{region}
+- 時間區間：{start_date or '近期'} ~ {end_date or '當前'}
+- 模擬類型：{mode_text}
+- 追蹤的人物：
+{cand_text}
+
+## 近期相關新聞標題（參考用）
+{chr(10).join(f'- {t}' for t in titles) if titles else '(無搜尋結果)'}
+
+## 任務
+請撰寫 6–10 行繁體中文事實性簡報，每行一個主題、用一兩句濃縮敘述，告訴 AI 系統「這就是選民身處的現實世界」。涵蓋以下面向：
+
+1. **中央政府 / 總統 / 行政院**：誰是現任總統？內閣方針為何？支持度趨勢？
+2. **立法院**：朝小野大 vs 完全執政？三大黨席次配置？正在審議或剛通過的重大法案？
+3. **經濟民生（廚房議題）**：通膨、油價、電費、房價、薪資、央行政策對民眾感受？經濟感受是改善還是惡化？
+4. **縣市 / 地方治理**（針對 {region}）：縣市長是誰？議會結構？地方重大爭議？
+5. **選舉脈絡**：相關的近期或即將到來的選舉？主要候選人？最新民調？藍白合 / 棄保效應？
+6. **兩岸關係**：兩岸氣氛、中共軍演、抗中保台 vs 和平交流的拉扯，民眾威脅感？
+7. **國防 / 外交**：軍購進度、美台關係、新總統對台政策、國際參與（WHA / 邦交）？
+8. **歸責心理**：當事情出錯時，這個區域的選民傾向責怪誰 — 總統、行政院、立法院、特定黨派，還是「整個體制」？
+
+## 格式規定
+- 純文字，每行一個主題，不要 markdown、不要 bullet、不要標題。
+- 具體：寫出真實人名、政黨、數字。
+- 中立事實性，不是評論。
+
+範例輸出（僅供格式參考）：
+中央：賴清德 2024 年 5 月就任總統，民進黨完全執政成為過去式（國會三黨不過半）；最新滿意度約 45%，社福與兩岸論述為主軸。
+立法院：國民黨 52 席、民眾黨 8 席、民進黨 51 席，藍白合作主導預算與重大法案。
+經濟：通膨年增率 ~2.5%，但雞蛋、外食價格漲幅明顯；新台幣兌美元在 32 上下，央行尚未升息。
+..."""
+        else:
+            mode_text = "satisfaction survey" if prediction_mode == "satisfaction" else "election prediction"
+            prompt = f"""You are a senior US political analyst writing a briefing for an AI-driven social simulation of American voters. The simulation needs to understand the macro environment so that simulated agents (virtual voters) react realistically to news.
 
 ## Simulation parameters
 - State / region: {region}
@@ -2074,34 +2154,36 @@ async def generate_macro_context(payload: dict = Body(...)):
 {chr(10).join(f"- {t}" for t in titles) if titles else "(no search results)"}
 
 ## Your task
-Write a 6-10 line factual briefing covering these dimensions of the US political landscape. Each line should be one concise statement. The briefing tells the AI system "this is the world the voters live in."
+Write a 6-10 line factual briefing covering these dimensions of the US political landscape. Each line should be one concise statement.
 
-1. **White House & executive branch**: Who is the sitting President? What is the administration's signature agenda? Approval rating trend?
-2. **Congress**: Which party controls the House and Senate? Is government unified or divided? What major legislation is pending or recently passed?
-3. **Economy (kitchen-table issues)**: What are voters feeling about inflation, grocery prices, gas, rent/mortgage, interest rates, jobs? Is the economy seen as improving or worsening?
-4. **State-level dynamics** (for {region}): Who is the Governor? Party control of the state legislature? Any major state-level controversies?
-5. **Election context**: What is the relevant upcoming or recent election? Who are the main candidates? What do polls show? What are the swing-state dynamics?
-6. **Culture-war & social issues**: Where does the national mood stand on abortion, immigration, gun control, LGBTQ rights, or other hot-button issues that mobilize voters?
-7. **Foreign policy & security**: Any overseas conflicts (Ukraine, Middle East, China/Taiwan, tariffs) that affect voter anxiety or the national mood?
-8. **Blame dynamics**: When things go wrong, whom do voters in this region tend to blame — the President, Congress, the Governor, a specific party, or "the system"?
+1. **White House & executive branch**
+2. **Congress**
+3. **Economy (kitchen-table issues)**
+4. **State-level dynamics** (for {region})
+5. **Election context**
+6. **Culture-war & social issues**
+7. **Foreign policy & security**
+8. **Blame dynamics**
 
 ## Format rules
 - Plain text, one topic per line. No markdown, no bullet points, no headers.
 - Be specific: name real people, real parties, real numbers where possible.
-- Be factual and neutral — this is a briefing, not an opinion piece.
+- Be factual and neutral — this is a briefing, not an opinion piece."""
 
-Example output (for illustration only):
-Federal: Republican President Donald Trump took office January 2025; unified Republican government with slim majorities in both chambers; policy agenda focused on tariffs, immigration enforcement, and deregulation.
-Economy: Inflation cooling to ~3% but grocery and housing costs remain elevated; mortgage rates near 7%; unemployment low at 3.9% but wage growth stagnating; consumer sentiment mixed.
-State (Pennsylvania): Democratic Governor Josh Shapiro; legislature split (R Senate, D House); key battleground state in 2024 with razor-thin margins.
-..."""
-
-        resp = await client.chat.completions.create(
-            model=creds.get("model", "gpt-4o-mini"),
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.4,
-            max_tokens=800,
-        )
+        # Reasoning models (o1/o3/o4-mini, gpt-5) reject `max_tokens` and
+        # `temperature` — use `max_completion_tokens` and let temperature
+        # default. Without this branch the macro-context endpoint 500'd
+        # for any system_vendor configured to o4-mini.
+        _model = creds.get("model", "gpt-4o-mini")
+        _ml = (_model or "").lower()
+        _is_reasoning = any(_ml.startswith(p) for p in ("o1", "o3", "o4", "gpt-5"))
+        _create_kwargs: dict = {"model": _model, "messages": [{"role": "user", "content": prompt}]}
+        if _is_reasoning:
+            _create_kwargs["max_completion_tokens"] = 4096
+        else:
+            _create_kwargs["temperature"] = 0.4
+            _create_kwargs["max_tokens"] = 800
+        resp = await client.chat.completions.create(**_create_kwargs)
         text = resp.choices[0].message.content.strip()
         # Clean up any markdown
         if text.startswith("```"):
@@ -2109,7 +2191,7 @@ State (Pennsylvania): Democratic Governor Josh Shapiro; legislature split (R Sen
         if text.endswith("```"):
             text = text[:-3].strip()
 
-        return {"macro_context": text}
+        return {"macro_context": text, "country": country}
 
     except Exception as e:
         log.exception("generate-macro-context failed")
@@ -2138,37 +2220,71 @@ async def suggest_keywords(payload: dict = Body(...)):
     try:
         import asyncio
 
-        # Step 1: Search news via Serper — multiple queries in parallel for broader coverage
-        local_queries = [
-            f'"{county}" governor mayor government',
-            f'"{county}" state legislature council',
-            f'"{county}" infrastructure roads transit',
-            f'"{county}" jobs unemployment economy',
-            f'"{county}" schools education',
-            f'"{county}" crime police safety',
-            f'"{county}" healthcare hospital',
-            f'"{county}" election candidate poll',
-        ]
-        national_queries = [
-            '"United States" president White House Cabinet',
-            '"United States" Congress Senate House bill',
-            '"United States" economy inflation Federal Reserve',
-            '"United States" jobs report wages labor',
-            '"United States" election Democrats Republicans poll',
-            '"United States" foreign policy China Ukraine',
-            '"United States" immigration border',
-            '"United States" healthcare Medicare student loans',
-        ]
+        # Pick TW vs US prompt: detect from county name OR candidate names.
+        # Default to TW for Civatas-TW. The previous US-only queries returned
+        # zero TW news → suggest-keywords produced US keyword sets even when
+        # the user picked a 臺北市 / 高雄市 template.
+        country = (payload.get("country") or "").upper().strip()
+        if not country:
+            cand_names_for_detect = [c.get("name", "") for c in (candidates or [])]
+            country = "TW" if _looks_like_tw(county, *cand_names_for_detect) else "TW"
+        is_tw = country != "US"
 
-        # Add candidate-specific queries
+        # Step 1: Search news via Serper — multiple queries in parallel for broader coverage
+        if is_tw:
+            local_queries = [
+                f'"{county}" 市長 縣長 市政',
+                f'"{county}" 議會 議員 預算',
+                f'"{county}" 捷運 公車 交通建設',
+                f'"{county}" 失業 就業 經濟',
+                f'"{county}" 國中小 學校 教育',
+                f'"{county}" 治安 警察 詐騙',
+                f'"{county}" 健保 醫院 長照',
+                f'"{county}" 選舉 候選人 民調',
+            ]
+            national_queries = [
+                '台灣 總統 行政院 內閣',
+                '台灣 立法院 法案 朝野',
+                '台灣 經濟 通膨 央行',
+                '台灣 失業 薪資 基本工資',
+                '台灣 大選 民進黨 國民黨 民眾黨 民調',
+                '台灣 兩岸 中國 美國 外交',
+                '台灣 國防 軍購 兵役',
+                '台灣 健保 能源 核能',
+            ]
+        else:
+            local_queries = [
+                f'"{county}" governor mayor government',
+                f'"{county}" state legislature council',
+                f'"{county}" infrastructure roads transit',
+                f'"{county}" jobs unemployment economy',
+                f'"{county}" schools education',
+                f'"{county}" crime police safety',
+                f'"{county}" healthcare hospital',
+                f'"{county}" election candidate poll',
+            ]
+            national_queries = [
+                '"United States" president White House Cabinet',
+                '"United States" Congress Senate House bill',
+                '"United States" economy inflation Federal Reserve',
+                '"United States" jobs report wages labor',
+                '"United States" election Democrats Republicans poll',
+                '"United States" foreign policy China Ukraine',
+                '"United States" immigration border',
+                '"United States" healthcare Medicare student loans',
+            ]
+
+        # Add candidate-specific queries (works for both locales)
         for c in candidates:
             cname = c.get("name", "")
             cparty = c.get("party", "")
             if cname:
-                local_queries.append(f"{cname} {county}")
+                local_queries.append(f'"{cname}" {county}')
                 if cparty:
-                    local_queries.append(f"{cname} {cparty}")
-                national_queries.append(f'{cname} policy election')
+                    local_queries.append(f'"{cname}" {cparty}')
+                national_queries.append(
+                    f'"{cname}" 政見 民調' if is_tw else f'{cname} policy election'
+                )
 
         local_tasks = [_search_serper_news(q, start_date, end_date, num=10) for q in local_queries]
         national_tasks = [_search_serper_news(q, start_date, end_date, num=10) for q in national_queries]
@@ -2205,13 +2321,53 @@ async def suggest_keywords(payload: dict = Body(...)):
         cand_context = ""
         if candidates:
             cand_lines = [f"- {c.get('name','')} ({c.get('party','')})" for c in candidates if c.get("name")]
-            cand_context = f"""
+            if is_tw:
+                cand_context = f"""
+## 追蹤的候選人 / 政治人物：
+{chr(10).join(cand_lines)}
+請為每位追蹤對象產生至少 1–2 行專屬搜尋關鍵字（人名 + 議題 / 政見 / 爭議 / 動態）。
+"""
+            else:
+                cand_context = f"""
 ## Tracked candidates / political figures:
 {chr(10).join(cand_lines)}
 Generate at least 1-2 dedicated search lines for each tracked person (name + issue/platform/controversy/activity).
 """
 
-        prompt = f"""You are a US news analyst. Based on the news headlines below from {start_date} to {end_date}, generate Google News search keyword sets for "{county}" (state/region level).
+        if is_tw:
+            prompt = f"""你是台灣新聞分析師。根據以下 {start_date} ~ {end_date} 期間的新聞標題，為「{county}」（縣市 / 區域層級）產生 Google 新聞搜尋關鍵字組。
+
+## {county} 在地新聞（{len(local_titles)} 則）：
+{chr(10).join(f'- {t}' for t in local_titles) if local_titles else '(無結果)'}
+
+## 全國 / 國際新聞（{len(national_titles)} 則）：
+{chr(10).join(f'- {t}' for t in national_titles) if national_titles else '(無結果)'}
+{cand_context}
+## 要求：
+產出 Google News 用的搜尋關鍵字，每行一組。
+
+### Local 關鍵字（local）：
+- 必須聚焦在「{county}」的縣市 / 區域層級議題，不是全國議題。
+- 每行一個搜尋字串，應包含「{county}」（或可辨識的簡稱，如「北市」「中市」）。
+- 涵蓋面向：縣市治理（市長 / 議會 / 預算）、基礎建設（捷運 / 交通 / 建設）、選舉（候選人 / 民調）、治安、就業 / 經濟、教育、健保 / 醫療、能源 / 環境、重大工程。
+- **必須**為每位追蹤的候選人加 1–2 行專屬搜尋（例：`"沈伯洋" 台北市 黑熊學院`、`"蔣萬安" 大巨蛋 預算`）。
+- 產出 10–15 行。範例：`"臺北市" 大巨蛋 議會`、`"高雄市" 工業 空汙`。
+
+### National 關鍵字（national）：
+- 此期間台灣全國 / 國際重大新聞。
+- 涵蓋面向：中央政治（總統 / 行政院 / 立法院）、經濟（央行 / 通膨 / 失業）、兩岸（中共 / 軍演 / 抗中保台）、外交（美中台 / 邦交 / WHA）、社會（健保 / 能源 / 司改 / 詐騙）、重大事件。
+- **若追蹤的候選人是全國級人物**，加入專屬搜尋行。
+- 產出 10–15 行。範例：`台灣 央行 升息 通膨`、`兩岸 共軍 軍演 國防`。
+
+### 格式規則：
+- 不要重複類似關鍵字。
+- 不要只盯著單一事件 — 維度要多樣化。
+- 避免無意義通用詞（「新聞」、「最新」、「報導」、「事件」單獨出現）。
+- 回傳 JSON：
+{{"local": "line1\\nline2\\n...", "national": "line1\\nline2\\n..."}}
+只回傳 JSON，不要其他文字。"""
+        else:
+            prompt = f"""You are a US news analyst. Based on the news headlines below from {start_date} to {end_date}, generate Google News search keyword sets for "{county}" (state/region level).
 
 ## Local news for {county} ({len(local_titles)} headlines):
 {chr(10).join(f"- {t}" for t in local_titles) if local_titles else "(no results)"}
@@ -2243,12 +2399,18 @@ Produce keyword sets for Google News search, one set per line.
 {{"local": "line1\\nline2\\n...", "national": "line1\\nline2\\n..."}}
 Return ONLY the JSON, no other text."""
 
-        resp = await client.chat.completions.create(
-            model=creds.get("model", "gpt-4o-mini"),
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.4,
-            max_tokens=800,
-        )
+        # Reasoning models (o1/o3/o4-mini, gpt-5) require max_completion_tokens
+        # and reject temperature. Default 4096 → enough for ~30 keyword lines.
+        _model = creds.get("model", "gpt-4o-mini")
+        _ml = (_model or "").lower()
+        _is_reasoning = any(_ml.startswith(p) for p in ("o1", "o3", "o4", "gpt-5"))
+        _create_kwargs: dict = {"model": _model, "messages": [{"role": "user", "content": prompt}]}
+        if _is_reasoning:
+            _create_kwargs["max_completion_tokens"] = 4096
+        else:
+            _create_kwargs["temperature"] = 0.4
+            _create_kwargs["max_tokens"] = 800
+        resp = await client.chat.completions.create(**_create_kwargs)
 
         text = resp.choices[0].message.content.strip()
         log.info(f"suggest-keywords LLM raw response: {text[:500]}")
