@@ -376,6 +376,7 @@ export async function startEvolution(
   candidatePartyMap?: Record<string, string>,
   roundStartDate?: string,
   roundEndDate?: string,
+  candidateIncumbentMap?: Record<string, boolean>,
 ) {
   const body: Record<string, unknown> = { agents, days, concurrency };
   if (candidateNames?.length) body.candidate_names = candidateNames;
@@ -385,6 +386,7 @@ export async function startEvolution(
   if (workspaceId) body.workspace_id = workspaceId;
   if (enabledVendors?.length) body.enabled_vendors = enabledVendors;
   if (candidatePartyMap) body.candidate_party_map = candidatePartyMap;
+  if (candidateIncumbentMap) body.candidate_incumbent_map = candidateIncumbentMap;
   if (roundStartDate) body.round_start_date = roundStartDate;
   if (roundEndDate) body.round_end_date = roundEndDate;
   return apiFetch("/api/pipeline/evolution/evolve", {
@@ -843,10 +845,26 @@ export async function socialResearch(query: string, startDate: string, endDate: 
   });
 }
 
-export async function suggestKeywords(county: string, startDate: string, endDate: string, candidates?: {name: string; party?: string}[]) {
+export async function suggestKeywords(
+  county: string,
+  startDate: string,
+  endDate: string,
+  candidates?: {name: string; party?: string}[],
+  country?: string,
+) {
+  // `country` (TW / US) lets the backend pick the right analyst prompt and
+  // search-query language. If omitted, the backend autodetects from the
+  // county name + candidate names — but explicit is always safer because
+  // ambiguous strings (e.g. an English-romanised TW name) can mislead it.
   return apiFetch("/api/pipeline/suggest-keywords", {
     method: "POST",
-    body: JSON.stringify({ county, start_date: startDate, end_date: endDate, candidates: candidates || [] }),
+    body: JSON.stringify({
+      county,
+      start_date: startDate,
+      end_date: endDate,
+      candidates: candidates || [],
+      ...(country ? { country } : {}),
+    }),
   });
 }
 
@@ -993,6 +1011,7 @@ export interface TemplateMeta {
     cycle: number | null;
     is_generic: boolean | null;
     candidate_count: number;
+    default_age_range?: [number, number] | null;
   } | null;
   metadata?: Record<string, any> | null;
 }

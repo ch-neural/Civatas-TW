@@ -62,17 +62,25 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
 
   // ── Generation ──
   const [targetCount, setTargetCount] = useState(100);
-  const [ageMin, setAgeMin] = useState(18);
+  // Defaults to TW voting age (20). Templates override via election.default_age_range;
+  // any previously-saved user values take precedence over template defaults.
+  const [ageMin, setAgeMin] = useState(20);
   const [ageMax, setAgeMax] = useState(95);
+  // Track whether saved settings carried explicit age values so we only apply
+  // template defaults when the user hasn't set them before. `settingsLoaded`
+  // must be state (not ref) so the template-defaults effect re-runs once load
+  // completes asynchronously.
+  const ageFromSavedRef = useRef(false);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   // Restore all settings from workspace
   useEffect(() => {
     getUiSettings(wsId, "population-setup").then((s: any) => {
       if (s?.surveyMethod) setSurveyMethod(s.surveyMethod);
       if (s?.targetCount) setTargetCount(s.targetCount);
-      if (s?.ageMin != null) setAgeMin(s.ageMin);
-      if (s?.ageMax != null) setAgeMax(s.ageMax);
-    }).catch(() => {});
+      if (s?.ageMin != null) { setAgeMin(s.ageMin); ageFromSavedRef.current = true; }
+      if (s?.ageMax != null) { setAgeMax(s.ageMax); ageFromSavedRef.current = true; }
+    }).catch(() => {}).finally(() => { setSettingsLoaded(true); });
   }, [wsId]);
 
   // Persist settings when changed
@@ -289,7 +297,10 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
     return () => { cancelled = true; };
   }, []);
   const usTemplates = useMemo(
-    () => templateList.filter((t) => t.country === "US"),
+    // Include TW + US templates. The "us" prefix is legacy naming from the
+    // USA version; TW is the canonical source (see CLAUDE.md Stage 4).
+    // Filtering to only US would hide all TW templates and break the panel.
+    () => templateList.filter((t) => t.country === "TW" || t.country === "US" || !t.country),
     [templateList],
   );
   const [usTemplate, setUsTemplate] = useState<string>(() => {
@@ -351,6 +362,21 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
     () => usTemplates.find((t) => t.id === usTemplate) || null,
     [usTemplates, usTemplate],
   );
+
+  // Apply the template's default_age_range on first load — but only if the
+  // user has never explicitly set an age range for this workspace. Once the
+  // user picks custom values (persisted via the save effect), this hook does
+  // nothing on subsequent template switches.
+  useEffect(() => {
+    if (!settingsLoaded) return;
+    if (ageFromSavedRef.current) return; // respect prior user choice
+    const range = selectedTemplateMeta?.election?.default_age_range;
+    if (Array.isArray(range) && range.length === 2
+        && typeof range[0] === "number" && typeof range[1] === "number") {
+      setAgeMin(range[0]);
+      setAgeMax(range[1]);
+    }
+  }, [selectedTemplateMeta, settingsLoaded]);
 
   const setLocale = useLocaleStore((s) => s.setLocale);
   const handleGenerateUS = useCallback(async () => {
@@ -457,13 +483,25 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                 const isCountyScope =
                   (meta?.election?.scope === "county" || meta?.election?.scope === "state") &&
                   !!meta?.region_code;
+                // Constituency templates (黨內初選) 跨多個 township，用第一個 township 的縣市來 highlight
+                const isConstituencyScope = meta?.election?.scope === "constituency";
+                const constituencyCounty = isConstituencyScope
+                  ? (((meta?.election as any)?.constituency_townships?.[0] as string | undefined)?.split("|")[0] ?? "")
+                  : "";
+                const constituencyDisplayName = isConstituencyScope
+                  ? ((meta?.election as any)?.constituency_name || meta?.region || "")
+                  : "";
                 // TW template 沒有 fips 欄位；region_code 直接是縣市名稱 (e.g. "臺北市")
-                const countyKey = isCountyScope ? (meta?.region_code || "") : "";
+                const countyKey = isCountyScope
+                  ? (meta?.region_code || "")
+                  : (isConstituencyScope ? constituencyCounty : "");
                 // 國家級模板：空資料 → 地圖用淡色描邊顯示 22 縣市；單縣市模板：用黃框 highlight 該縣市。
                 const mapData: Record<string, number> = {};
                 const title = isCountyScope
                   ? t("popsetup.map_title.state", { region: meta?.region || meta?.region_code || "" })
-                  : t("popsetup.map_title.national");
+                  : isConstituencyScope
+                    ? t("popsetup.map_title.state", { region: constituencyDisplayName })
+                    : t("popsetup.map_title.national");
                 // 點擊縣市時，切換到對應的 single-county 模板
                 const handleCountyClick = (countyName: string) => {
                   if (generating) return;
@@ -480,7 +518,7 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                 return (
                   <USMap
                     mode="states"
-                    selectedFeature={isCountyScope ? countyKey : ""}
+                    selectedFeature={(isCountyScope || isConstituencyScope) ? countyKey : ""}
                     data={mapData}
                     colorScale={["#1e293b", "#3b82f6"]}
                     title={title}
@@ -622,6 +660,13 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                 const raceStats = count(existingPersonas, "race");
                 const stateStats = count(existingPersonas, "district");
                 const leanColor = (lean: string) => {
+                  // TW 5-bucket (Civatas-TW canonical) — green / blue palette
+                  if (lean === "深綠") return "#0d6b1e";
+                  if (lean === "偏綠") return "#1B9431";
+                  if (lean === "中間" || lean === "白") return "#94a3b8";
+                  if (lean === "偏藍") return "#0000C8";
+                  if (lean === "深藍") return "#000080";
+                  // Legacy US labels (backward compat)
                   if (lean?.includes("Solid") && lean?.includes("Dem")) return "#2563eb";
                   if (lean?.includes("Lean") && lean?.includes("Dem")) return "#60a5fa";
                   if (lean?.includes("Tossup") || lean?.includes("Swing")) return "#a855f7";
@@ -687,15 +732,22 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                   background: generating ? "rgba(59,130,246,0.3)" : existingPersonas.length > 0 ? "rgba(245,158,11,0.8)" : "#3b82f6",
                   color: "#fff", fontSize: 14, fontWeight: 700,
                 }}>
-                {generating
-                  ? `${genPhase}`
-                  : existingPersonas.length > 0
-                    ? (selectedTemplateMeta?.election?.scope === "state"
-                      ? `🔄 Re-generate ${selectedTemplateMeta.region || selectedTemplateMeta.region_code || "State"} Population`
-                      : `🔄 Re-generate National Population`)
-                    : selectedTemplateMeta?.election?.scope === "state"
-                      ? t("popsetup.generate.state", { region: selectedTemplateMeta.region || selectedTemplateMeta.region_code || "" })
-                      : t("popsetup.generate.national")}
+                {(() => {
+                  const sc = selectedTemplateMeta?.election?.scope;
+                  const regionName = sc === "constituency"
+                    ? (((selectedTemplateMeta?.election as any)?.constituency_name) || selectedTemplateMeta?.region || "")
+                    : (selectedTemplateMeta?.region || selectedTemplateMeta?.region_code || "");
+                  const isRegional = sc === "state" || sc === "county" || sc === "constituency";
+                  if (generating) return `${genPhase}`;
+                  if (existingPersonas.length > 0) {
+                    return isRegional
+                      ? `🔄 Re-generate ${regionName} Population`
+                      : `🔄 Re-generate National Population`;
+                  }
+                  return isRegional
+                    ? t("popsetup.generate.state", { region: regionName })
+                    : t("popsetup.generate.national");
+                })()}
               </button>
 
               {/* Step progress */}

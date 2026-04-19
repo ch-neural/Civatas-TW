@@ -15,7 +15,11 @@ import {
 const LEAN_COLORS: Record<string, string> = {
   // 3-tier aggregate buckets
   "left": "#3b82f6", "center": "#94a3b8", "right": "#ef4444",
-  // 5-tier per-agent labels
+  // TW 5-bucket (Civatas-TW canonical)
+  "深綠": "#0d6b1e", "偏綠": "#1B9431",
+  "中間": "#94a3b8",
+  "偏藍": "#0000C8", "深藍": "#000080",
+  // US 5-tier per-agent labels (legacy fallback)
   "Solid Dem": "#1e40af", "Lean Dem": "#3b82f6",
   "Tossup": "#94a3b8",
   "Lean Rep": "#ef4444", "Solid Rep": "#991b1b",

@@ -19,7 +19,11 @@ const vendorColors: Record<string, string> = {
   deepseek: "#6366f1", template: "#fbbf24", "未知": "#6b7280", "unknown": "#6b7280",
 };
 const leaningColors: Record<string, string> = {
-  // TW
+  // TW 5-bucket (Civatas-TW canonical — DPP green / KMT blue palette)
+  "深綠": "#0d6b1e", "偏綠": "#1B9431",
+  "中間": "#94a3b8", "白": "#28C8C8",
+  "偏藍": "#0000C8", "深藍": "#000080",
+  // TW 3-tier legacy (early Civatas-TW persona generator output)
   "偏左派": "#22c55e", "中立": "#9ca3af", "偏右派": "#3b82f6", "未知": "#6b7280",
   // US (Civatas-USA Stage 1.5+)
   "Solid Dem": "#1e40af", "Lean Dem": "#3b82f6",

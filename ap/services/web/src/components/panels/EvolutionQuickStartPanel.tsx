@@ -415,6 +415,9 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
   const abortRef = useRef(false);
   const pauseRef = useRef(false);
   const activeJobIdRef = useRef<string | null>(null);
+  // Always-fresh ref to handleStart so the mount-rehydrate IIFE doesn't
+  // invoke a stale closure (captured when tplLoading was still true).
+  const handleStartRef = useRef<((resumeFromRound?: number, resumeNewsCount?: number) => Promise<void>) | null>(null);
 
   // Persist evolution progress so it survives page close
   const saveProgress = useCallback((state: Record<string, any>) => {
@@ -435,7 +438,19 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
     (async () => {
       try {
         const saved = await getUiSettings(wsId, "evolution-progress");
-        if (!saved || saved.status === "idle" || saved.status === "done") return;
+        if (!saved || saved.status === "idle") return;
+        // Completed run — restore the "done" completion panel so users who
+        // reload the page after a full run don't see a blank Start screen
+        // and think the evolution "stopped without a Resume button".
+        if (saved.status === "done") {
+          const { currentRound: cr, totalRounds: tr, newsCount: nc } = saved;
+          if (tr) setTotalRounds(tr);
+          if (cr) setCurrentRound(cr);
+          if (nc) setNewsCount(nc);
+          setPhase("done");
+          setPhaseLabel(en ? "Evolution complete!" : "演化完成！");
+          return;
+        }
 
         // There was an active evolution plan
         const { status, currentRound: cr, totalRounds: tr, newsCount: nc, activeJobId, simDate } = saved;
@@ -510,7 +525,10 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
                   setPhaseLabel(en ? "Evolution complete!" : "演化完成！");
                   saveProgress({ ...saved, status: "done", activeJobId: null });
                 } else {
-                  handleStart((cr || 0) + 1, nc || 0);
+                  // Use the ref so we invoke the CURRENT handleStart (with
+                  // fresh tplLoading/template values), not the one captured
+                  // at mount when the template was still loading.
+                  handleStartRef.current?.((cr || 0) + 1, nc || 0);
                 }
               })();
               return;
@@ -794,6 +812,7 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
     const candidateNames = _cands.map((c: any) => c.name).filter(Boolean);
     const candDescs: Record<string, string> = {};
     const candPartyMap: Record<string, string> = {};
+    const candIncumbentMap: Record<string, boolean> = {};
     for (const c of _cands) {
       if (c.name && c.description) candDescs[c.name] = c.description;
       // Authoritative alignment bucket for the evolver (DPP/KMT/TPP/IND).
@@ -805,6 +824,14 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
         const matched = _partyByCode(code);
         candPartyMap[c.name] = matched?.bucket || code;
       }
+      // Authoritative incumbent flag from template (camelCase from frontend
+      // hydration, snake_case from raw JSON). Evolver uses this to award the
+      // incumbency bonus — without it, zh-TW descriptions ("時任總統尋求連任")
+      // never matched the English-only keyword check, so 賴清德 lost his
+      // incumbency advantage and bled support across every round.
+      if (c.name) {
+        candIncumbentMap[c.name] = Boolean((c as any).is_incumbent ?? (c as any).isIncumbent);
+      }
     }
     const partyDetection = _elec?.party_detection ?? undefined;
     // Fetch all configured agent vendors (non-system) so newly-added vendors are included
@@ -812,16 +839,30 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
     try {
       const settingsRes = await apiFetch("/api/settings");
       const allVendors: any[] = settingsRes?.llm_vendors || [];
+      // The `system_vendor_id` slot is reserved for system-level tasks (AI
+      // analysis, prompt repair). Using it for per-agent diary generation
+      // was a mistake — it caused 50% of agents to be assigned to e.g.
+      // `system-llm` (o4-mini), whose reasoning-token budget routinely
+      // truncated before emitting JSON, triggering fallback to openai-1
+      // with doubled latency and duplicate token spend. Exclude it here so
+      // `enabled_vendors` mirrors the user's agent-vendor whitelist only.
+      const systemVendorId: string | null = settingsRes?.system_vendor_id || null;
+      const activeVendorIds: string[] = Array.isArray(settingsRes?.active_vendors)
+        ? settingsRes.active_vendors
+        : [];
       const agentVendorIds = allVendors
-        .filter((v: any) => v.role !== "system" && v.id)
-        .map((v: any) => v.id as string);
+        .filter((v: any) => v.role !== "system" && v.id && v.id !== systemVendorId)
+        .map((v: any) => v.id as string)
+        // If the user has explicitly narrowed `active_vendors`, honour that;
+        // otherwise fall through to the full agent-vendor list.
+        .filter((id: string) => activeVendorIds.length === 0 || activeVendorIds.includes(id));
       if (agentVendorIds.length) enabledVendors = agentVendorIds;
     } catch { /* ignore — backend will auto-derive from agents */ }
     // Pass round's real-date range so the backend can fetch real TAIEX data
     // for that period. Agents who actually follow the stock market (decided
     // by income / age / occupation in tw_market_data._should_see_market) will
     // see the market summary in their macro_context.
-    const res = await startEvolution(personas, crawlInterval, concurrency, candidateNames, advParams as Record<string, unknown>, candDescs, partyDetection, wsId, enabledVendors, candPartyMap, roundStart, roundEnd);
+    const res = await startEvolution(personas, crawlInterval, concurrency, candidateNames, advParams as Record<string, unknown>, candDescs, partyDetection, wsId, enabledVendors, candPartyMap, roundStart, roundEnd, candIncumbentMap);
     const jobId = res?.job_id || null;
     activeJobIdRef.current = jobId;
 
@@ -932,8 +973,16 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
     if (!abortRef.current) {
       setPhase("done");
       setPhaseLabel(en ? "Evolution complete!" : "演化完成！");
-      // Mark evolution as fully done (not idle) so sidebar shows ✓
-      saveUiSettings(wsId, "evolution-progress", { status: "done" }).catch(() => {});
+      // Mark evolution as fully done (not idle) so sidebar shows ✓.
+      // Persist the round + news counts too so a page reload can show the
+      // completion summary (rounds / news crawled / agents) instead of a
+      // blank Start screen that looks like "evolution stopped".
+      saveUiSettings(wsId, "evolution-progress", {
+        status: "done",
+        currentRound: rounds,
+        totalRounds: rounds,
+        newsCount: nc,
+      }).catch(() => {});
       // Auto-create a snapshot so Prediction can run without an extra click.
       // Only on a clean full-completion path (no abort / no error earlier in loop).
       try {
@@ -957,6 +1006,10 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
     }
     setRunning(false);
   }, [running, personas, simDays, crawlInterval, concurrency, startDate, endDate, runOneRound, en, clearProgress, tplLoading, template, isGeneric, wsId]);
+
+  useEffect(() => {
+    handleStartRef.current = handleStart;
+  }, [handleStart]);
 
   // Pause — finish current evolve job, then stop
   const handlePause = () => {
@@ -1264,15 +1317,17 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
         {phase === "idle" && (
           <button
             onClick={() => handleStart()}
-            disabled={running || !personaCount}
+            disabled={running || !personaCount || tplLoading}
             style={{
               width: "100%", padding: "14px 24px", borderRadius: 12, border: "none",
-              background: personaCount ? "linear-gradient(135deg, #e94560, #c62368)" : "rgba(100,100,100,0.3)",
-              color: "var(--text-primary)", fontSize: 16, fontWeight: 700, cursor: personaCount ? "pointer" : "not-allowed",
+              background: (personaCount && !tplLoading) ? "linear-gradient(135deg, #e94560, #c62368)" : "rgba(100,100,100,0.3)",
+              color: "var(--text-primary)", fontSize: 16, fontWeight: 700, cursor: (personaCount && !tplLoading) ? "pointer" : "not-allowed",
               transition: "opacity 0.2s",
             }}
           >
-            {en ? "🚀 Start Evolution" : "🚀 開始演化"}
+            {tplLoading
+              ? (en ? "⏳ Loading template..." : "⏳ 載入模板中...")
+              : (en ? "🚀 Start Evolution" : "🚀 開始演化")}
           </button>
         )}
 
@@ -1290,12 +1345,19 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
               <span>{en ? "News crawled" : "已抓新聞"}: <strong style={{ color: "var(--text-primary)" }}>{newsCount}</strong></span>
             </div>
             <div style={{ display: "flex", gap: 12 }}>
-              <button onClick={handleResume} style={{
-                flex: 1, padding: "10px 20px", borderRadius: 8, border: "none",
-                background: "linear-gradient(135deg, #e94560, #c62368)", color: "var(--text-primary)",
-                fontSize: 14, fontWeight: 700, cursor: "pointer",
-              }}>
-                {en ? "▶ Resume" : "▶ 繼續"}
+              <button
+                onClick={handleResume}
+                disabled={tplLoading}
+                style={{
+                  flex: 1, padding: "10px 20px", borderRadius: 8, border: "none",
+                  background: tplLoading ? "rgba(100,100,100,0.3)" : "linear-gradient(135deg, #e94560, #c62368)",
+                  color: "var(--text-primary)",
+                  fontSize: 14, fontWeight: 700, cursor: tplLoading ? "not-allowed" : "pointer",
+                }}
+              >
+                {tplLoading
+                  ? (en ? "⏳ Loading template..." : "⏳ 載入模板中...")
+                  : (en ? "▶ Resume" : "▶ 繼續")}
               </button>
               <button onClick={async () => { await handleStop(); handleStart(); }} style={{
                 padding: "10px 20px", borderRadius: 8, fontSize: 14,

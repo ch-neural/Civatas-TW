@@ -449,21 +449,27 @@ export default function EvolutionPanel({
               </h2>
               {dietRules && (() => {
                 const sourceLeanings: Record<string, string> = dietRules.source_leanings || {
-                  "Reuters": "Tossup", "Associated Press": "Tossup", "The Hill": "Tossup",
-                  "The New York Times": "Lean Dem", "CNN": "Lean Dem", "NPR": "Lean Dem", "The Washington Post": "Lean Dem",
-                  "Fox News": "Lean Rep", "The Wall Street Journal": "Lean Rep", "New York Post": "Lean Rep",
-                  "MSNBC": "Solid Dem", "Breitbart": "Solid Rep",
+                  // TW default fallback (used only if backend doesn't return source_leanings)
+                  "中央通訊社": "中間", "公視新聞": "中間",
+                  "自由時報": "偏綠", "三立新聞網": "偏綠", "民視新聞網": "偏綠",
+                  "民報": "深綠",
+                  "聯合新聞網": "偏藍", "中時新聞網": "偏藍", "TVBS 新聞": "偏藍",
+                  "中天新聞網": "深藍", "中國時報": "深藍",
                 };
+                // TW 5-bucket palette + legacy US fallback
                 const leaningColor: Record<string, string> = {
+                  "深綠": "#0d6b1e", "偏綠": "#1B9431", "中間": "#94a3b8",
+                  "偏藍": "#0000C8", "深藍": "#000080",
                   "Solid Dem": "#2563eb", "Lean Dem": "#60a5fa", "Tossup": "#a855f7",
                   "Lean Rep": "#f87171", "Solid Rep": "#dc2626",
                 };
                 const leaningEmoji: Record<string, string> = {
+                  "深綠": "🟢", "偏綠": "🟩", "中間": "⚪", "偏藍": "🟦", "深藍": "🔵",
                   "Solid Dem": "🔵", "Lean Dem": "🟦", "Tossup": "🟣",
                   "Lean Rep": "🟥", "Solid Rep": "🔴",
                 };
                 const leaningBadge = (src: string) => {
-                  const l = sourceLeanings[src] || "Tossup";
+                  const l = sourceLeanings[src] || "中間";
                   return (
                     <span style={{
                       display: "inline-flex", alignItems: "center", gap: 3,
@@ -478,8 +484,14 @@ export default function EvolutionPanel({
                   );
                 };
 
-                // Group sources by leaning for the spectrum table
-                const spectrum = ["Solid Dem", "Lean Dem", "Tossup", "Lean Rep", "Solid Rep"];
+                // Auto-detect spectrum buckets present in the data so we
+                // don't render five empty US columns in a TW workspace
+                // (or vice versa). Falls back to TW order if mixed.
+                const _seen = new Set(Object.values(sourceLeanings));
+                const _isTW = ["深綠", "偏綠", "中間", "偏藍", "深藍"].some(b => _seen.has(b));
+                const spectrum = _isTW
+                  ? ["深綠", "偏綠", "中間", "偏藍", "深藍"]
+                  : ["Solid Dem", "Lean Dem", "Tossup", "Lean Rep", "Solid Rep"];
                 const grouped: Record<string, string[]> = {};
                 spectrum.forEach(l => grouped[l] = []);
                 Object.entries(sourceLeanings).forEach(([src, l]) => {

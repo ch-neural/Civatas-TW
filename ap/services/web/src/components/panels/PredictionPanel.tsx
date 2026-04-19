@@ -29,9 +29,32 @@ import {
 // when a US template becomes active. Matches TW politicians, parties, and
 // distinctively-Taiwanese policy phrases.
 const TW_SEED_PATTERNS = /民進黨|國民黨|民眾黨|時代力量|台灣基進|賴清德|蔡英文|盧秀燕|柯文哲|蘇貞昌|蔡其昌|楊瓊瓔|江啟臣|何欣純|林佳龍|台中|台北|高雄|新北|桃園|兩岸|九合一|立法院|行政院/;
-function looksLikeTwSeed(s: string | null | undefined): boolean {
-  if (!s) return false;
-  return TW_SEED_PATTERNS.test(s);
+// Coerce arrays / null / non-string defensively — saved meta.json may carry
+// these fields as `string[]` and `regex.test(array)` would silently stringify
+// to "a,b,c" which falsely matches partial words. Always join arrays first.
+function _toFlatString(v: unknown): string {
+  if (v == null) return "";
+  if (Array.isArray(v)) return v.filter(Boolean).map(String).join(" ");
+  return typeof v === "string" ? v : String(v);
+}
+function looksLikeTwSeed(s: unknown): boolean {
+  const t = _toFlatString(s);
+  if (!t) return false;
+  return TW_SEED_PATTERNS.test(t);
+}
+
+// Mirror heuristic for the *other* direction: does this string look like a
+// US seed default? When the active template is TW (Civatas-TW canonical
+// workspace) but the textbox holds a US-style political briefing carried
+// over from a snapshot save / older code path, we want to wipe it and
+// reseed with the TW default — otherwise users see Federal/Congress/
+// Governor/President's-party text on a 臺北市 prediction page (the bug
+// that surfaced this whole audit).
+const US_SEED_PATTERNS = /\bDemocrat(?:ic|s)?\b|\bRepublican(?:s)?\b|\bGOP\b|\bCongress\b|\bSenate\b|\bWhite House\b|\bGovernor\b|\bsitting President\b|Congress is narrowly divided|two major parties|grocery\/gas prices|interest rates|swing state|Federal Reserve|abortion rights/i;
+function looksLikeUsSeed(s: unknown): boolean {
+  const t = _toFlatString(s);
+  if (!t) return false;
+  return US_SEED_PATTERNS.test(t);
 }
 import {
   apiFetch,
@@ -263,15 +286,41 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
   useEffect(() => {
     if (!activeTemplate) return;
     const isUs = activeTemplate?.country === "US";
-    if (!predictionMacroContext.trim() || (isUs && looksLikeTwSeed(predictionMacroContext))) {
-      const def = getDefaultMacroContext(activeTemplate, "en");
+    // Pick the locale that matches the template's country so a TW workspace
+    // gets the 繁中 macro context (and a US workspace gets English),
+    // instead of always pulling the "en" copy regardless of country.
+    const macroLocale = isUs ? "en" : "zh-TW";
+    // Replace when:
+    //   (a) field is empty, OR
+    //   (b) the active template is US but the saved value is TW-flavoured, OR
+    //   (c) the active template is TW but the saved value is US-flavoured
+    //       (covers stale workspaces saved when the prior fallback was the
+    //       hardcoded "Federal: ... Congress is narrowly divided ..." block).
+    //
+    // Defensive String() coercion: callers may have set state to an Array
+    // (legacy meta.json carried `predLocalKeywords` as `string[]`) — calling
+    // `.trim()` on an array threw TypeError and tripped the React error
+    // boundary, surfacing as "Application error: a client-side exception".
+    const _toText = (v: unknown): string => {
+      if (Array.isArray(v)) return v.filter(Boolean).map(String).join("\n");
+      if (v == null) return "";
+      return typeof v === "string" ? v : String(v);
+    };
+    const _shouldReplace = (cur: unknown) => {
+      const s = _toText(cur);
+      return !s.trim()
+        || (isUs && looksLikeTwSeed(s))
+        || (!isUs && looksLikeUsSeed(s));
+    };
+    if (_shouldReplace(predictionMacroContext)) {
+      const def = getDefaultMacroContext(activeTemplate, macroLocale);
       if (def) setPredictionMacroContext(def);
     }
-    if (!predLocalKeywords.trim() || (isUs && looksLikeTwSeed(predLocalKeywords))) {
+    if (_shouldReplace(predLocalKeywords)) {
       const local = getDefaultLocalKeywords(activeTemplate);
       if (local) setPredLocalKeywords(local);
     }
-    if (!predNationalKeywords.trim() || (isUs && looksLikeTwSeed(predNationalKeywords))) {
+    if (_shouldReplace(predNationalKeywords)) {
       const national = getDefaultNationalKeywords(activeTemplate);
       if (national) setPredNationalKeywords(national);
     }
@@ -299,9 +348,18 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
   const [selectedGroupTab, setSelectedGroupTab] = useState(0);
   const [chartGroupTab, setChartGroupTab] = useState<string>("all"); // "all" or group name
 
-  // Helper: get smart default base score for a party id (D/R/I).
+  // Helper: get smart default base score for a party id.
+  // Accepts both US codes (D/R/I, "Democrat"/"Republican"/"Independent") AND
+  // TW codes (DPP/KMT/TPP/IND, "民進黨"/"國民黨"/"民眾黨"/"無黨籍"). The
+  // earlier English-only check returned 30 (default) for every TW candidate,
+  // flattening the major-vs-minor party distinction in the smart base score.
   const getPartyDefault = (party: string): number => {
-    const p = party.toLowerCase();
+    const p = (party || "").toLowerCase();
+    const z = party || "";
+    if (p === "dpp" || p.includes("dpp") || z.includes("民進黨") || z.includes("綠營")) return 50;
+    if (p === "kmt" || p.includes("kmt") || z.includes("國民黨") || z.includes("藍營")) return 50;
+    if (p === "tpp" || p.includes("tpp") || z.includes("民眾黨") || z.includes("白營")) return 30;
+    if (z.includes("無黨籍") || z.includes("獨立參選")) return 25;
     if (p.includes("democrat") || p === "d" || p.includes("(d)")) return 50;
     if (p.includes("republican") || p === "r" || p.includes("(r)")) return 50;
     if (p.includes("independent") || p === "i" || p.includes("(i)")) return 25;
@@ -313,37 +371,60 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
     const desc = cand.description || cand.party || "";
     const breakdown: {label: string; value: number; reason: string}[] = [];
 
-    // 1. Party base (15-40)
+    // 1. Party base (15-40) — `partyId` is whatever bucket key the active
+    // template uses (D/R/I for US, DPP/KMT/TPP/IND for TW).
     const partyId = detectPartyIdTemplate(cand.name, desc) || detectPartyId(cand.name, desc);
     let partyBase = 30;
     let partyReason = "Unknown / minor party";
-    if (partyId === "D" || partyId === "R") {
+    if (partyId === "D" || partyId === "R" || partyId === "DPP" || partyId === "KMT") {
       partyBase = 35; partyReason = "Major party — strong base support";
-    } else if (partyId === "I") {
+    } else if (partyId === "TPP") {
+      partyBase = 25; partyReason = "Third party — smaller but consolidated base";
+    } else if (partyId === "I" || partyId === "IND") {
       partyBase = 18; partyReason = "Independent — no party organization";
     }
     breakdown.push({ label: "Party base", value: partyBase, reason: partyReason });
 
-    // 2. Role / position bonus (0-10)
-    const role = (cand.role || "").toLowerCase();
+    // 2. Role / position bonus (0-10).
+    // Accept both English (US) and 繁中 (TW) role markers in the description.
+    // The original English-only check awarded 0 role bonus to every TW
+    // candidate, so 「時任總統」/「市長」/「立委」 candidates lost this signal.
+    const roleEn = (cand.role || "").toLowerCase();
     const descLower = desc.toLowerCase();
+    const descZh = desc;
     let roleBonus = 0;
     let roleReason = "";
-    if (role.includes("president") || descLower.includes("president")) { roleBonus = 10; roleReason = "Head of state, maximum visibility"; }
-    else if (role.includes("governor") || descLower.includes("governor")) { roleBonus = 8; roleReason = "State chief executive"; }
-    else if (role.includes("senator") || descLower.includes("senator")) { roleBonus = 7; roleReason = "US Senator, national profile"; }
-    else if (role.includes("mayor") || descLower.includes("mayor")) { roleBonus = 6; roleReason = "Mayor, local executive"; }
-    else if (role.includes("representative") || descLower.includes("congress") || descLower.includes("house of representatives")) { roleBonus = 5; roleReason = "US Representative"; }
-    else if (role.includes("state legislature") || descLower.includes("state legislator")) { roleBonus = 3; roleReason = "State legislator"; }
-    else if (descLower.includes("candidate")) { roleBonus = 2; roleReason = "Candidate seeking name recognition"; }
+    const _hasZh = (kws: string[]) => kws.some(k => descZh.includes(k));
+    if (roleEn.includes("president") || descLower.includes("president") || _hasZh(["總統", "副總統", "現任總統"])) {
+      roleBonus = 10; roleReason = "國家元首 / Head of state, maximum visibility";
+    } else if (roleEn.includes("governor") || descLower.includes("governor") || _hasZh(["縣長", "直轄市長"])) {
+      roleBonus = 8; roleReason = "縣市首長 / state chief executive";
+    } else if (roleEn.includes("senator") || descLower.includes("senator") || _hasZh(["立法委員", "立委", "立法院"])) {
+      roleBonus = 7; roleReason = "立委 / national legislator";
+    } else if (roleEn.includes("mayor") || descLower.includes("mayor") || _hasZh(["市長"])) {
+      roleBonus = 6; roleReason = "市長 / local executive";
+    } else if (roleEn.includes("representative") || descLower.includes("congress") || descLower.includes("house of representatives") || _hasZh(["議員", "民意代表"])) {
+      roleBonus = 5; roleReason = "議員 / representative";
+    } else if (roleEn.includes("state legislature") || descLower.includes("state legislator") || _hasZh(["縣議員", "市議員"])) {
+      roleBonus = 3; roleReason = "地方議員 / local legislator";
+    } else if (descLower.includes("candidate") || _hasZh(["候選人", "參選"])) {
+      roleBonus = 2; roleReason = "候選人 / candidate seeking name recognition";
+    }
     if (roleBonus > 0) breakdown.push({ label: "Role bonus", value: roleBonus, reason: roleReason });
 
-    // 3. Incumbent bonus (0-8)
+    // 3. Incumbent bonus (0-8). Honour both schemas (`isIncumbent` camelCase
+    // from frontend hydration, `is_incumbent` snake_case from raw template
+    // JSON) plus the unambiguous Chinese phrase 「尋求連任」 / 「現任」.
     let incumbBonus = 0;
-    const isIncumbent = !!cand.isIncumbent || /incumbent|sitting/i.test(desc);
+    const isIncumbent = !!cand.isIncumbent
+      || !!(cand as any).is_incumbent
+      || /incumbent|sitting/i.test(desc)
+      || descZh.includes("尋求連任")
+      || descZh.includes("現任總統")
+      || descZh.includes("現任副總統");
     if (isIncumbent) {
       incumbBonus = 8;
-      breakdown.push({ label: "Incumbency", value: incumbBonus, reason: "Sitting officeholder — administrative resources & record" });
+      breakdown.push({ label: "Incumbency", value: incumbBonus, reason: "現任 / sitting officeholder — administrative resources & record" });
     }
 
     // 4. Visibility bonus (-7..+7)
@@ -409,11 +490,35 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
     const maxCandsPerGroup = Math.max(...pollGroups.map(g => g.candidates.filter(c => c.name).length), 0);
     const isTwoWay = maxCandsPerGroup === 2; // 兩人對決
 
-    // 3. Detect same-party matchup (US D/R primary)
-    const allDescs = allCands.map(c => (c.name + " " + (c.description || "")).toLowerCase());
-    const dCount = allDescs.filter(d => d.includes("democrat") || d.includes("(d)")).length;
-    const rCount = allDescs.filter(d => d.includes("republican") || d.includes("(r)")).length;
-    const isSameParty = (dCount >= 2 && rCount === 0) || (rCount >= 2 && dCount === 0);
+    // 3. Detect same-party matchup (US D/R primary OR TW intra-party 初選).
+    // The earlier check only matched "democrat"/"republican" — TW primaries
+    // always classified as not-same-party even when all three candidates were
+    // 民進黨 立委 etc., breaking the auto-tune profile.
+    const allDescs = allCands.map(c => (c.name + " " + (c.description || "")));
+    const allDescsLower = allDescs.map(s => s.toLowerCase());
+    const dCount = allDescs.filter((d, i) =>
+      allDescsLower[i].includes("democrat")
+      || allDescsLower[i].includes("(d)")
+      || allDescsLower[i].includes("dpp")
+      || d.includes("民進黨")
+      || d.includes("綠營")
+    ).length;
+    const rCount = allDescs.filter((d, i) =>
+      allDescsLower[i].includes("republican")
+      || allDescsLower[i].includes("(r)")
+      || allDescsLower[i].includes("kmt")
+      || d.includes("國民黨")
+      || d.includes("藍營")
+    ).length;
+    const tCount = allDescs.filter((d, i) =>
+      allDescsLower[i].includes("tpp")
+      || d.includes("民眾黨")
+      || d.includes("白營")
+    ).length;
+    const isSameParty =
+      (dCount >= 2 && rCount === 0 && tCount === 0)
+      || (rCount >= 2 && dCount === 0 && tCount === 0)
+      || (tCount >= 2 && dCount === 0 && rCount === 0);
 
     // 4. Detect if any candidate has strong cross-party traits
     const hasCrossPartyCandidate = Object.values(candidateTraits).some(
@@ -845,13 +950,19 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
       if (cfg.concurrency) setConcurrency(cfg.concurrency);
       if (cfg.pinCategory) setPinCategory(cfg.pinCategory);
       if (cfg.pinnedPersonaIds) setPinnedPersonaIds(cfg.pinnedPersonaIds);
-      // Restore macro context / keywords — but skip stale TW seed values.
-      // If the saved value contains CJK from a pre-1.9 TW workspace, don't
-      // load it; let the template-seeding effect replace it with the English
-      // template default on the next render.
-      if (cfg.predictionMacroContext && !looksLikeTwSeed(cfg.predictionMacroContext)) setPredictionMacroContext(cfg.predictionMacroContext);
-      if (cfg.predFetchQuery && !looksLikeTwSeed(cfg.predFetchQuery)) setPredFetchQuery(cfg.predFetchQuery);
-      if (cfg.predFetchNationalQuery && !looksLikeTwSeed(cfg.predFetchNationalQuery)) setPredFetchNationalQuery(cfg.predFetchNationalQuery);
+      // Restore macro context / keywords — but skip cross-locale stale values.
+      // Original code only filtered TW-flavoured text (a Civatas-USA-era guard),
+      // which meant a US fallback that got saved into a TW workspace's meta.json
+      // would be restored verbatim on every reload, overriding the template
+      // default. The active template's `country` decides which direction is
+      // "stale": TW workspace → drop US-flavoured saves; US workspace → drop
+      // TW-flavoured saves; let the template-seeding effect refill afterwards.
+      const _isUsWorkspace = activeTemplate?.country === "US";
+      const _staleForThisWorkspace = (s: string | null | undefined) =>
+        _isUsWorkspace ? looksLikeTwSeed(s) : looksLikeUsSeed(s);
+      if (cfg.predictionMacroContext && !_staleForThisWorkspace(cfg.predictionMacroContext)) setPredictionMacroContext(cfg.predictionMacroContext);
+      if (cfg.predFetchQuery && !_staleForThisWorkspace(cfg.predFetchQuery)) setPredFetchQuery(cfg.predFetchQuery);
+      if (cfg.predFetchNationalQuery && !_staleForThisWorkspace(cfg.predFetchNationalQuery)) setPredFetchNationalQuery(cfg.predFetchNationalQuery);
       if (cfg.predFetchLocalRatio !== undefined) setPredFetchLocalRatio(cfg.predFetchLocalRatio);
       if (cfg.predAgentMode) setPredAgentMode(cfg.predAgentMode);
       if (cfg.predSampleRate !== undefined) setPredSampleRate(cfg.predSampleRate);
@@ -876,8 +987,18 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
       if (cfg.useDynamicSearch !== undefined) setUseDynamicSearch(cfg.useDynamicSearch);
       if (cfg.enableNewsSearch !== undefined) setEnableNewsSearch(cfg.enableNewsSearch);
       if (cfg.searchInterval) setSearchInterval(cfg.searchInterval);
-      if (cfg.predLocalKeywords && !looksLikeTwSeed(cfg.predLocalKeywords)) setPredLocalKeywords(cfg.predLocalKeywords);
-      if (cfg.predNationalKeywords && !looksLikeTwSeed(cfg.predNationalKeywords)) setPredNationalKeywords(cfg.predNationalKeywords);
+      // Normalise to newline-joined string before setting state — saved
+      // meta.json may carry these as `string[]` (legacy + the cleanup we
+      // ran earlier wrote arrays). The textarea + downstream `.trim()` /
+      // `.split()` calls all assume string, so an array crashes the panel.
+      const _kwToStr = (v: unknown): string => {
+        if (Array.isArray(v)) return v.filter(Boolean).map(String).join("\n");
+        return typeof v === "string" ? v : "";
+      };
+      const _localStr = _kwToStr(cfg.predLocalKeywords);
+      const _natStr = _kwToStr(cfg.predNationalKeywords);
+      if (_localStr && !looksLikeTwSeed(_localStr)) setPredLocalKeywords(_localStr);
+      if (_natStr && !looksLikeTwSeed(_natStr)) setPredNationalKeywords(_natStr);
       if (cfg.predCounty) setPredCounty(cfg.predCounty);
       if (cfg.predStartDate) setPredStartDate(cfg.predStartDate);
       if (cfg.predEndDate) setPredEndDate(cfg.predEndDate);
@@ -1200,25 +1321,30 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
 
   // Auto-seed macro context from active template when snapshot is selected
   // and field is still empty. The template carries a locale-aware default
-  // macro context (en + zh-TW); we pick the English version.
+  // macro context (en + zh-TW); pick the locale matching the template's
+  // country so TW workspaces don't get an English US-style briefing
+  // (was "en" hard-coded — that's how Federal/Congress/Governor leaked
+  // into 臺北市 prediction pages and stayed even after page reloads
+  // because the value got persisted to meta.json).
   useEffect(() => {
     if (!selectedSnap || predictionMacroContext.trim()) return;
-    // Use the active template's macro context if available
+    const isUs = activeTemplate?.country === "US";
+    const macroLocale = isUs ? "en" : "zh-TW";
     if (activeTemplate) {
-      const tmplMacro = getDefaultMacroContext(activeTemplate, "en");
+      const tmplMacro = getDefaultMacroContext(activeTemplate, macroLocale);
       if (tmplMacro) {
         setPredictionMacroContext(tmplMacro);
         return;
       }
     }
-    // Fallback: generic US context (no template active)
+    // Fallback when no template is active: TW context for Civatas-TW.
     setPredictionMacroContext(
-      "Federal: The sitting President leads the executive branch; Congress is narrowly divided between the two major parties.\n" +
-      "Economy: Voters are focused on inflation, grocery/gas prices, housing costs, and interest rates. Job market is mixed.\n" +
-      "State: The Governor and state legislature handle local governance, infrastructure, and education.\n" +
-      "Blame: Voters tend to blame the President's party for national economic issues, and the Governor for state-level service failures."
+      "[台灣政治經濟現況]\n" +
+      "中央政府由總統與行政院領導；立法院席次分配在民進黨、國民黨、民眾黨之間，2024 起呈三黨不過半結構。\n" +
+      "選民通常把全國性議題（通膨、能源、外交、兩岸關係、國防）歸因於中央執政黨；地方性議題（治安、學校、交通、縣市治理）歸因於縣市長與地方政府。\n" +
+      "兩岸關係、美中台三角、抗中保台 vs 和平交流 是台灣政治長期主軸。"
     );
-  }, [selectedSnap]); // Only trigger when snapshot changes
+  }, [selectedSnap, activeTemplate]); // Re-trigger on snapshot OR template change
 
   // Active personas = only those in calibration/prediction snapshot
   const activePersonas = useMemo(() => {
@@ -3192,7 +3318,11 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
                             const satItems = surveyItems.filter(s => s.name.trim()).map(s => `${s.name}(${s.role}/${s.party})`);
                             const targets = predictionMode === "satisfaction" ? satItems : candNames;
 
-                            // Use suggestKeywords' LLM endpoint to generate macro context
+                            // Use suggestKeywords' LLM endpoint to generate macro context.
+                            // Pass `country` explicitly from the active template so a US
+                            // template doesn't accidentally hit the TW analyst prompt
+                            // (and vice versa) when names happen to be ambiguous.
+                            const _tplCountry = (activeTemplate as any)?.country || "TW";
                             const res = await apiFetch("/api/pipeline/generate-macro-context", {
                               method: "POST",
                               body: JSON.stringify({
@@ -3201,6 +3331,7 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
                                 end_date: endDate,
                                 candidates: targets,
                                 prediction_mode: predictionMode,
+                                country: _tplCountry,
                               }),
                             });
                             if (res.macro_context) {
@@ -3231,6 +3362,28 @@ export default function PredictionPanel({ wsId }: { wsId: string }) {
                   </div>
 
                   <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+                {/* Sim days — core prediction parameter, always visible.
+                    Previously this input only existed inside the dynamic-news
+                    -search sub-block (useDynamicSearch && enableNewsSearch),
+                    so when both toggles were off the user had no way to
+                    set how many days the prediction simulates. */}
+                <div>
+                  <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, display: "block", marginBottom: 4, fontFamily: "var(--font-cjk)" }}>
+                    {en ? "Simulated days" : "預測天數（模擬幾天）"}
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={90}
+                    value={simDays}
+                    onChange={e => setSimDays(Number(e.target.value))}
+                    disabled={running}
+                    style={{ width: 80, padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 13, outline: "none" }}
+                  />
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 3, fontFamily: "var(--font-cjk)" }}>
+                    {en ? "How many sim days the prediction runs" : "預測會跑幾個模擬日（election: 3 / poll: 5 建議）"}
+                  </div>
+                </div>
                 <div>
                   <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, display: "block", marginBottom: 4 }}>{t("prediction.s3.concurrency")}</label>
                   <input type="number" min={1} max={20} value={concurrency} onChange={(e) => setConcurrency(Number(e.target.value))} disabled={running} style={{ width: 80, padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 13, outline: "none" }} />

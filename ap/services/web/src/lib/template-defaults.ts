@@ -76,23 +76,63 @@ const US_DEFAULT_CALIB_PARAMS = {
 
 export type ActiveTemplate = any | null;
 
-/** Default macro context — template-aware; TW 預設繁中。 */
+/** Default macro context — template-aware; TW 預設繁中。
+ *
+ * Templates currently ship with a one-sentence `default_macro_context`
+ * (e.g. `"2028 總統大選假設情境：賴清德 vs 鄭麗文。兩強對決。"`) which
+ * doesn't give the LLM enough background to react realistically. When the
+ * template line is too short, we PREPEND it as the scenario tag and APPEND
+ * the rich TW context block — so users see "scenario hint + general
+ * environment" instead of just "賴 vs 鄭 二字描述" alone in the textarea.
+ */
+// chars below which the template's own macro_context is too thin to give the
+// LLM a useful environment description — observed: every Civatas-TW template
+// ships a 23–61 char one-liner, so the threshold must clear all of them
+// (poll_2028_preferred_candidate.json is the longest at 61).
+const _MACRO_MIN_USEFUL = 80;
+
 export function getDefaultMacroContext(template: ActiveTemplate, locale: string = "zh-TW"): string {
   const fromTemplate = template?.election?.default_macro_context;
-  if (fromTemplate) {
-    return fromTemplate[locale] || fromTemplate["zh-TW"] || fromTemplate["en"] || TW_DEFAULT_MACRO_ZH;
-  }
-  return locale === "en" ? TW_DEFAULT_MACRO_EN : TW_DEFAULT_MACRO_ZH;
+  const tplStr =
+    fromTemplate
+      ? (fromTemplate[locale] || fromTemplate["zh-TW"] || fromTemplate["en"] || "")
+      : "";
+  const fallback = locale === "en" ? TW_DEFAULT_MACRO_EN : TW_DEFAULT_MACRO_ZH;
+  if (!tplStr.trim()) return fallback;
+  // Template provided enough context on its own — return as-is.
+  if (tplStr.length >= _MACRO_MIN_USEFUL) return tplStr;
+  // Otherwise enrich: scenario header + general TW background.
+  const header = locale === "en"
+    ? `[Scenario] ${tplStr.trim()}\n\n`
+    : `[模擬情境]\n${tplStr.trim()}\n\n`;
+  return header + fallback;
 }
 
-/** Default local search keywords. */
+// Templates store search keywords as `string[]` (Civatas-TW build_templates.py)
+// but consumer panels (PredictionPanel textarea) expect a single newline-joined
+// string. Normalise both shapes — an unjoined array previously crashed
+// `predLocalKeywords.trim()` with TypeError → "Application error" on the
+// prediction page. Also accept a single string verbatim for legacy callers.
+function _kwToString(val: unknown, fallback: string): string {
+  if (Array.isArray(val)) return val.filter(Boolean).map(String).join("\n");
+  if (typeof val === "string") return val;
+  return fallback;
+}
+
+/** Default local search keywords (newline-joined). */
 export function getDefaultLocalKeywords(template: ActiveTemplate): string {
-  return template?.election?.default_search_keywords?.local || TW_DEFAULT_LOCAL_KW;
+  return _kwToString(
+    template?.election?.default_search_keywords?.local,
+    TW_DEFAULT_LOCAL_KW,
+  );
 }
 
-/** Default national search keywords. */
+/** Default national search keywords (newline-joined). */
 export function getDefaultNationalKeywords(template: ActiveTemplate): string {
-  return template?.election?.default_search_keywords?.national || TW_DEFAULT_NATIONAL_KW;
+  return _kwToString(
+    template?.election?.default_search_keywords?.national,
+    TW_DEFAULT_NATIONAL_KW,
+  );
 }
 
 /** Default sandbox auto-fetch query (single-line, fewer keywords). */

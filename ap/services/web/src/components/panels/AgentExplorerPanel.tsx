@@ -12,7 +12,11 @@ import {
 } from "recharts";
 
 const LEAN_COLORS: Record<string, string> = {
-  // US Cook PVI 5-tier
+  // TW 5-bucket (Civatas-TW canonical)
+  "深綠": "#0d6b1e", "偏綠": "#1B9431",
+  "中間": "#94a3b8",
+  "偏藍": "#0000C8", "深藍": "#000080",
+  // US Cook PVI 5-tier (legacy fallback)
   "Solid Dem": "#1e40af", "Lean Dem": "#3b82f6",
   "Tossup": "#94a3b8",
   "Lean Rep": "#ef4444", "Solid Rep": "#991b1b",

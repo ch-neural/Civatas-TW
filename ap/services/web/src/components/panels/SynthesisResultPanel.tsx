@@ -8,7 +8,12 @@ import { getWorkspacePersonas } from "@/lib/api";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#f97316", "#ec4899", "#14b8a6", "#a855f7"];
-const LEAN_COLORS: Record<string, string> = { "Solid Dem": "#1e40af", "Lean Dem": "#3b82f6", "Tossup": "#94a3b8", "Lean Rep": "#f87171", "Solid Rep": "#dc2626" };
+const LEAN_COLORS: Record<string, string> = {
+  // TW 5-bucket (canonical for Civatas-TW)
+  "深綠": "#0d6b1e", "偏綠": "#1B9431", "中間": "#94a3b8", "偏藍": "#0000C8", "深藍": "#000080",
+  // Legacy US labels (backward compat — pre-TW snapshots may still surface these)
+  "Solid Dem": "#1e40af", "Lean Dem": "#3b82f6", "Tossup": "#94a3b8", "Lean Rep": "#f87171", "Solid Rep": "#dc2626",
+};
 const tooltipStyle = { background: "#1e1e2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 11 };
 
 // Stage 1.8: personality dimension labels resolved via i18n keys (template-locale aware)
