@@ -380,7 +380,14 @@ export async function startEvolution(
 ) {
   const body: Record<string, unknown> = { agents, days, concurrency };
   if (candidateNames?.length) body.candidate_names = candidateNames;
-  if (scoringParams) body.scoring_params = scoringParams;
+  if (scoringParams) {
+    // Hoist feed-stratification fields to top-level request fields (they are not
+    // scoring_params — they live in the job dict directly in the backend).
+    const { use_exposure_mix, replication_seed, ...restScoringParams } = scoringParams as Record<string, unknown>;
+    body.scoring_params = restScoringParams;
+    if (use_exposure_mix) body.use_exposure_mix = use_exposure_mix;
+    if (replication_seed != null) body.replication_seed = replication_seed;
+  }
   if (candidateDescriptions) body.candidate_descriptions = candidateDescriptions;
   if (partyDetection) body.party_detection = partyDetection;
   if (workspaceId) body.workspace_id = workspaceId;

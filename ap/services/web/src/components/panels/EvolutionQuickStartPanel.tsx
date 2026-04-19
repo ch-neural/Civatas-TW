@@ -78,6 +78,9 @@ const DEFAULT_ADV_PARAMS = {
   news_mix_national: 35,
   news_mix_local: 30,
   news_mix_international: 10,
+  // Feed stratification (MEDIA_HABIT_EXPOSURE_MIX)
+  use_exposure_mix: false,
+  replication_seed: 0,
 };
 
 type AdvParams = typeof DEFAULT_ADV_PARAMS;
@@ -1837,6 +1840,71 @@ export default function EvolutionQuickStartPanel({ wsId }: { wsId: string }) {
                     onChange={(v) => setAdvParams({ ...advParams, news_mix_international: v })}
                     disabled={running} />
                 </div>
+              </div>
+
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", margin: "0 0 20px" }} />
+
+              {/* ── Section 7: Feed Stratification ── */}
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <span style={{ fontSize: 14 }}>🎯</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>
+                    {en ? "Feed Stratification" : "新聞曝光分層"}
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                  <input
+                    type="checkbox"
+                    id="use_exposure_mix"
+                    checked={!!advParams.use_exposure_mix}
+                    onChange={(e) => setAdvParams({ ...advParams, use_exposure_mix: e.target.checked })}
+                    disabled={running}
+                    style={{ marginTop: 2, cursor: running ? "not-allowed" : "pointer" }}
+                  />
+                  <label htmlFor="use_exposure_mix" style={{ fontSize: 12, color: "var(--text-secondary)", cursor: running ? "not-allowed" : "pointer", lineHeight: 1.5 }}>
+                    {en
+                      ? "Use media habit exposure mix (depth-aware feed)"
+                      : "使用新聞曝光混合矩陣（depth-aware feed）"}
+                  </label>
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 12, lineHeight: 1.6, paddingLeft: 20 }}>
+                  {en
+                    ? "When enabled, each agent's daily news pool is pre-filtered by MEDIA_HABIT_EXPOSURE_MIX before select_feed runs — stratifying coverage by 深綠/偏綠/中間/偏藍/深藍 leaning depth. Improves research reproducibility."
+                    : "啟用後，每位 Agent 每日新聞池在 select_feed 前先依 MEDIA_HABIT_EXPOSURE_MIX 按 深綠/偏綠/中間/偏藍/深藍 傾向深度分層採樣，提高研究可重現性。"}
+                </div>
+
+                {advParams.use_exposure_mix && (
+                  <div style={{ paddingLeft: 20 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                      <label style={{ fontSize: 11, color: "var(--text-tertiary)" }}>
+                        {en ? "Replication seed (0 = random)" : "複現種子（0 = 每次隨機）"}
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={advParams.replication_seed ?? 0}
+                        onChange={(e) => setAdvParams({ ...advParams, replication_seed: Number(e.target.value) || 0 })}
+                        disabled={running}
+                        style={{
+                          width: 120,
+                          background: "rgba(255,255,255,0.06)",
+                          border: "1px solid rgba(255,255,255,0.12)",
+                          borderRadius: 6,
+                          color: "var(--text-primary)",
+                          fontSize: 12,
+                          padding: "4px 8px",
+                        }}
+                      />
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", lineHeight: 1.5 }}>
+                        {en
+                          ? "Set a non-zero seed to reproduce identical article selections across runs."
+                          : "設定非零種子可在多次跑演化時得到完全相同的文章選取，方便實驗比較。"}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* ── Reset to defaults ── */}
