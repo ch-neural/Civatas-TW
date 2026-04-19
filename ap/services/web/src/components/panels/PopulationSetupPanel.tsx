@@ -457,13 +457,28 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                 const isCountyScope =
                   (meta?.election?.scope === "county" || meta?.election?.scope === "state") &&
                   !!meta?.region_code;
+                // TW: 黨內初選跨鄉鎮選區 (scope === "constituency")
+                const isConstituencyScope = meta?.election?.scope === "constituency";
+                // Constituency templates span multiple townships within one (or more) counties.
+                // Derive the parent county from the first township admin_key ("臺北市|松山區" → "臺北市")
+                // to highlight the general area on the county-level choropleth.
+                const constituencyCounty = isConstituencyScope
+                  ? (meta?.election?.constituency_townships?.[0]?.split("|")[0] ?? "")
+                  : "";
+                const constituencyDisplayName = isConstituencyScope
+                  ? (meta?.election?.constituency_name || meta?.region || "")
+                  : "";
                 // TW template 沒有 fips 欄位；region_code 直接是縣市名稱 (e.g. "臺北市")
-                const countyKey = isCountyScope ? (meta?.region_code || "") : "";
+                const countyKey = isCountyScope
+                  ? (meta?.region_code || "")
+                  : (isConstituencyScope ? constituencyCounty : "");
                 // 國家級模板：空資料 → 地圖用淡色描邊顯示 22 縣市；單縣市模板：用黃框 highlight 該縣市。
                 const mapData: Record<string, number> = {};
                 const title = isCountyScope
                   ? t("popsetup.map_title.state", { region: meta?.region || meta?.region_code || "" })
-                  : t("popsetup.map_title.national");
+                  : isConstituencyScope
+                    ? t("popsetup.map_title.state", { region: constituencyDisplayName })
+                    : t("popsetup.map_title.national");
                 // 點擊縣市時，切換到對應的 single-county 模板
                 const handleCountyClick = (countyName: string) => {
                   if (generating) return;
@@ -480,7 +495,7 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                 return (
                   <USMap
                     mode="states"
-                    selectedFeature={isCountyScope ? countyKey : ""}
+                    selectedFeature={(isCountyScope || isConstituencyScope) ? countyKey : ""}
                     data={mapData}
                     colorScale={["#1e293b", "#3b82f6"]}
                     title={title}
@@ -687,15 +702,23 @@ export default function PopulationSetupPanel({ wsId }: { wsId: string }) {
                   background: generating ? "rgba(59,130,246,0.3)" : existingPersonas.length > 0 ? "rgba(245,158,11,0.8)" : "#3b82f6",
                   color: "#fff", fontSize: 14, fontWeight: 700,
                 }}>
-                {generating
-                  ? `${genPhase}`
-                  : existingPersonas.length > 0
-                    ? (selectedTemplateMeta?.election?.scope === "state"
-                      ? `🔄 Re-generate ${selectedTemplateMeta.region || selectedTemplateMeta.region_code || "State"} Population`
-                      : `🔄 Re-generate National Population`)
-                    : selectedTemplateMeta?.election?.scope === "state"
-                      ? t("popsetup.generate.state", { region: selectedTemplateMeta.region || selectedTemplateMeta.region_code || "" })
-                      : t("popsetup.generate.national")}
+                {(() => {
+                  const sc = selectedTemplateMeta?.election?.scope;
+                  const regionName = sc === "constituency"
+                    ? (selectedTemplateMeta?.election?.constituency_name || selectedTemplateMeta?.region || "")
+                    : (selectedTemplateMeta?.region || selectedTemplateMeta?.region_code || "");
+                  const isRegional = sc === "state" || sc === "county" || sc === "constituency";
+
+                  if (generating) return `${genPhase}`;
+                  if (existingPersonas.length > 0) {
+                    return isRegional
+                      ? `🔄 Re-generate ${regionName} Population`
+                      : `🔄 Re-generate National Population`;
+                  }
+                  return isRegional
+                    ? t("popsetup.generate.state", { region: regionName })
+                    : t("popsetup.generate.national");
+                })()}
               </button>
 
               {/* Step progress */}
