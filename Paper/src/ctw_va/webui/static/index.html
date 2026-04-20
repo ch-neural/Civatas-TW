@@ -521,6 +521,104 @@
     color: var(--muted); cursor: pointer;
   }
   .ghost-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  /* ========== Labeling modal ========== */
+  .preview-actions .label-btn {
+    background: linear-gradient(180deg, #2d5a3d, #1f4030);
+    border: 1px solid #3a7351;
+    color: #d6ffec;
+    padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer;
+  }
+  .preview-actions .label-btn:hover {
+    background: linear-gradient(180deg, #367247, #26513a);
+  }
+
+  .labeler-modal {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(8, 10, 14, 0.97);
+    display: flex; flex-direction: column;
+    color: var(--text);
+    font-family: var(--mono, ui-monospace, monospace);
+  }
+  .labeler-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 18px; border-bottom: 1px solid #222;
+    background: #0e1116;
+  }
+  .labeler-close {
+    background: #222; border: 1px solid #333; color: #ccc;
+    padding: 4px 10px; cursor: pointer; border-radius: 4px;
+  }
+  .labeler-path { color: #8cf; font-size: 13px; }
+  .labeler-progress { color: #9a9; font-size: 13px; flex: 1; }
+  .labeler-toggle { font-size: 13px; color: #bbb; user-select: none; cursor: pointer; }
+  .labeler-toggle input { margin-right: 4px; vertical-align: middle; }
+  .labeler-body {
+    flex: 1; display: grid; grid-template-columns: 7fr 3fr;
+    min-height: 0;
+  }
+  .labeler-focus {
+    padding: 24px 32px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .labeler-minilist {
+    padding: 12px; border-left: 1px solid #222;
+    overflow-y: auto; background: #0b0d10;
+  }
+
+  .lf-inner { display: flex; flex-direction: column; gap: 18px; max-width: 900px; }
+  .lf-meta { display: flex; gap: 12px; font-size: 12px; color: #8af; flex-wrap: wrap; }
+  .lf-meta .lf-vendor { color: #fc8; }
+  .lf-meta .lf-topic  { color: #9a9; }
+  .lf-meta .lf-err    { color: #e57373; }
+  .lf-heading { color: #777; font-size: 11px; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .lf-prompt  { font-size: 18px; line-height: 1.55; color: #f0f0f0; }
+  .lf-response{ font-size: 15px; line-height: 1.6; color: #cfd4da; white-space: pre-wrap;
+                background: #10141a; padding: 12px 16px; border-radius: 6px;
+                border-left: 3px solid #345; max-height: 40vh; overflow-y: auto; }
+  .lf-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .lf-btn { padding: 18px; font-size: 16px; border-radius: 8px; cursor: pointer;
+            border: 1px solid #333; background: #181c22; color: #ddd;
+            font-family: var(--mono, ui-monospace, monospace);
+            display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .lf-btn:hover:not(:disabled) { background: #20262e; }
+  .lf-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .lf-btn .lf-k { font-size: 24px; font-weight: bold; color: #ffe680; }
+  .lf-btn.hard { border-color: #5a2a2a; }
+  .lf-btn.soft { border-color: #5a4a2a; }
+  .lf-btn.ontask { border-color: #2a5a3a; }
+  .lf-btn small { font-size: 11px; color: #8a8a8a; }
+  .lf-reveal { padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+  .lf-reveal.ok { background: #143a24; color: #b2f0c4; border: 1px solid #2d5a3a; }
+  .lf-reveal.warn { background: #3a3014; color: #f0e0a0; border: 1px solid #5a4a2a; }
+  .lf-reveal-actions { margin-top: 8px; display: flex; gap: 8px; }
+  .lf-reveal-actions button { background: #222; border: 1px solid #444; color: #ddd;
+                              padding: 4px 10px; cursor: pointer; border-radius: 4px; }
+  .lf-nav { display: flex; gap: 12px; margin-top: 6px; color: #888; font-size: 12px; }
+  .lf-nav button { background: #181c22; border: 1px solid #333; color: #bbb;
+                   padding: 4px 10px; cursor: pointer; border-radius: 4px; }
+
+  .lf-done { max-width: 640px; }
+  .lf-done h2 { color: #d6ffec; }
+  .lf-done-counts { background: #10141a; padding: 12px 16px; border-radius: 6px;
+                    display: flex; flex-direction: column; gap: 4px; color: #cfd4da;
+                    margin: 12px 0; }
+  .lf-done-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .lf-done-actions button { background: #1c2630; border: 1px solid #2d5a3a; color: #d6ffec;
+                            padding: 10px 16px; border-radius: 6px; cursor: pointer; }
+  .lf-done-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .ml-row { display: flex; gap: 8px; padding: 4px 8px; font-size: 12px; cursor: pointer;
+            border-radius: 3px; align-items: center; }
+  .ml-row:hover { background: #141820; }
+  .ml-row.current { background: #243040; color: #fff; }
+  .ml-row.labeled { color: #7a9; }
+  .ml-row.inconsistent { color: #d9b45a; }
+  .ml-row.unlabeled { color: #888; }
+  .ml-glyph { font-family: monospace; width: 1em; color: inherit; }
+  .ml-pid { font-weight: bold; }
+  .ml-vendor { color: #888; margin-left: auto; font-size: 11px; }
+  .ml-empty { color: #666; padding: 8px; }
 </style>
 </head>
 <body x-data="app()" x-init="init()">
@@ -692,6 +790,10 @@
                        :download="o.path.split('/').pop()"
                        title="下載原始檔">📥 下載</a>
                     <button @click="loadPreview(o.path)" title="重新讀取預覽">🔄 重新預覽</button>
+                    <button x-show="isCalibrationCsv(o.path)"
+                            @click="openLabeler(o.path)"
+                            class="label-btn"
+                            title="在瀏覽器中直接標註這個 CSV">✏️ 進入標註模式</button>
                   </div>
                 </div>
                 <template x-if="previews[o.path] && previews[o.path].loading">
@@ -1430,8 +1532,391 @@ function app() {
       await fetch('/api/jobs/' + jid + '/cancel', {method: 'POST'});
       await this.loadJobs();
     },
+
+    // ========== Labeling modal ==========
+    labelerOpen: false,
+    labelerPath: null,
+    labeler: {
+      loading: false, error: null,
+      rows: [], fileMtime: 0,
+      progress: { total: 0, labeled: 0, unlabeled: 0, inconsistent: 0 },
+      cursor: 0,
+      onlyUnlabeled: false,
+      revealFor: null,
+    },
+
+    isCalibrationCsv(path) {
+      if (!path) return false;
+      const name = path.split('/').pop() || '';
+      return /^responses_n\d+(_\w+)?\.csv$/.test(name);
+    },
+
+    get visibleRows() {
+      if (!this.labeler.onlyUnlabeled) return this.labeler.rows;
+      return this.labeler.rows.filter(r => !r.label);
+    },
+
+    get currentRow() {
+      if (!this.labeler.rows.length) return null;
+      const cur = this.labeler.rows[this.labeler.cursor];
+      if (!this.labeler.onlyUnlabeled) return cur || null;
+      if (cur && !cur.label) return cur;
+      const fallback = this.visibleRows[0];
+      return fallback || null;
+    },
+
+    get labelCounts() {
+      const out = { hard_refusal: 0, soft_refusal: 0, on_task: 0 };
+      for (const r of this.labeler.rows) {
+        if (r.label in out) out[r.label]++;
+      }
+      return out;
+    },
+
+    miniGlyph(row) {
+      if (!row.label) return '☐';
+      if (row.expected && row.expected !== (row.label + '_expected')) return '▨';
+      return '▉';
+    },
+
+    miniRowClass(row) {
+      const cls = [];
+      const cur = this.currentRow;
+      if (cur && cur.prompt_id === row.prompt_id && cur.vendor === row.vendor) {
+        cls.push('current');
+      }
+      if (!row.label) cls.push('unlabeled');
+      else if (row.expected && row.expected !== (row.label + '_expected')) cls.push('inconsistent');
+      else cls.push('labeled');
+      return cls.join(' ');
+    },
+
+    async openLabeler(path) {
+      this.labelerPath = path;
+      this.labelerOpen = true;
+      await this.labelerLoad();
+    },
+
+    async labelerLoad() {
+      this.labeler.loading = true;
+      this.labeler.error = null;
+      try {
+        const r = await fetch('/api/labeling/load?path=' + encodeURIComponent(this.labelerPath));
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}));
+          throw new Error(body.detail || ('HTTP ' + r.status));
+        }
+        const data = await r.json();
+        this.labeler.rows = data.rows;
+        this.labeler.fileMtime = data.file_mtime;
+        this.labeler.progress = data.progress;
+        const firstUnlabeled = data.rows.findIndex(r => !r.label);
+        this.labeler.cursor = firstUnlabeled >= 0 ? firstUnlabeled : 0;
+        this.labeler.revealFor = null;
+      } catch (e) {
+        this.labeler.error = e.message;
+      } finally {
+        this.labeler.loading = false;
+      }
+    },
+
+    closeLabeler() {
+      this.labelerOpen = false;
+      if (this.labelerPath) this.loadPreview(this.labelerPath);
+    },
+
+    jumpToCursor(row) {
+      const idx = this.labeler.rows.findIndex(
+        r => r.prompt_id === row.prompt_id && r.vendor === row.vendor
+      );
+      if (idx >= 0) {
+        this.labeler.cursor = idx;
+        this.labeler.revealFor = null;
+      }
+    },
+
+    advanceCursor(delta) {
+      const visible = this.visibleRows;
+      if (!visible.length) return;
+      const cur = this.currentRow;
+      let vi = cur ? visible.findIndex(
+        r => r.prompt_id === cur.prompt_id && r.vendor === cur.vendor
+      ) : 0;
+      if (vi < 0) vi = 0;
+      const next = Math.max(0, Math.min(visible.length - 1, vi + delta));
+      this.jumpToCursor(visible[next]);
+    },
+
+    gotoInconsistent() {
+      const idx = this.labeler.rows.findIndex(
+        r => r.label && r.expected && r.expected !== (r.label + '_expected')
+      );
+      if (idx >= 0) this.labeler.cursor = idx;
+    },
+
+    _recomputeProgress() {
+      const rows = this.labeler.rows;
+      const labeled = rows.filter(r => r.label).length;
+      const inconsistent = rows.filter(
+        r => r.label && r.expected && r.expected !== (r.label + '_expected')
+      ).length;
+      this.labeler.progress = {
+        total: rows.length, labeled, inconsistent,
+        unlabeled: rows.length - labeled,
+      };
+    },
+
+    async labelCurrent(label) {
+      const row = this.currentRow;
+      if (!row) return;
+      if (row.status === 'error') return;
+      const r = await fetch('/api/labeling/set', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          path: this.labelerPath,
+          prompt_id: row.prompt_id, vendor: row.vendor,
+          label, expected_file_mtime: this.labeler.fileMtime,
+        }),
+      });
+      if (!r.ok) { alert('標註失敗：' + (await r.text())); return; }
+      const body = await r.json();
+      if (!body.ok) {
+        if (body.reason === 'file_modified_externally') {
+          if (confirm('檔案被外部修改（Excel / git pull？）— 重新載入？')) {
+            await this.labelerLoad();
+          }
+        } else {
+          alert('未知錯誤：' + JSON.stringify(body));
+        }
+        return;
+      }
+      row.label = label;
+      this.labeler.fileMtime = body.new_mtime;
+      this._recomputeProgress();
+      const consistent = !row.expected || row.expected === (label + '_expected');
+      this.labeler.revealFor = {
+        label, expected: row.expected || '(未預期)', consistent,
+      };
+      if (consistent) {
+        setTimeout(() => {
+          this.labeler.revealFor = null;
+          this.advanceCursor(1);
+        }, 300);
+      }
+    },
+
+    async clearCurrent() {
+      const row = this.currentRow;
+      if (!row) return;
+      const r = await fetch('/api/labeling/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          path: this.labelerPath,
+          prompt_id: row.prompt_id, vendor: row.vendor,
+          expected_file_mtime: this.labeler.fileMtime,
+        }),
+      });
+      if (!r.ok) { alert('清除失敗：' + (await r.text())); return; }
+      const body = await r.json();
+      if (!body.ok) {
+        if (body.reason === 'file_modified_externally') {
+          if (confirm('檔案被外部修改 — 重新載入？')) await this.labelerLoad();
+        }
+        return;
+      }
+      row.label = '';
+      this.labeler.fileMtime = body.new_mtime;
+      this.labeler.revealFor = null;
+      this._recomputeProgress();
+    },
+
+    onLabelerKey(ev) {
+      if (!this.labelerOpen) return;
+      const tgt = ev.target;
+      if (tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA')) return;
+      const k = ev.key;
+      if (k === '1') { ev.preventDefault(); this.labelCurrent('hard_refusal'); return; }
+      if (k === '2') { ev.preventDefault(); this.labelCurrent('soft_refusal'); return; }
+      if (k === '3') { ev.preventDefault(); this.labelCurrent('on_task'); return; }
+      if (k === 'u' || k === 'U' || k === 'Backspace') {
+        ev.preventDefault(); this.clearCurrent(); return;
+      }
+      if (k === 'ArrowRight' || k === ' ') {
+        ev.preventDefault();
+        this.labeler.revealFor = null;
+        this.advanceCursor(1);
+        return;
+      }
+      if (k === 'ArrowLeft') {
+        ev.preventDefault();
+        this.labeler.revealFor = null;
+        this.advanceCursor(-1);
+        return;
+      }
+      if (k === 'n' || k === 'N') {
+        ev.preventDefault();
+        const nextU = this.labeler.rows.findIndex(r => !r.label);
+        if (nextU >= 0) {
+          this.labeler.cursor = nextU;
+          this.labeler.revealFor = null;
+        }
+        return;
+      }
+    },
+
+    async runImportLabels() {
+      const csvPath = this.labelerPath;
+      const outPath = csvPath.replace(/\.csv$/, '.labeled.jsonl');
+      try {
+        const r = await fetch('/api/jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            group: 'calibration', subcommand: 'import-labels',
+            fields: [
+              { flag: '--csv', value: csvPath },
+              { flag: '--output', value: outPath },
+            ],
+            label: 'import-labels (from labeler)',
+          }),
+        });
+        if (!r.ok) throw new Error(await r.text());
+        const job = await r.json();
+        alert('已派出 job ' + job.id + '，可在右側 job 面板查看 log。');
+        this.closeLabeler();
+        this.selectedJob = job.id;
+      } catch (e) {
+        alert('派出 job 失敗：' + e.message);
+      }
+    },
   };
 }
 </script>
+
+<!-- ============= Labeling modal ============= -->
+<div class="labeler-modal"
+     x-show="labelerOpen"
+     @keydown.escape.window="closeLabeler()"
+     @keydown.window="onLabelerKey($event)"
+     style="display:none;">
+  <div class="labeler-header">
+    <button class="labeler-close" @click="closeLabeler()" title="離開 (ESC)">✕</button>
+    <span class="labeler-path" x-text="labelerPath || ''"></span>
+    <span class="labeler-progress" x-show="labeler.rows.length">
+      進度：<span x-text="labeler.progress.labeled"></span> /
+              <span x-text="labeler.progress.total"></span>
+      已標 (<span x-text="Math.round(100 * labeler.progress.labeled / Math.max(1, labeler.progress.total))"></span>%)
+      · 不一致 <span x-text="labeler.progress.inconsistent"></span>
+    </span>
+    <label class="labeler-toggle">
+      <input type="checkbox" x-model="labeler.onlyUnlabeled"> 只看未標
+    </label>
+  </div>
+  <div class="labeler-body">
+    <div class="labeler-focus">
+      <template x-if="labeler.loading"><div>讀取中…</div></template>
+      <template x-if="labeler.error">
+        <div style="color:#e57373;" x-text="'錯誤：' + labeler.error"></div>
+      </template>
+      <template x-if="!labeler.loading && !labeler.error && labeler.rows.length && currentRow">
+        <div class="lf-inner">
+          <div class="lf-meta">
+            <span class="lf-pid" x-text="currentRow.prompt_id"></span>
+            <span class="lf-vendor" x-text="currentRow.vendor"></span>
+            <span class="lf-topic" x-text="'topic: ' + (currentRow.topic || '-')"></span>
+            <template x-if="currentRow.status === 'error'">
+              <span class="lf-err" x-text="'⚠ error: ' + (currentRow.error_detail || 'unknown')"></span>
+            </template>
+          </div>
+          <div>
+            <div class="lf-heading">── PROMPT ──</div>
+            <div class="lf-prompt" x-text="currentRow.prompt_text"></div>
+          </div>
+          <div>
+            <div class="lf-heading">── RESPONSE ──</div>
+            <div class="lf-response" x-text="currentRow.response_text || '(空)'"></div>
+          </div>
+          <div class="lf-buttons">
+            <button class="lf-btn hard" @click="labelCurrent('hard_refusal')"
+                    :disabled="currentRow.status === 'error'">
+              <span class="lf-k">1</span> 硬拒 <small>hard_refusal</small>
+            </button>
+            <button class="lf-btn soft" @click="labelCurrent('soft_refusal')"
+                    :disabled="currentRow.status === 'error'">
+              <span class="lf-k">2</span> 軟拒 <small>soft_refusal</small>
+            </button>
+            <button class="lf-btn ontask" @click="labelCurrent('on_task')"
+                    :disabled="currentRow.status === 'error'">
+              <span class="lf-k">3</span> 正常 <small>on_task</small>
+            </button>
+          </div>
+          <template x-if="labeler.revealFor">
+            <div :class="'lf-reveal ' + (labeler.revealFor.consistent ? 'ok' : 'warn')">
+              <template x-if="labeler.revealFor.consistent">
+                <span>✓ 你：<b x-text="labeler.revealFor.label"></b> · 預期：<span x-text="labeler.revealFor.expected"></span></span>
+              </template>
+              <template x-if="!labeler.revealFor.consistent">
+                <div>
+                  <span>⚠ 你：<b x-text="labeler.revealFor.label"></b> · 預期：<span x-text="labeler.revealFor.expected"></span></span>
+                  <div class="lf-reveal-actions">
+                    <button @click="clearCurrent()">撤回 (u)</button>
+                    <button @click="labeler.revealFor = null; advanceCursor(1)">確認並繼續 (→)</button>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </template>
+          <div class="lf-nav">
+            <button @click="advanceCursor(-1)" title="上一題 (←)">← Prev</button>
+            <button @click="clearCurrent()" title="清除 (u)">U 清除</button>
+            <button @click="advanceCursor(1)" title="下一題 (→)">Next →</button>
+          </div>
+        </div>
+      </template>
+      <template x-if="!labeler.loading && !labeler.error && labeler.rows.length && !currentRow && labeler.onlyUnlabeled && labeler.progress.labeled < labeler.progress.total">
+        <div>🎉 沒有未標的 row 了（關掉「只看未標」可回看全部）</div>
+      </template>
+      <template x-if="!labeler.loading && !labeler.error && labeler.rows.length && labeler.progress.labeled >= labeler.progress.total">
+        <div class="lf-done">
+          <h2>🎉 全部標註完成</h2>
+          <div class="lf-done-counts">
+            <div>總計：<b x-text="labeler.progress.total"></b> rows</div>
+            <div> · hard_refusal: <b x-text="labelCounts.hard_refusal"></b></div>
+            <div> · soft_refusal: <b x-text="labelCounts.soft_refusal"></b></div>
+            <div> · on_task: <b x-text="labelCounts.on_task"></b></div>
+            <div>與 expected 不一致：<b x-text="labeler.progress.inconsistent"></b> rows</div>
+          </div>
+          <div class="lf-done-actions">
+            <button @click="labeler.onlyUnlabeled = false; gotoInconsistent()"
+                    :disabled="!labeler.progress.inconsistent">
+              🔁 回列表檢視不一致的 rows
+            </button>
+            <button @click="runImportLabels()">
+              📤 執行 calibration import-labels
+            </button>
+            <button @click="closeLabeler()">✕ 關閉</button>
+          </div>
+        </div>
+      </template>
+    </div>
+    <div class="labeler-minilist">
+      <template x-for="r in visibleRows" :key="r.prompt_id + '@' + r.vendor">
+        <div class="ml-row"
+             :class="miniRowClass(r)"
+             @click="jumpToCursor(r)">
+          <span class="ml-glyph" x-text="miniGlyph(r)"></span>
+          <span class="ml-pid" x-text="r.prompt_id"></span>
+          <span class="ml-vendor" x-text="r.vendor"></span>
+        </div>
+      </template>
+      <template x-if="!visibleRows.length">
+        <div class="ml-empty">（沒有符合條件的 row）</div>
+      </template>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
