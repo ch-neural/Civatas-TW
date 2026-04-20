@@ -13,6 +13,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 from . import jobs as jobs_mod
+from . import labeling as labeling_mod
 from . import spec as spec_mod
 from . import status as status_mod
 from ..adapter.clients import register_default_clients
@@ -340,6 +341,12 @@ def path_exists(path: str) -> dict:
         "exists": True, "path": path,
         "size": full.stat().st_size, "mtime": full.stat().st_mtime,
     }
+
+
+# -------- Labeling router (calibration CSV in-browser labeler) --------
+
+labeling_mod.configure(path_resolver=_resolve_safe)
+app.include_router(labeling_mod.router)
 
 
 # -------- Static index --------
