@@ -1,0 +1,1437 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CTW-VA-2026 · 實驗測試台</title>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0b0d10;
+    --panel: #13171c;
+    --panel-2: #1a1f26;
+    --border: #242a33;
+    --text: #d9e0ea;
+    --muted: #8b95a5;
+    --accent: #36d399;       /* TW 綠 */
+    --accent-dim: #1b9070;
+    --blue: #3b82f6;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --purple: #a855f7;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+    font-size: 14px; line-height: 1.55;
+  }
+  code, pre, .mono { font-family: ui-monospace, "JetBrains Mono", Menlo, monospace; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  header {
+    padding: 14px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+    background: linear-gradient(180deg, #0f1317 0%, #0b0d10 100%);
+  }
+  header h1 {
+    font-size: 15px; margin: 0; letter-spacing: 0.02em;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  header h1 .tag {
+    font-size: 10px; color: var(--muted); letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  header .vendors { display: flex; gap: 6px; margin-left: auto; }
+  .v-chip {
+    padding: 3px 9px; border-radius: 999px; font-size: 11px;
+    border: 1px solid var(--border); background: var(--panel);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .v-chip.on { border-color: var(--accent-dim); color: var(--accent); }
+  .v-chip.off { color: var(--muted); opacity: 0.55; }
+  .v-chip .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted);
+  }
+  .v-chip.on .dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+  main {
+    display: grid; grid-template-columns: 240px 1fr 360px;
+    gap: 0; height: calc(100vh - 54px);
+  }
+  aside, section { overflow-y: auto; }
+  aside { border-right: 1px solid var(--border); background: var(--panel); }
+  .sb-group { padding: 12px 18px 6px; }
+  .sb-group h3 {
+    font-size: 10px; color: var(--muted); margin: 0 0 8px;
+    letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600;
+  }
+  .sb-item {
+    padding: 7px 10px; border-radius: 6px; cursor: pointer;
+    color: var(--text); font-size: 13px; margin-bottom: 2px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .sb-item:hover { background: var(--panel-2); }
+  .sb-item.active { background: var(--accent-dim); color: #fff; }
+  .sb-item .mini {
+    font-size: 10px; color: var(--muted); letter-spacing: 0.05em;
+  }
+  .sb-item.active .mini { color: #d9e0ea; }
+  .sb-item .stub-badge {
+    font-size: 9px; padding: 1px 5px; border-radius: 3px;
+    background: #333; color: var(--muted);
+  }
+  .state-icon {
+    display: inline-block; width: 14px; text-align: center;
+    font-size: 11px; font-weight: 700; margin-right: 2px;
+    font-family: ui-monospace, monospace;
+  }
+  .state-icon.done    { color: var(--accent); }
+  .state-icon.ready   { color: #60a5fa; }
+  .state-icon.blocked { color: var(--muted); opacity: 0.6; }
+  .state-icon.stub    { color: var(--muted); opacity: 0.4; }
+  .state-banner {
+    padding: 10px 14px; border-radius: 6px; margin-bottom: 16px;
+    font-size: 12.5px; line-height: 1.55;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .state-banner .big-icon { font-size: 18px; font-weight: 700; line-height: 1; }
+  .state-banner .content { flex: 1; }
+  .state-banner .content .headline { font-weight: 600; margin-bottom: 3px; }
+  .state-banner .content .detail { color: var(--muted); font-size: 11.5px; }
+  .state-banner .content .detail .mono {
+    font-family: ui-monospace, monospace; color: var(--text);
+  }
+  .state-banner.done    { background: rgba(54,211,153,0.08);  border-left: 3px solid var(--accent); }
+  .state-banner.done    .big-icon { color: var(--accent); }
+  .state-banner.ready   { background: rgba(96,165,250,0.08);  border-left: 3px solid #60a5fa; }
+  .state-banner.ready   .big-icon { color: #60a5fa; }
+  .state-banner.blocked { background: rgba(245,158,11,0.08); border-left: 3px solid var(--amber); }
+  .state-banner.blocked .big-icon { color: var(--amber); }
+  .state-banner.stub    { background: var(--panel); border-left: 3px solid var(--border); }
+  .state-banner.stub    .big-icon { color: var(--muted); }
+
+  section.content { padding: 22px 28px; }
+  .cmd-head { display: flex; align-items: start; gap: 16px; margin-bottom: 18px; }
+  .cmd-head h2 {
+    font-size: 19px; margin: 0 0 3px;
+    font-weight: 600; letter-spacing: -0.01em;
+  }
+  .cmd-head .summary { color: var(--muted); font-size: 13px; max-width: 560px; }
+  .cmd-head .path-hint {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+  }
+  .stub-banner {
+    padding: 10px 14px; border: 1px dashed var(--border); border-radius: 6px;
+    color: var(--muted); font-size: 13px; margin-bottom: 16px;
+    background: var(--panel);
+  }
+  .cat-intro {
+    padding: 10px 14px; border-left: 3px solid var(--accent-dim);
+    background: var(--panel); border-radius: 4px;
+    color: var(--muted); font-size: 12.5px; margin-bottom: 18px;
+    white-space: pre-line; line-height: 1.6;
+  }
+  .why-box {
+    padding: 12px 16px; border-radius: 6px;
+    background: var(--panel);
+    border-left: 3px solid var(--blue);
+    margin-bottom: 18px;
+  }
+  .why-box h4 {
+    margin: 0 0 6px; font-size: 11px; color: var(--blue);
+    letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+  }
+  .why-box p {
+    margin: 0; color: var(--text); font-size: 12.5px; line-height: 1.7;
+  }
+  .deps-box {
+    padding: 12px 16px; border-radius: 6px; background: var(--panel);
+    border-left: 3px solid var(--purple); margin-bottom: 18px;
+  }
+  .deps-box h4 {
+    margin: 0 0 10px; font-size: 11px; color: var(--purple);
+    letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+  }
+  .deps-section { margin-bottom: 10px; }
+  .deps-section:last-child { margin-bottom: 0; }
+  .deps-section .arrow {
+    font-size: 10px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.1em; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .deps-section.in .arrow { color: #8aa5ff; }     /* incoming deps */
+  .deps-section.out .arrow { color: var(--accent); }   /* downstream */
+  .deps-section.par .arrow { color: var(--amber); }    /* parallel */
+  .dep-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 8px; margin: 2px 4px 2px 0;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; font-family: ui-monospace, monospace;
+    font-size: 11px; cursor: pointer; color: var(--text);
+  }
+  .dep-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .dep-chip.env { cursor: default; color: var(--amber); border-color: rgba(245,158,11,0.3); }
+  .dep-chip.gate { cursor: default; color: var(--blue); border-color: rgba(59,130,246,0.3); }
+  .dep-note { font-size: 11.5px; color: var(--muted); padding: 2px 8px 6px; line-height: 1.5; }
+  .dep-none { font-size: 11.5px; color: var(--muted); font-style: italic; padding-left: 14px; }
+  .details-box {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 16px; margin-bottom: 18px;
+  }
+  .details-box h4 {
+    margin: 0 0 8px; font-size: 11px;
+    color: var(--muted); letter-spacing: 0.14em;
+    text-transform: uppercase; font-weight: 600;
+  }
+  .details-box ul {
+    margin: 0; padding-left: 18px; font-size: 12.5px;
+    color: var(--text); line-height: 1.65;
+  }
+  .details-box li { margin-bottom: 3px; }
+  .details-box .kw {
+    color: var(--amber); font-family: ui-monospace, monospace;
+  }
+  .outputs-box {
+    background: var(--panel); border: 1px solid var(--accent-dim);
+    border-left: 3px solid var(--accent); border-radius: 6px;
+    padding: 12px 16px; margin-bottom: 18px;
+  }
+  .outputs-box h4 {
+    margin: 0 0 10px; font-size: 11px; color: var(--accent);
+    letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+  }
+  .output-item { margin-bottom: 12px; }
+  .output-item:last-child { margin-bottom: 0; }
+  .output-item .path {
+    font-family: ui-monospace, monospace; font-size: 12px;
+    color: var(--amber); word-break: break-all;
+    background: var(--bg); padding: 3px 7px; border-radius: 3px;
+    display: inline-block; margin-bottom: 4px;
+  }
+  .output-item .kind {
+    font-size: 12px; color: var(--text); margin-bottom: 3px;
+  }
+  .output-item .expected {
+    font-size: 11.5px; color: var(--muted); margin-bottom: 4px;
+  }
+  .output-item .expected::before { content: "內容預估："; color: var(--muted); }
+  .output-item .next {
+    font-size: 11.5px; color: var(--muted);
+  }
+  .output-item .next::before { content: "→ "; color: var(--accent); font-weight: 600; }
+  .schema-table {
+    margin-top: 4px; font-family: ui-monospace, monospace;
+    font-size: 11px; color: var(--muted);
+    border-top: 1px dashed var(--border); padding-top: 6px;
+  }
+  .schema-table .row {
+    display: grid; grid-template-columns: 140px 1fr; gap: 8px;
+    padding: 1px 0;
+  }
+  .schema-table .row .k { color: var(--accent); }
+  .schema-table .row .v { color: var(--text); }
+  .schema-string {
+    font-family: ui-monospace, monospace; font-size: 11px;
+    color: var(--muted); padding-top: 6px; border-top: 1px dashed var(--border);
+    margin-top: 4px; line-height: 1.5;
+  }
+  .preview-box {
+    background: var(--panel); border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    border-radius: 6px; padding: 10px 14px 12px; margin-bottom: 18px;
+  }
+  .preview-box h4 {
+    margin: 0 0 8px; font-size: 11px; color: var(--amber);
+    letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+  }
+  .preview-item { margin-bottom: 14px; }
+  .preview-item:last-child { margin-bottom: 0; }
+  .preview-head {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 6px; margin-bottom: 6px;
+  }
+  .preview-head .path-label {
+    font-family: ui-monospace, monospace; font-size: 11.5px;
+    color: var(--amber); word-break: break-all;
+  }
+  .preview-head .size {
+    font-size: 10.5px; color: var(--muted); font-family: ui-monospace, monospace;
+  }
+  .preview-actions { display: flex; gap: 6px; }
+  .preview-actions a, .preview-actions button {
+    font-size: 11px; padding: 4px 10px; border-radius: 4px;
+    border: 1px solid var(--border); background: var(--panel-2); cursor: pointer;
+    color: var(--text); text-decoration: none; display: inline-block;
+  }
+  .preview-actions a:hover, .preview-actions button:hover {
+    border-color: var(--accent); color: var(--accent);
+  }
+  .preview-table-wrap {
+    max-height: 360px; overflow: auto;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: #07090b;
+  }
+  table.preview {
+    border-collapse: collapse; font-size: 11px;
+    font-family: ui-monospace, "JetBrains Mono", monospace;
+    color: var(--text); width: max-content; min-width: 100%;
+  }
+  table.preview th, table.preview td {
+    padding: 5px 8px; text-align: left;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top; max-width: 320px;
+    overflow: hidden; text-overflow: ellipsis;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  table.preview th {
+    position: sticky; top: 0; z-index: 1;
+    background: var(--panel-2); color: var(--muted);
+    font-weight: 600; letter-spacing: 0.04em; font-size: 10px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  table.preview tr:hover td { background: rgba(27,144,112,0.06); }
+  table.preview td.status-error { color: var(--red); font-weight: 600; }
+  table.preview td.status-ok { color: var(--accent); }
+  table.preview td.label-empty { color: var(--muted); font-style: italic; }
+  table.preview td.label-filled { color: var(--amber); font-weight: 600; }
+  .preview-text {
+    padding: 10px 12px; font-family: ui-monospace, monospace;
+    font-size: 11px; background: #07090b; color: #c8d1dc;
+    white-space: pre-wrap; max-height: 360px; overflow: auto;
+    border-radius: 4px; border: 1px solid var(--border);
+  }
+  .preview-footer {
+    margin-top: 6px; font-size: 10.5px; color: var(--muted);
+  }
+  .preview-footer .tip {
+    color: var(--amber); font-weight: 600;
+  }
+
+  .field {
+    display: block; margin-bottom: 14px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px;
+  }
+  .field.promote { border-color: var(--amber); box-shadow: 0 0 0 1px rgba(245,158,11,.15); }
+  .field label {
+    font-size: 12px; color: var(--muted); margin-bottom: 5px;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .field label .flag { color: var(--accent); font-family: ui-monospace, monospace; font-size: 11px; }
+  .field label .req { color: var(--red); font-weight: 600; }
+  .field label .promote-pill {
+    background: var(--amber); color: #000; font-size: 10px;
+    padding: 1px 5px; border-radius: 3px; font-weight: 600;
+  }
+  .field input, .field select {
+    width: 100%; padding: 8px 10px; background: var(--bg);
+    border: 1px solid var(--border); color: var(--text);
+    border-radius: 5px; font-size: 13px;
+    font-family: ui-monospace, "JetBrains Mono", monospace;
+  }
+  .field input:focus, .field select:focus {
+    outline: 2px solid var(--accent-dim); outline-offset: 0;
+    border-color: var(--accent);
+  }
+  .field .help { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  .action-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 14px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 8px;
+    margin-top: 18px;
+  }
+  .action-row .label {
+    width: 100%; font-size: 11px; color: var(--muted);
+    margin-bottom: 4px; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  button.run {
+    padding: 8px 14px; border-radius: 6px; cursor: pointer;
+    background: var(--accent-dim); color: #fff; font-weight: 600;
+    border: 1px solid var(--accent-dim); font-size: 13px;
+    transition: all 120ms;
+  }
+  button.run:hover { background: var(--accent); border-color: var(--accent); }
+  button.run.vendor {
+    background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--text);
+  }
+  button.run.vendor:hover:not(:disabled) {
+    background: var(--panel); border-color: var(--accent);
+    color: var(--accent);
+  }
+  button.run.vendor[disabled] {
+    opacity: 0.35; cursor: not-allowed;
+  }
+  button.run.all { background: var(--purple); border-color: var(--purple); }
+  button.run.all:hover { filter: brightness(1.15); }
+
+  aside.right { border-left: 1px solid var(--border); background: var(--panel); }
+  .jobs-head {
+    padding: 10px 14px 6px; display: flex; justify-content: space-between;
+    align-items: baseline; border-bottom: 1px solid var(--border);
+  }
+  .jobs-head h3 {
+    margin: 0; font-size: 11px; color: var(--muted);
+    letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .tabs { display: flex; gap: 0; margin: 0 14px; border-bottom: 1px solid var(--border); }
+  .tabs button {
+    padding: 8px 12px; background: transparent; border: 0;
+    color: var(--muted); font-size: 12px; cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .tabs button.active {
+    color: var(--accent); border-color: var(--accent);
+  }
+  .job {
+    padding: 9px 14px 9px 11px; border-bottom: 1px solid var(--border);
+    cursor: pointer; font-size: 12px;
+    border-left: 4px solid var(--border);   /* default grey; phase classes override */
+    transition: background 100ms;
+  }
+  .job:hover { background: var(--panel-2); }
+  .job.active { background: var(--panel-2); }
+  .job.active::after {
+    content: ""; position: absolute; right: 0;
+    width: 2px; height: 100%; background: var(--accent);
+  }
+  /* Phase-colored left stripe */
+  .job.phase-A      { border-left-color: #1b9070; }
+  .job.phase-B      { border-left-color: #3b82f6; }
+  .job.phase-C      { border-left-color: #a855f7; }
+  .job.phase-D      { border-left-color: #f59e0b; }
+  .job.phase-budget { border-left-color: #ec4899; }
+  .job .top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 3px; gap: 6px;
+  }
+  .job .lbl { font-weight: 600; color: var(--text); flex: 1; }
+  .job .meta { font-size: 10px; color: var(--muted); font-family: ui-monospace, monospace; }
+  .phase-pill {
+    font-size: 10.5px; padding: 2px 8px; border-radius: 4px;
+    letter-spacing: 0.05em; font-weight: 700;
+    white-space: nowrap;
+    font-family: -apple-system, sans-serif;
+    min-width: 30px; text-align: center;
+  }
+  .phase-pill.A      { background: #1b9070;  color: #fff; }   /* green — 醒目 */
+  .phase-pill.B      { background: #3b82f6;  color: #fff; }   /* blue  — run */
+  .phase-pill.C      { background: #a855f7;  color: #fff; }   /* purple — analyze/paper */
+  .phase-pill.D      { background: #f59e0b;  color: #000; }   /* amber — dashboard */
+  .phase-pill.budget { background: #ec4899;  color: #fff; }   /* pink  — cost */
+  .job-filter {
+    display: flex; gap: 4px; padding: 8px 14px 4px;
+    font-size: 11px; border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .job-filter button {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); padding: 3px 9px; border-radius: 3px;
+    cursor: pointer; font-size: 10.5px;
+  }
+  .job-filter button.on {
+    background: var(--accent-dim); border-color: var(--accent-dim); color: #fff;
+  }
+  .job-filter button:hover:not(.on) { color: var(--text); border-color: var(--accent-dim); }
+  .status {
+    padding: 1px 6px; border-radius: 3px; font-size: 10px;
+    font-family: ui-monospace, monospace; letter-spacing: 0.03em;
+  }
+  .status.running { background: var(--blue); color: #fff; }
+  .status.done { background: var(--accent-dim); color: #fff; }
+  .status.error { background: var(--red); color: #fff; }
+  .status.cancelled { background: #555; color: #fff; }
+
+  .log-panel {
+    padding: 12px 14px; font-family: ui-monospace, "JetBrains Mono", monospace;
+    font-size: 11px; background: #07090b; color: #c8d1dc;
+    height: 280px; overflow-y: auto; white-space: pre-wrap;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .log-panel .hint { color: var(--muted); font-style: italic; }
+  .summary-strip {
+    padding: 10px 14px; font-size: 12px;
+    border-top: 1px solid var(--border);
+    background: var(--panel-2);
+    font-family: ui-monospace, monospace;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .summary-strip.done { border-left: 3px solid var(--accent); }
+  .summary-strip.running { border-left: 3px solid var(--blue); }
+  .summary-strip.error { border-left: 3px solid var(--red); }
+  .summary-strip .lbl {
+    font-size: 9px; color: var(--muted); letter-spacing: 0.12em;
+    text-transform: uppercase; display: block; margin-bottom: 2px;
+    font-family: -apple-system, "PingFang TC", sans-serif;
+  }
+
+  .exp-card {
+    border: 1px solid var(--border); background: var(--panel);
+    border-radius: 8px; padding: 12px 14px; margin-bottom: 10px;
+  }
+  .exp-card h4 {
+    margin: 0 0 8px; font-size: 13px; display: flex;
+    justify-content: space-between; align-items: baseline;
+  }
+  .exp-card h4 .cost { color: var(--accent); font-family: ui-monospace, monospace; font-size: 12px; }
+  .exp-legend {
+    display: grid; grid-template-columns: 70px 1fr 90px 80px 60px; gap: 6px;
+    font-size: 10px; color: var(--muted); font-family: -apple-system, sans-serif;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 0 6px; border-bottom: 1px dashed var(--border);
+    margin-bottom: 4px;
+  }
+  .vendor-row {
+    display: grid; grid-template-columns: 70px 1fr 90px 80px 60px; gap: 6px;
+    font-size: 11px; padding: 4px 0; color: var(--muted);
+    font-family: ui-monospace, monospace; align-items: center;
+  }
+  .vendor-row .bar {
+    height: 4px; background: var(--panel-2); border-radius: 2px; overflow: hidden;
+  }
+  .vendor-row .bar .fill {
+    height: 100%; background: var(--accent-dim);
+  }
+  .vendor-row .name { color: var(--text); }
+  .vendor-row .ok { color: var(--accent); }
+  .vendor-row .err { color: var(--red); }
+  .stats-intro {
+    padding: 10px 14px; border-radius: 6px;
+    background: var(--panel); border: 1px dashed var(--border);
+    color: var(--muted); font-size: 12px; margin-bottom: 10px;
+    line-height: 1.55;
+  }
+  .stats-intro code { color: var(--amber); font-family: ui-monospace, monospace; }
+
+  .empty { color: var(--muted); padding: 16px 18px; font-size: 12px; }
+
+  .hcenter { display: flex; align-items: center; gap: 6px; }
+  .spacer { flex: 1; }
+  .ghost-btn {
+    padding: 4px 10px; font-size: 11px; background: transparent;
+    border: 1px solid var(--border); border-radius: 4px;
+    color: var(--muted); cursor: pointer;
+  }
+  .ghost-btn:hover { color: var(--text); border-color: var(--accent); }
+</style>
+</head>
+<body x-data="app()" x-init="init()">
+
+<header>
+  <h1>
+    CTW-VA-2026
+    <span class="tag">Civatas-TW Vendor Audit · 實驗測試台</span>
+  </h1>
+  <div class="vendors">
+    <template x-for="v in vendors" :key="v.name">
+      <span class="v-chip" :class="v.available ? 'on' : 'off'"
+            :title="v.available ? 'API key 已設置' : v.env_key + ' 未在 .env 中'">
+        <span class="dot"></span>
+        <span x-text="v.name"></span>
+      </span>
+    </template>
+  </div>
+</header>
+
+<main>
+  <!-- Left sidebar: commands grouped by category -->
+  <aside>
+    <template x-for="[cat, cmds] in Object.entries(categories)" :key="cat">
+      <div class="sb-group">
+        <h3 x-text="cat"></h3>
+        <template x-for="c in cmds" :key="c.group + '/' + c.subcommand">
+          <div class="sb-item"
+               :class="(active && active.group === c.group && active.subcommand === c.subcommand) ? 'active' : ''"
+               @click="selectCommand(c)">
+            <span>
+              <span class="state-icon"
+                    :class="stateFor(c).state"
+                    :title="stateHintFor(c)"
+                    x-text="stateIcon(stateFor(c).state)"></span>
+              <span x-text="c.title"></span>
+            </span>
+            <template x-if="c.supports_vendors">
+              <span class="mini">5×</span>
+            </template>
+          </div>
+        </template>
+      </div>
+    </template>
+  </aside>
+
+  <!-- Main content: command form + run buttons -->
+  <section class="content">
+    <template x-if="!active">
+      <div class="empty">← 左側選一個 CLI 指令</div>
+    </template>
+
+    <template x-if="active">
+      <div>
+        <div class="cmd-head">
+          <div>
+            <h2 x-text="active.title"></h2>
+            <div class="summary" x-text="active.summary"></div>
+            <div class="path-hint mono"
+                 x-text="'civatas-exp ' + active.group + ' ' + active.subcommand"></div>
+          </div>
+        </div>
+
+        <div class="state-banner" :class="stateFor(active).state">
+          <span class="big-icon" x-text="stateIcon(stateFor(active).state)"></span>
+          <div class="content">
+            <div class="headline" x-text="stateHeadline(stateFor(active))"></div>
+            <div class="detail" x-html="stateDetailHtml(stateFor(active))"></div>
+          </div>
+        </div>
+
+        <template x-if="categoryIntros[active.category]">
+          <div class="cat-intro" x-text="categoryIntros[active.category]"></div>
+        </template>
+
+        <template x-if="active.why">
+          <div class="why-box">
+            <h4>為什麼要跑這一步</h4>
+            <p x-text="active.why"></p>
+          </div>
+        </template>
+
+        <template x-if="hasDependencyInfo">
+          <div class="deps-box">
+            <h4>相依關係（前置 / 並行 / 後續）</h4>
+
+            <div class="deps-section in">
+              <div class="arrow">↑ 必須先完成（前置）</div>
+              <template x-if="!active.depends_on || active.depends_on.length === 0">
+                <div class="dep-none">無 — 可作為 pipeline 的起點執行</div>
+              </template>
+              <template x-for="(d, di) in active.depends_on || []" :key="di">
+                <div>
+                  <span class="dep-chip"
+                        :class="d.kind === 'env' ? 'env' : (d.kind === 'gate' ? 'gate' : '')"
+                        @click="jumpToDep(d)"
+                        :title="d.kind === 'env' ? '環境變數 — 在 .env 設定' : (d.kind === 'gate' ? '驗收 gate — 非指令' : '點擊跳至該步驟')">
+                    <span x-text="d.kind === 'env' ? '🔑' : (d.kind === 'gate' ? '🚦' : '▶')"></span>
+                    <span x-text="d.what"></span>
+                  </span>
+                  <template x-if="d.note">
+                    <div class="dep-note" x-text="d.note"></div>
+                  </template>
+                </div>
+              </template>
+            </div>
+
+            <template x-if="active.parallel_with && active.parallel_with.length">
+              <div class="deps-section par">
+                <div class="arrow">⇄ 可以並行跑（彼此獨立）</div>
+                <template x-for="(d, di) in active.parallel_with" :key="di">
+                  <span class="dep-chip"
+                        @click="jumpToDep(d)"
+                        title="並行 — 不用等對方完成">
+                    <span>▶</span>
+                    <span x-text="(d.group || '') + '/' + (d.subcommand || '')"></span>
+                  </span>
+                </template>
+              </div>
+            </template>
+
+            <div class="deps-section out">
+              <div class="arrow">↓ 這步完成後才能跑（後續）</div>
+              <template x-if="!active.unblocks || active.unblocks.length === 0">
+                <div class="dep-none">無 — 這是管線終點或獨立工具</div>
+              </template>
+              <template x-for="(d, di) in active.unblocks || []" :key="di">
+                <div>
+                  <span class="dep-chip"
+                        :class="d.kind === 'gate' ? 'gate' : ''"
+                        @click="jumpToDep(d)"
+                        :title="d.kind === 'gate' ? '驗收 gate — 非指令' : '點擊跳至該步驟'">
+                    <span x-text="d.kind === 'gate' ? '🚦' : '▶'"></span>
+                    <span x-text="d.kind === 'gate' ? d.what : (d.group + '/' + d.subcommand)"></span>
+                  </span>
+                  <template x-if="d.note">
+                    <div class="dep-note" x-text="d.note"></div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+
+        <template x-if="active.details && active.details.length">
+          <div class="details-box">
+            <h4>這個測試會做什麼</h4>
+            <ul>
+              <template x-for="(d, di) in active.details" :key="di">
+                <li x-text="d"></li>
+              </template>
+            </ul>
+          </div>
+        </template>
+
+        <template x-if="previewableOutputs.length">
+          <div class="preview-box">
+            <h4>產出預覽（線上檢視 / 下載）</h4>
+            <template x-for="(o, oi) in previewableOutputs" :key="o.path">
+              <div class="preview-item">
+                <div class="preview-head">
+                  <div>
+                    <span class="path-label" x-text="o.path"></span>
+                    <span class="size"
+                          x-text="'· ' + formatSize(o.meta.size) + ' · ' + formatMtime(o.meta.mtime)"></span>
+                  </div>
+                  <div class="preview-actions">
+                    <a :href="'/api/file?path=' + encodeURIComponent(o.path)"
+                       :download="o.path.split('/').pop()"
+                       title="下載原始檔">📥 下載</a>
+                    <button @click="loadPreview(o.path)" title="重新讀取預覽">🔄 重新預覽</button>
+                  </div>
+                </div>
+                <template x-if="previews[o.path] && previews[o.path].loading">
+                  <div class="preview-footer">讀取中…</div>
+                </template>
+                <template x-if="previews[o.path] && previews[o.path].error">
+                  <div class="preview-footer" style="color:var(--red);"
+                       x-text="'預覽失敗：' + previews[o.path].error"></div>
+                </template>
+                <template x-if="previews[o.path] && previews[o.path].data && (previews[o.path].data.format === 'csv' || previews[o.path].data.format === 'jsonl')">
+                  <div>
+                    <div class="preview-table-wrap">
+                      <table class="preview">
+                        <thead>
+                          <tr>
+                            <template x-for="h in previews[o.path].data.headers" :key="h">
+                              <th x-text="h"></th>
+                            </template>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <template x-for="(row, ri) in previews[o.path].data.rows" :key="ri">
+                            <tr>
+                              <template x-for="h in previews[o.path].data.headers" :key="h">
+                                <td :class="cellClass(h, row[h])"
+                                    x-text="formatCell(row[h])"></td>
+                              </template>
+                            </tr>
+                          </template>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="preview-footer">
+                      顯示前 <span x-text="previews[o.path].data.row_count_shown"></span> 列
+                      <span x-show="previews[o.path].data.truncated">（還有更多 — 請下載完整檔案）</span>
+                      <template x-if="o.path.endsWith('.csv')">
+                        <span>· <span class="tip">標註方式</span>：在 <code>label</code> 欄填 <code>hard_refusal</code> / <code>soft_refusal</code> / <code>on_task</code>，存檔後跑 <code>calibration import-labels</code>。</span>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+                <template x-if="previews[o.path] && previews[o.path].data && previews[o.path].data.format === 'text'">
+                  <pre class="preview-text" x-text="previews[o.path].data.text"></pre>
+                </template>
+                <template x-if="previews[o.path] && previews[o.path].data && previews[o.path].data.format === 'json'">
+                  <pre class="preview-text"
+                       x-text="JSON.stringify(previews[o.path].data.data, null, 2)"></pre>
+                </template>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <template x-if="active.outputs && active.outputs.length">
+          <div class="outputs-box">
+            <h4>跑完會得到什麼（產出）</h4>
+            <template x-for="(o, oi) in active.outputs" :key="oi">
+              <div class="output-item">
+                <div class="path" x-text="o.path"></div>
+                <div class="kind" x-text="o.kind"></div>
+                <template x-if="o.expected">
+                  <div class="expected" x-text="o.expected"></div>
+                </template>
+                <template x-if="o.next_step">
+                  <div class="next" x-text="o.next_step"></div>
+                </template>
+                <template x-if="o.schema && typeof o.schema === 'object'">
+                  <div class="schema-table">
+                    <template x-for="(v, k) in o.schema" :key="k">
+                      <div class="row">
+                        <span class="k" x-text="k"></span>
+                        <span class="v" x-text="v"></span>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+                <template x-if="o.schema && typeof o.schema === 'string'">
+                  <div class="schema-string" x-text="'欄位：' + o.schema"></div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <template x-if="active.is_stub">
+          <div class="stub-banner">
+            這是尚未實作的 stub，會印提示訊息後結束。按下執行仍會產生 job 紀錄，可用來驗證 webui 流程。
+          </div>
+        </template>
+
+        <template x-for="(f, i) in activeFields" :key="i">
+          <div class="field" :class="f.promote ? 'promote' : ''">
+            <label>
+              <span class="flag" x-text="f.flag || '(positional)'"></span>
+              <span x-text="f.name"></span>
+              <template x-if="f.required"><span class="req">*</span></template>
+              <template x-if="f.promote"><span class="promote-pill">N</span></template>
+            </label>
+            <template x-if="f.type === 'int'">
+              <input type="number" x-model.number="f.value" :placeholder="f.default">
+            </template>
+            <template x-if="f.type === 'bool'">
+              <select x-model="f.value">
+                <option value="">（留空：CLI 預設）</option>
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
+            </template>
+            <template x-if="f.type !== 'int' && f.type !== 'bool'">
+              <input type="text" x-model="f.value" :placeholder="f.default">
+            </template>
+            <div class="help" x-text="f.help"></div>
+          </div>
+        </template>
+
+        <div class="action-row">
+          <template x-if="active.supports_vendors">
+            <div style="width: 100%;">
+              <div class="label">
+                <span>▶ 全部 vendor = 單一 job 一次跑 5 家（推薦）</span><br>
+                <span>▶ 單一 vendor 按鈕 = 只跑那家，output 檔會自動加 <code>_vendor</code> 尾綴避免覆寫全量結果</span>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <template x-for="v in vendors" :key="v.name">
+                  <button class="run vendor" :disabled="!v.available"
+                          @click="runVendorOnly(v.name)"
+                          :title="v.available ? '單跑 ' + v.name + '；output 會加 _' + v.name + ' 尾綴' : v.env_key + ' 未設置'">
+                    ▶ <span x-text="v.name"></span>
+                  </button>
+                </template>
+                <button class="run all"
+                        @click="runAllVendors()">
+                  ▶ 全部 vendor（<span x-text="availableCount"></span>）
+                </button>
+              </div>
+            </div>
+          </template>
+          <template x-if="!active.supports_vendors">
+            <button class="run" @click="runJob(null)">▶ 執行</button>
+          </template>
+        </div>
+
+        <!-- Experiment stats — only meaningful for commands that write SQLite -->
+        <template x-if="showsStats">
+          <div style="margin-top: 28px;">
+            <h3 style="font-size: 12px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px;">
+              實驗統計（runs/*/data.db）
+              <button class="ghost-btn" @click="loadExperiments()" style="margin-left: 10px;">↻ 重新整理</button>
+            </h3>
+            <div class="stats-intro">
+              這張表列出 <code>runs/&lt;experiment_id&gt;/data.db</code> 裡 vendor 呼叫的累積統計。
+              每跑一次 <code>run smoke-test</code> 會寫 5 筆（每 vendor 一列），重跑同 experiment_id 會累加。
+              <strong>只有 run / cost 類的指令會產生這張表</strong>；Stage A/B/C/merge/stats/persona-slate 不寫 data.db。<br>
+              · <strong>橫條長度</strong> = 該 vendor 花費佔實驗總花費的百分比 ·
+              <strong>總花費</strong> = 跨次數累加 · <strong>平均延遲</strong> = 每 call 的 HTTP 往返時間
+            </div>
+            <template x-if="nonEmptyExperiments.length === 0">
+              <div class="empty" style="padding: 12px 0;">尚無實驗紀錄（跑 `run smoke-test` 就會產生）。</div>
+            </template>
+            <template x-for="exp in nonEmptyExperiments" :key="exp.experiment_id">
+              <div class="exp-card">
+                <h4>
+                  <span x-text="exp.experiment_id"></span>
+                  <span class="cost"
+                        x-text="'$' + exp.total_cost_usd.toFixed(4) + ' / ' + exp.total_calls + ' 次呼叫'"></span>
+                </h4>
+                <div class="exp-legend">
+                  <span>vendor</span>
+                  <span>花費佔比</span>
+                  <span>總花費</span>
+                  <span>平均延遲</span>
+                  <span>次數</span>
+                </div>
+                <template x-for="v in exp.vendors" :key="v.vendor">
+                  <div class="vendor-row">
+                    <span class="name" x-text="v.vendor"></span>
+                    <div class="bar">
+                      <div class="fill"
+                           :style="'width: ' + Math.min(100, (v.cost_usd / Math.max(0.0001, exp.total_cost_usd)) * 100) + '%;'"></div>
+                    </div>
+                    <span x-text="'$' + v.cost_usd.toFixed(5)"></span>
+                    <span x-text="v.avg_latency_ms.toFixed(0) + ' ms'"></span>
+                    <span :class="(v.status_counts && v.status_counts.error) ? 'err' : 'ok'"
+                          x-text="v.calls + (v.status_counts && v.status_counts.error ? ' (' + v.status_counts.error + ' 錯)' : '')"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </template>
+  </section>
+
+  <!-- Right sidebar: job list + log tail -->
+  <aside class="right">
+    <div class="jobs-head">
+      <h3>
+        Job 歷史
+        <span style="color:var(--muted); font-weight: normal;"
+              x-text="'（' + filteredJobs.length + '/' + jobs.length + '）'"></span>
+      </h3>
+      <button class="ghost-btn" @click="loadJobs()">↻</button>
+    </div>
+    <div class="job-filter">
+      <button :class="jobFilter === 'all' ? 'on' : ''" @click="jobFilter='all'">全部</button>
+      <button :class="jobFilter === 'step' ? 'on' : ''" @click="jobFilter='step'"
+              :disabled="!active"
+              :title="active ? '只看此 step 的 job' : '先選一個 step'">此 step</button>
+      <button :class="jobFilter === 'phase' ? 'on' : ''" @click="jobFilter='phase'"
+              :disabled="!active"
+              :title="active ? '只看此 Phase 分類的 job' : '先選一個 step'">此 Phase</button>
+    </div>
+    <template x-if="filteredJobs.length === 0">
+      <div class="empty">
+        <span x-show="jobs.length === 0">尚未跑過任何 job。</span>
+        <span x-show="jobs.length > 0">此範圍內尚無 job（按「全部」看所有紀錄）。</span>
+      </div>
+    </template>
+    <template x-for="j in filteredJobs" :key="j.job_id">
+      <div class="job"
+           :class="'phase-' + phaseClassForGroup(j.group)
+                   + ((selectedJob && selectedJob.job_id === j.job_id) ? ' active' : '')"
+           style="position: relative;"
+           @click="selectJob(j)">
+        <div class="top">
+          <span class="phase-pill" :class="phaseClassForGroup(j.group)"
+                x-text="phaseShortForGroup(j.group)"
+                :title="phaseNameForGroup(j.group)"></span>
+          <span class="lbl" x-text="j.group + ' ' + j.subcommand"></span>
+          <span class="status" :class="j.status" x-text="j.status"></span>
+        </div>
+        <div class="meta">
+          <span x-text="j.job_id"></span>
+          <span x-show="j.vendor"> · </span>
+          <span x-show="j.vendor" x-text="j.vendor"></span>
+          <span x-show="j.duration_s"> · </span>
+          <span x-show="j.duration_s" x-text="j.duration_s ? j.duration_s.toFixed(1) + 's' : ''"></span>
+        </div>
+      </div>
+    </template>
+
+    <template x-if="selectedJob">
+      <div>
+        <div class="jobs-head" style="padding-top: 12px;">
+          <h3>
+            Log · <span class="mono" style="color:var(--text)" x-text="selectedJob.job_id"></span>
+          </h3>
+          <div class="hcenter">
+            <span class="status" :class="selectedJob.status" x-text="selectedJob.status"></span>
+            <button class="ghost-btn" x-show="selectedJob.status === 'running'"
+                    @click="cancelJob(selectedJob.job_id)">取消</button>
+          </div>
+        </div>
+        <pre class="log-panel" x-ref="logPanel"
+             x-text="logText || '（尚無輸出）'"></pre>
+        <div class="summary-strip" :class="selectedJob.status">
+          <span class="lbl"
+                x-text="selectedJob.status === 'running' ? '進行中 · 最新一行輸出' : (selectedJob.status === 'done' ? '✓ 完成摘要（最後一行）' : '最新輸出')"></span>
+          <span x-text="latestSummary || '（尚無輸出）'"></span>
+        </div>
+      </div>
+    </template>
+  </aside>
+</main>
+
+<script>
+function app() {
+  return {
+    spec: null,
+    vendors: [],
+    commands: [],
+    categories: {},
+    categoryIntros: {},
+    stepStatus: {},
+    previews: {},         // { path: { loading, error, data, meta } }
+    previewedFor: null,   // last active key we auto-loaded previews for
+    active: null,
+    activeFields: [],
+    jobs: [],
+    selectedJob: null,
+    logText: '',
+    logOffset: 0,
+    pollTimer: null,
+
+    get latestSummary() {
+      if (!this.logText) return '';
+      const lines = this.logText.split('\n').filter(l => l.trim() && !l.startsWith('$ '));
+      return lines.length ? lines[lines.length - 1] : '';
+    },
+
+    get showsStats() {
+      // Only commands that write to SQLite benefit from the stats section.
+      if (!this.active) return false;
+      return this.active.group === 'run' || this.active.group === 'cost';
+    },
+
+    get hasDependencyInfo() {
+      if (!this.active) return false;
+      const hasIn = (this.active.depends_on || []).length > 0;
+      const hasPar = (this.active.parallel_with || []).length > 0;
+      const hasOut = (this.active.unblocks || []).length > 0;
+      // Render the block whenever any metadata is set (even empty depends_on
+      // counts as "no prereqs" — useful info).
+      return hasIn || hasPar || hasOut
+        || this.active.depends_on !== undefined
+        || this.active.unblocks !== undefined;
+    },
+
+    jobFilter: 'all',
+
+    get filteredJobs() {
+      if (!this.active || this.jobFilter === 'all') return this.jobs;
+      if (this.jobFilter === 'step') {
+        return this.jobs.filter(j =>
+          j.group === this.active.group && j.subcommand === this.active.subcommand
+        );
+      }
+      if (this.jobFilter === 'phase') {
+        const targetCat = this.active.category;
+        const sameCatGroups = new Set(
+          this.commands
+            .filter(c => c.category === targetCat)
+            .map(c => c.group + '/' + c.subcommand)
+        );
+        return this.jobs.filter(j =>
+          sameCatGroups.has(j.group + '/' + j.subcommand)
+        );
+      }
+      return this.jobs;
+    },
+
+    _groupToPhase(group) {
+      // Map a CLI group to its Phase pill style + label.
+      const map = {
+        'news-pool':     {cls: 'A',      short: 'A1',  full: 'Phase A1 — 新聞池'},
+        'persona-slate': {cls: 'A',      short: 'A3',  full: 'Phase A3 — Persona Slate'},
+        'calibration':   {cls: 'A',      short: 'A5',  full: 'Phase A5 — 拒答校準'},
+        'run':           {cls: 'B',      short: 'B/C', full: 'Phase B/C — 實驗執行'},
+        'cost':          {cls: 'budget', short: 'B5',  full: 'Phase B5 — 花費追蹤'},
+        'analyze':       {cls: 'C',      short: 'C7',  full: 'Phase C7 — 統計分析'},
+        'dashboard':     {cls: 'D',      short: 'D',   full: 'Phase D — 儀表板'},
+        'paper':         {cls: 'C',      short: 'C9',  full: 'Phase C9 — 論文輸出'},
+      };
+      return map[group] || {cls: '', short: '?', full: group};
+    },
+    phaseClassForGroup(g) { return this._groupToPhase(g).cls; },
+    phaseShortForGroup(g) { return this._groupToPhase(g).short; },
+    phaseNameForGroup(g)  { return this._groupToPhase(g).full; },
+
+    jumpToDep(d) {
+      if (!d) return;
+      let group = d.group;
+      let sub = d.subcommand;
+      // depends_on entries use {kind: "step", what: "group/subcommand"} shape;
+      // unblocks entries use {group, subcommand} directly. Handle both.
+      if ((!group || !sub) && d.kind === 'step' && typeof d.what === 'string') {
+        const parts = d.what.split('/');
+        if (parts.length === 2) {
+          group = parts[0]; sub = parts[1];
+        }
+      }
+      if (!group || !sub) return;
+      const target = this.commands.find(
+        c => c.group === group && c.subcommand === sub
+      );
+      if (target) this.selectCommand(target);
+    },
+
+    get nonEmptyExperiments() {
+      return (this.experiments || []).filter(e => (e.total_calls || 0) > 0);
+    },
+
+    async init() {
+      await this.loadSpec();
+      await this.loadJobs();
+      await this.loadExperiments();
+      await this.loadStatus();
+      // Default to first non-stub command.
+      const first = this.commands.find(c => !c.is_stub) || this.commands[0];
+      if (first) this.selectCommand(first);
+      // Refresh job list every 3s; status every 10s.
+      setInterval(() => this.loadJobs(true), 3000);
+      setInterval(() => this.loadStatus(), 10000);
+    },
+
+    async loadStatus() {
+      try {
+        const r = await fetch('/api/status');
+        if (r.ok) this.stepStatus = await r.json();
+      } catch (e) { /* ignore transient errors */ }
+    },
+
+    stateFor(c) {
+      if (!c) return {state: 'ready', evidence: [], blocked_by: []};
+      const k = c.group + '/' + c.subcommand;
+      return this.stepStatus[k] || {state: 'ready', evidence: [], blocked_by: []};
+    },
+
+    stateIcon(s) {
+      return {done: '✓', ready: '→', blocked: '🔒', stub: '○'}[s] || '?';
+    },
+
+    stateHeadline(s) {
+      return {
+        done: '已完成（偵測到產物 / 成功 job）',
+        ready: '可以跑 — 前置條件都滿足',
+        blocked: '被阻塞 — 先完成前置',
+        stub: '未實作 — 尚是 stub',
+      }[s.state] || s.state;
+    },
+
+    stateHintFor(c) {
+      const s = this.stateFor(c);
+      if (s.state === 'done') return '已完成';
+      if (s.state === 'ready') return '可以跑';
+      if (s.state === 'blocked') {
+        const names = (s.blocked_by || []).map(b => b.what || '?').join(', ');
+        return '被阻塞：' + names;
+      }
+      if (s.state === 'stub') return '未實作';
+      return '';
+    },
+
+    stateDetailHtml(s) {
+      if (s.state === 'stub') {
+        return 'CLI 裡仍是 placeholder；此頁按下執行會印一行訊息後結束，可用來驗證 webui job 流程。';
+      }
+      if (s.state === 'blocked') {
+        const items = (s.blocked_by || []).map(b => {
+          if (b.kind === 'env') {
+            return `<li>🔑 環境變數 <span class="mono">${b.what}</span>`
+                 + (b.missing && b.missing.length ? `（缺 <span class="mono">${b.missing.join(', ')}</span>）` : '')
+                 + (b.note ? ` — ${b.note}` : '') + '</li>';
+          }
+          if (b.kind === 'step') {
+            return `<li>▶ 前置 step <span class="mono">${b.what}</span> 尚未完成`
+                 + (b.note ? ` — ${b.note}` : '') + '</li>';
+          }
+          return `<li>${b.what || '?'}</li>`;
+        }).join('');
+        return '<ul style="margin:4px 0 0; padding-left:18px;">' + items + '</ul>';
+      }
+      if (s.state === 'done') {
+        const items = (s.evidence || []).map(e => {
+          if (e.kind === 'file') {
+            const sizeKb = e.size ? (e.size / 1024).toFixed(1) + ' KB' : '';
+            const mtime = e.mtime ? new Date(e.mtime * 1000).toLocaleString('zh-TW') : '';
+            return `<li>📄 <span class="mono">${e.path}</span> · ${sizeKb} · ${mtime}</li>`;
+          }
+          if (e.kind === 'job') {
+            const dur = e.duration_s ? ' · ' + e.duration_s.toFixed(1) + 's' : '';
+            return `<li>▶ 上次成功 job <span class="mono">${e.job_id}</span>${dur}</li>`;
+          }
+          return '<li>' + JSON.stringify(e) + '</li>';
+        }).join('');
+        return (items ? '<ul style="margin:4px 0 0; padding-left:18px;">' + items + '</ul>' : '')
+          + '（要重跑這一步就改下方參數再按執行 — 會覆寫現有產物）';
+      }
+      // ready
+      return '前置條件都滿足，可以按下方按鈕執行。';
+    },
+
+    async loadSpec() {
+      const r = await fetch('/api/spec');
+      this.spec = await r.json();
+      this.vendors = this.spec.vendors;
+      this.commands = this.spec.commands;
+      this.categoryIntros = this.spec.category_intros || {};
+      // Group by category (preserve original order).
+      this.categories = {};
+      for (const c of this.commands) {
+        if (!this.categories[c.category]) this.categories[c.category] = [];
+        this.categories[c.category].push(c);
+      }
+    },
+
+    selectCommand(c) {
+      this.active = c;
+      // Deep-clone fields + add `value` = default (stringified for input binding).
+      this.activeFields = (c.fields || []).map(f => ({
+        ...f,
+        value: f.default === undefined || f.default === null ? '' : String(f.default),
+      }));
+      // Reset preview cache when switching command; auto-probe existing outputs.
+      this.previewedFor = c.group + '/' + c.subcommand;
+      this.probePreviews();
+    },
+
+    get previewableOutputs() {
+      if (!this.active) return [];
+      // Resolve each output path against the current field values so template
+      // placeholders like {N} get replaced with the user's actual input.
+      const resolved = (this.active.outputs || [])
+        .map(o => ({
+          ...o,
+          resolved_path: this._resolveOutputPath(o.path),
+        }))
+        .filter(o =>
+          o.resolved_path
+          && !o.resolved_path.startsWith('(')
+          && /\.(csv|jsonl|json|txt|md|sha256|log)$/i.test(o.resolved_path)
+        );
+      return resolved
+        .filter(o => this.previews[o.resolved_path]
+                     && this.previews[o.resolved_path].meta)
+        .map(o => ({
+          path: o.resolved_path,
+          meta: this.previews[o.resolved_path].meta,
+        }));
+    },
+
+    _resolveOutputPath(template) {
+      if (!template) return '';
+      // Replace {FOO} tokens with current field values when available.
+      return template.replace(/\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (_, key) => {
+        const f = (this.activeFields || [])
+          .find(x => x.name && x.name.toUpperCase() === key.toUpperCase());
+        return f && f.value !== '' ? f.value : '';
+      });
+    },
+
+    async probePreviews() {
+      if (!this.active) return;
+      const targets = (this.active.outputs || [])
+        .map(o => this._resolveOutputPath(o.path))
+        .filter(p =>
+          p && !p.startsWith('(')
+          && /\.(csv|jsonl|json|txt|md|sha256|log)$/i.test(p)
+        );
+      // Snapshot the command we're probing — if the user navigates away before
+      // all requests return, the results will still populate the cache (OK).
+      for (const p of targets) {
+        try {
+          const r = await fetch('/api/path-exists?path=' + encodeURIComponent(p));
+          if (!r.ok) { continue; }
+          const data = await r.json();
+          if (data.exists) {
+            // Seed entry so previewableOutputs shows it immediately; load
+            // preview data in the background.
+            if (!this.previews[p]) this.previews[p] = {};
+            this.previews[p].meta = {size: data.size, mtime: data.mtime};
+            this.loadPreview(p);
+          } else {
+            // File no longer exists — clear stale cache.
+            delete this.previews[p];
+          }
+        } catch (_) { /* ignore transient error */ }
+      }
+    },
+
+    async loadPreview(path) {
+      if (!this.previews[path]) this.previews[path] = {};
+      this.previews[path].loading = true;
+      this.previews[path].error = null;
+      try {
+        const r = await fetch('/api/preview?path=' + encodeURIComponent(path) + '&limit=50');
+        if (!r.ok) {
+          const txt = await r.text();
+          this.previews[path].error = 'HTTP ' + r.status + ' — ' + txt.slice(0, 120);
+        } else {
+          this.previews[path].data = await r.json();
+        }
+      } catch (e) {
+        this.previews[path].error = String(e);
+      } finally {
+        this.previews[path].loading = false;
+      }
+    },
+
+    cellClass(header, value) {
+      if (header === 'status') {
+        if (value === 'ok') return 'status-ok';
+        if (value === 'error' || value === 'refusal_filter') return 'status-error';
+      }
+      if (header === 'label') {
+        return (value === null || value === undefined || value === '')
+          ? 'label-empty' : 'label-filled';
+      }
+      return '';
+    },
+
+    formatCell(v) {
+      if (v === null || v === undefined) return '';
+      if (typeof v === 'object') return JSON.stringify(v);
+      const s = String(v);
+      // Keep it readable; wrap via CSS, don't truncate here.
+      return s;
+    },
+
+    formatSize(bytes) {
+      if (!bytes && bytes !== 0) return '';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+    },
+
+    formatMtime(ts) {
+      if (!ts) return '';
+      return new Date(ts * 1000).toLocaleString('zh-TW');
+    },
+
+    get availableCount() {
+      return this.vendors.filter(v => v.available).length;
+    },
+
+    async runJob(vendor) {
+      const body = {
+        group: this.active.group,
+        subcommand: this.active.subcommand,
+        fields: this.activeFields.map(f => ({
+          name: f.name, flag: f.flag, value: this._coerce(f),
+        })),
+        vendor: vendor,
+      };
+      const r = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) {
+        alert('執行失敗：' + await r.text());
+        return;
+      }
+      const job = await r.json();
+      await this.loadJobs();
+      this.selectJob(job);
+    },
+
+    async runAllVendors() {
+      // Fire ONE job with no vendor filter — the CLI defaults to running
+      // all 5 vendors in a single process. Firing 5 separate jobs would
+      // cause race conditions on shared output files (e.g. calibration
+      // fetch writes responses_nN.jsonl at the end of the run).
+      await this.runJob(null);
+    },
+
+    async runVendorOnly(vendor) {
+      // Per-vendor button: run only that vendor. For commands that write
+      // to a shared output file, auto-append `_<vendor>` to the output
+      // path so single-vendor test runs don't overwrite the full-run file.
+      const pathField = this.activeFields.find(
+        f => f.name === 'output' && typeof f.value === 'string' && f.value
+      );
+      let originalPath = null;
+      if (pathField && !pathField.value.includes('_' + vendor)) {
+        const v = pathField.value;
+        const dotIdx = v.lastIndexOf('.');
+        if (dotIdx > 0) {
+          originalPath = v;
+          pathField.value = v.slice(0, dotIdx) + '_' + vendor + v.slice(dotIdx);
+        }
+      }
+      await this.runJob(vendor);
+      if (originalPath) {
+        // Restore the original path so the next button press isn't double-suffixed.
+        pathField.value = originalPath;
+      }
+    },
+
+    _coerce(f) {
+      const v = f.value;
+      if (v === '' || v === null || v === undefined) return '';
+      if (f.type === 'int') return Number(v);
+      if (f.type === 'bool') return v === 'true';
+      return v;
+    },
+
+    async loadJobs(silent) {
+      const r = await fetch('/api/jobs?limit=50');
+      const data = await r.json();
+      this.jobs = data;
+      // If the selected job got updated, refresh its state + log.
+      if (this.selectedJob) {
+        const updated = this.jobs.find(j => j.job_id === this.selectedJob.job_id);
+        if (updated) {
+          const prevStatus = this.selectedJob.status;
+          this.selectedJob = updated;
+          if (prevStatus !== 'done' && prevStatus !== 'error') {
+            await this.refreshLog();
+          }
+        }
+      }
+    },
+
+    async loadExperiments() {
+      const r = await fetch('/api/experiments');
+      this.experiments = await r.json();
+    },
+    experiments: [],
+
+    async selectJob(j) {
+      this.selectedJob = j;
+      this.logOffset = 0;
+      this.logText = '';
+      await this.refreshLog();
+      // Poll log if job is still running.
+      if (this.pollTimer) clearInterval(this.pollTimer);
+      if (j.status === 'running' || j.status === 'pending') {
+        this.pollTimer = setInterval(() => this.refreshLog(), 1000);
+      }
+    },
+
+    async refreshLog() {
+      if (!this.selectedJob) return;
+      const r = await fetch(
+        '/api/jobs/' + this.selectedJob.job_id + '/log?offset=' + this.logOffset
+      );
+      const data = await r.json();
+      if (data.chunk) {
+        this.logText += data.chunk;
+        this.logOffset = data.next_offset;
+        this.$nextTick(() => {
+          const el = this.$refs.logPanel;
+          if (el) el.scrollTop = el.scrollHeight;
+        });
+      }
+      // Refresh job status too (cheap).
+      const jr = await fetch('/api/jobs/' + this.selectedJob.job_id);
+      if (jr.ok) {
+        const updated = await jr.json();
+        const wasRunning = this.selectedJob.status === 'running';
+        this.selectedJob = updated;
+        if (wasRunning && (updated.status === 'done' || updated.status === 'error')) {
+          if (this.pollTimer) clearInterval(this.pollTimer);
+          this.pollTimer = null;
+          await this.loadJobs();
+          await this.loadExperiments();
+          await this.loadStatus();
+          await this.probePreviews();
+        }
+      }
+    },
+
+    async cancelJob(jid) {
+      await fetch('/api/jobs/' + jid + '/cancel', {method: 'POST'});
+      await this.loadJobs();
+    },
+  };
+}
+</script>
+</body>
+</html>

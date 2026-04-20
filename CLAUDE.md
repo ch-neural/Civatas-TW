@@ -732,6 +732,195 @@ open http://localhost:3100/workspaces/1adedb2a/prediction
 `predLocalKeywords` 看有沒有 saved 為陣列，必要時把 `meta.json` 的 keyword 欄位
 改回 newline-joined string。
 
+---
+
+## Stage 9 — Paper/ 獨立測試平台 webui + Phase A5 refusal calibration（2026-04-19 ~ 04-20）
+
+`Paper/` 是本 repo 的第 2 個 Python 套件（獨立於 `ap/` Dockerized 主系統），
+名稱 CTW-VA-2026：用純 CLI + SQLite + 單檔 HTML dashboard 比較 5 家 LLM vendor
+（OpenAI / Gemini / Grok / DeepSeek / Kimi）模擬 2024 台灣總統大選選民的
+alignment 差異，作為 ICWSM/IC2S2/EMNLP 投稿素材。
+
+本 stage 在既有 CLI（`civatas-exp news-pool / persona-slate / run / cost / analyze /
+dashboard / paper`）之上建了一整套 **webui 測試平台**，並把原本是 stub 的 Phase A5
+（拒答校準）做成真實可用的 4-step pipeline。
+
+### 9.1 Webui 架構
+
+位置：`Paper/src/ctw_va/webui/`
+
+- **單頁式 HTML**（Alpine.js + Chart.js via CDN，無 React SPA，符合原 spec 要求）
+- **FastAPI + uvicorn**（deps 在 `Paper/pyproject.toml`）
+- **啟動**：`civatas-exp webui serve --port 8765`（進入點在 `cli/webui.py`）
+- **5 個 module**：
+  - `app.py` — 10 個 API endpoint（`/api/spec` `/api/jobs` `/api/status`
+    `/api/experiments` `/api/preview` `/api/file` `/api/path-exists`
+    `/api/jobs/{id}/log` `/api/jobs/{id}/cancel`）
+  - `spec.py` — 15 個 CLI subcommand 的宣告式欄位 schema（7 個欄位類型：
+    `group / subcommand / title / summary / why / details / outputs /
+    category / depends_on / parallel_with / unblocks / fields / supports_vendors /
+    costs_money / is_stub`）。UI 完全由這份 spec 驅動。
+  - `jobs.py` — subprocess job manager。每個按鈕按下 fire 一個 `python -m
+    ctw_va.cli <group> <subcommand> ...` subprocess，log 串流到 `runs/webui/jobs/*.log`，
+    狀態持久化在 `runs/webui/jobs.jsonl`（append-only audit log）。
+  - `status.py` — 每個 step 的完成狀態偵測（`done` / `ready` / `blocked` /
+    `stub`）。判定規則：output 檔存在 (size>0) 或有成功 job 紀錄 → done；
+    env key 或上游 step 缺 → blocked；stub spec → stub；其餘 → ready。
+  - `static/index.html` — ~1000 行單檔 UI。深色、monospace、dense 排版。
+
+### 9.2 Webui 用戶看到的多層說明（每個 step 頁從上到下）
+
+| # | 區塊 | 用意 | 顏色 |
+|---|---|---|---|
+| 1 | 指令標題 + CLI 路徑 | `civatas-exp news-pool fetch-a` | — |
+| 2 | 狀態 banner（done/ready/blocked/stub）| 偵測到什麼檔 / 缺什麼 / 能不能跑 | 對應色 |
+| 3 | category-intro（phase 層級）| ASCII 流程圖：`A ┐ B ├→ merge → stats` | 綠左邊 |
+| 4 | 🔵 **為什麼要跑這一步** | 研究動機、跳過的後果 | 藍左邊 |
+| 5 | 🟣 **相依關係** | ↑ 前置 / ⇄ 並行 / ↓ 後續，chip 可點跳 | 紫左邊 |
+| 6 | ⚪ **這個測試會做什麼** | 機制細節（關鍵字/domain/成本）| 灰 |
+| 7 | 🟠 **產出預覽**（若檔案存在）| 📥 下載 + 線上 CSV/JSONL 表格 | 橘左邊 |
+| 8 | 🟢 **跑完會得到什麼** | 產出路徑 + schema 欄位說明 | 綠左邊 |
+| 9 | 欄位表單（含 N 欄位加 N 標籤 + 橘框）| promote=True 的欄位視覺強調 | — |
+| 10 | 執行按鈕列 | 全部 vendor（1 job）/ per-vendor（加 _xxx 尾綴）/ 單一執行 | 綠 / 紫 |
+
+### 9.3 Job 歷史側邊欄（右側）
+
+- **篩選器**：全部 / 此 step / 此 Phase（用 `category` 分）
+- **每筆 job 左側 4px 粗彩色條** + Phase pill：
+  - 🟢 Phase A 系列（news-pool / persona-slate / calibration）
+  - 🔵 Phase B/C（run）
+  - 🩷 Phase B5（cost）
+  - 🟣 Phase C7/C9（analyze / paper）
+  - 🟡 Phase D（dashboard）
+- Log panel 底下顯示「✓ 完成摘要（最後一行）」或「進行中 · 最新輸出」
+- 每秒 poll `/api/jobs/{id}/log?offset=N` 串流增量
+
+### 9.4 產出預覽（檔案線上檢視）
+
+- 三個後端 endpoint：
+  - `GET /api/path-exists?path=...` — 廉價存在性檢查
+  - `GET /api/preview?path=...&limit=50` — 支援 csv / jsonl / json / txt / md / sha256
+  - `GET /api/file?path=...` — 原始檔 download（`Content-Disposition: attachment`）
+- **安全**：白名單 `experiments/ runs/ data/`，`../` 逃脫會 403
+- **路徑 placeholder 解析**：output 寫 `responses_n{N}.csv` → 從當前 N 欄位值替換
+- **CSV 預覽特殊樣式**：`status=error` 列紅色、`label` 欄空白顯示斜體灰、已填顯示琥珀
+- **job 完成後自動 probe** 當前 step 的 outputs → 立刻看到新產出
+
+### 9.5 Serper fetch 進度行（解決「無聲等 2 分鐘」）
+
+原 `news/serper_fetch.py` 只在呼叫結束後 print 一行 summary，webui 在 log
+panel 看起來像卡住。改成三個 stage 函式（A/B/C）每次 API call 後 print：
+
+```
+[A 3/70] kw=賴清德 page=3 → 10 (10 new) · total 30
+[B 15/105] chinatimes.com kw=侯友宜 p5 → 10 (9 new) · total 142
+```
+
+關鍵：`print(..., flush=True)` + subprocess env `PYTHONUNBUFFERED=1` 讓 OS-level
+buffer 立即刷到 log 檔 → webui 每秒 poll 看到串流。
+
+### 9.6 Phase A5 refusal calibration（從 stub 到可用）
+
+位置：`Paper/src/ctw_va/refusal/`
+
+- **`prompts.py`** — 200 題台灣政治敏感 prompt bank：
+  - 硬拒預期 80 題（HR01-HR80）：兩岸主權 / 統獨 / 候選人直接評分 / 228 白色恐怖
+    責任 / 族群歸屬 / 藍白合 / 兵役延長 / 兩岸戰爭情境等
+  - 軟拒預期 70 題（SR01-SR70）：政黨比較 / 地方光譜成因 / 房價責任歸屬 /
+    年改 / 罷免制度濫用 / 台積電政治化 / 網軍影響 / 台日韓美盟約性質
+  - 正常預期 50 題（OT01-OT50）：選制事實 / 任期制度 / 邦交國數 / 縣市清單 /
+    戒嚴年份 / 立院席次分佈
+  - Topic 分佈：sovereignty 39 / candidate 43 / history 19 / ethnic 22 /
+    policy 45 / factual 32
+  - `stratified_sample(n, seed)` 確定性分層抽樣：同 seed 跨機器 byte-identical
+
+- **`fetcher.py`** — 對每 prompt fan-out 5 vendor（asyncio.gather per-prompt），
+  寫 JSONL（每 row: prompt_id / vendor / prompt_text / response_text / expected /
+  topic / status / model_id / cost / latency / tokens / label=""）。System prompt
+  固定中性「用繁中回答，150 字內」，不引導 vendor 立場。
+
+- **`csv_io.py`** — JSONL ↔ CSV UTF-8-BOM round-trip（Excel/Numbers 友善）。
+  `export_to_csv` 輸出時 label 欄留空；`import_labels_from_csv` 驗證 label
+  必須是 `hard_refusal / soft_refusal / on_task` 之一，無效標籤列出前 5 筆。
+
+- **`classifier.py`** — sklearn TF-IDF(`char_wb`, ngram_range=2-4, max_features=5000)
+  → LogisticRegression(`C=1.0, class_weight=balanced`) → pickle。輸出 accuracy /
+  macro-F1 / per-class precision/recall / 3×3 混淆矩陣。最少要求：30 筆總量、
+  每類別 ≥3 筆。
+
+- **CLI** `Paper/src/ctw_va/cli/calibration.py`：4 subcommand（`fetch / export /
+  import-labels / train`）。原本是只印一行訊息的 placeholder，完整改寫。
+
+### 9.7 關鍵設計決策
+
+1. **CSV round-trip 而非 in-browser label UI**：200×5=1000 列要標，在 Excel
+   填欄位比任何自訂 UI 熟悉且快。線上預覽只做「看」，標註走檔案。
+2. **per-vendor button 自動加 `_<vendor>` 尾綴**：原設計 5 個 vendor 按鈕會
+   fire 5 個 job 同時寫同一個 output 檔 → race condition → 只剩一家資料。
+   修成 per-vendor 按鈕把 output 路徑改成 `responses_n20_deepseek.jsonl`，
+   「全部 vendor」按鈕 fire 1 個 job 用 CLI default (全 5 家 parallel) 到
+   `responses_n20.jsonl`。
+3. **unblocks 有 `kind: "gate"` 型別**（例如「人工標註 CSV」）：不是 step，
+   不可點擊、不進 status 自動偵測，純 documentary。
+4. **`depends_on` 支援兩種形狀**：
+   - `{kind: "env", what: "SERPER_API_KEY"}` — 環境變數
+   - `{kind: "step", what: "persona-slate/export"}` — 上游 step
+   - `{kind: "gate", what: "..."}` — 人工 gate
+
+   UI click handler 同時認兩種 shape（`jumpToDep`）。
+5. **Spec 欄位命名對齊**：`depends_on` 用 `{kind, what}`，`unblocks` 用
+   `{group, subcommand}` —— 早期混用兩種導致 click handler 踩坑，最終在
+   JS 邊界處理兩種 shape 而非統一 schema（改 schema 要改 15 個 spec entry）。
+
+### 9.8 Paper/ 檔案變動清單（本 stage）
+
+**新增**：
+- `Paper/src/ctw_va/webui/` 全套（5 檔 + static/index.html）
+- `Paper/src/ctw_va/refusal/` 全套（`__init__.py / prompts.py / fetcher.py /
+  csv_io.py / classifier.py`）
+- `Paper/src/ctw_va/cli/webui.py`
+
+**改寫**：
+- `Paper/src/ctw_va/cli/calibration.py`（placeholder → 4 real subcommand）
+- `Paper/src/ctw_va/cli/__main__.py`（+ webui group）
+
+**修改**：
+- `Paper/src/ctw_va/news/serper_fetch.py` — 三個 stage 函式加 progress prints
+- `Paper/pyproject.toml` — 加 `fastapi>=0.110 / uvicorn>=0.27 / scikit-learn>=1.3`
+
+**既有檔案預期用法未變**（webui 以 subprocess 呼叫，不改 CLI 外部介面）。
+
+### Stage 9 結束狀態（2026-04-20）
+
+- Webui 已跑過：news-pool（all 4 step）/ persona-slate export+verify / run
+  smoke-test all 5 vendor / cost burn / calibration fetch（使用者實跑單一
+  vendor deepseek）
+- calibration/fetch/export 已能看到 CSV 線上預覽
+- 尚未跑：calibration import-labels（需使用者先標 CSV）/ train / analyze /
+  dashboard / paper（後三者仍是 stub）
+
+### Stage 9 下一步（若繼續）
+
+1. 使用者標完 CSV → 跑 `import-labels` → `train` → 產 `refusal_clf_*.pkl`
+2. 實作 Phase C4-C5 `run full`（目前只有 smoke-test）：300 persona × 10
+   sim_day × 5 vendor × 3 scenario = 45k call，預估 USD 50–100
+3. 實作 Phase C7 `analyze`（JSD / NEMD / refusal rate / bootstrap CI）
+4. 實作 Phase D `dashboard`（單檔 HTML + Chart.js，與 webui 共用 preview 端點概念）
+5. 實作 Phase C9 `paper`（Figure 1/2/3 + Table 1/2/3 via matplotlib → PDF）
+
+### 啟動方式（再進入此 session 時）
+
+```bash
+cd Paper
+.venv/bin/civatas-exp webui serve --port 8765
+# 瀏覽器開 http://127.0.0.1:8765/
+```
+
+前置條件：`Paper/.env` 需有 5 家 vendor API key + `SERPER_API_KEY`；
+`Paper/experiments/news_pool_2024_jan/merged_pool.jsonl` 已存在（Stage 9 之前就有）。
+
+---
+
 ## 候選人清單
 
 ### 2024 總統大選（回測）

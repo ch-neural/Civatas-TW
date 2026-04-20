@@ -142,9 +142,12 @@ def fetch_stage_a(
 
     total = 0
     seen_urls: set[str] = set()
+    total_calls = len(keywords) * max_pages
+    call_idx = 0
 
     for kw in keywords:
         for page in range(1, max_pages + 1):
+            call_idx += 1
             try:
                 news = _serper_post(api_key, {
                     "q": kw,
@@ -161,6 +164,7 @@ def fetch_stage_a(
                 break
 
             if not news:
+                print(f"[A {call_idx}/{total_calls}] kw={kw} page={page} → 0 (stop)", flush=True)
                 break  # no more results for this keyword
 
             new_records = []
@@ -177,6 +181,7 @@ def fetch_stage_a(
 
             _append_jsonl(output_path, new_records)
             total += len(new_records)
+            print(f"[A {call_idx}/{total_calls}] kw={kw} page={page} → {len(new_records)} ({new_count} new) · total {total}", flush=True)
 
             if new_count == 0:
                 break  # no new unique articles — stop paginating
@@ -205,10 +210,13 @@ def fetch_stage_b(
 
     total = 0
     seen_urls: set[str] = set()
+    total_calls = len(blue_media_domains) * len(keywords) * max_pages
+    call_idx = 0
 
     for domain in blue_media_domains:
         for kw in keywords:
             for page in range(1, max_pages + 1):
+                call_idx += 1
                 try:
                     news = _serper_post(api_key, {
                         "q": f"{kw} site:{domain}",
@@ -225,6 +233,7 @@ def fetch_stage_b(
                     break
 
                 if not news:
+                    print(f"[B {call_idx}/{total_calls}] {domain} kw={kw} p{page} → 0 (stop)", flush=True)
                     break
 
                 new_records = []
@@ -241,6 +250,7 @@ def fetch_stage_b(
 
                 _append_jsonl(output_path, new_records)
                 total += len(new_records)
+                print(f"[B {call_idx}/{total_calls}] {domain} kw={kw} p{page} → {len(new_records)} ({new_count} new) · total {total}", flush=True)
 
                 if new_count == 0:
                     break
@@ -269,10 +279,13 @@ def fetch_stage_c(
 
     total = 0
     seen_urls: set[str] = set()
+    total_calls = len(deep_spectrum_domains) * len(keywords) * max_pages
+    call_idx = 0
 
     for domain in deep_spectrum_domains:
         for kw in keywords:
             for page in range(1, max_pages + 1):
+                call_idx += 1
                 try:
                     news = _serper_post(api_key, {
                         "q": f"{kw} site:{domain}",
@@ -289,6 +302,7 @@ def fetch_stage_c(
                     break
 
                 if not news:
+                    print(f"[C {call_idx}/{total_calls}] {domain} kw={kw} p{page} → 0 (stop)", flush=True)
                     break
 
                 new_records = []
@@ -305,6 +319,7 @@ def fetch_stage_c(
 
                 _append_jsonl(output_path, new_records)
                 total += len(new_records)
+                print(f"[C {call_idx}/{total_calls}] {domain} kw={kw} p{page} → {len(new_records)} ({new_count} new) · total {total}", flush=True)
 
                 if new_count == 0:
                     break

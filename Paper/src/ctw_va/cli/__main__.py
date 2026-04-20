@@ -13,6 +13,7 @@ from . import (
     analyze,
     dashboard,
     paper,
+    webui,
 )
 
 from ctw_va import __version__
@@ -33,6 +34,7 @@ cli.add_command(cost.cost)
 cli.add_command(analyze.analyze)
 cli.add_command(dashboard.dashboard)
 cli.add_command(paper.paper)
+cli.add_command(webui.webui)
 
 
 if __name__ == "__main__":
