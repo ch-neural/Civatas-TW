@@ -904,7 +904,10 @@ buffer 立即刷到 log 檔 → webui 每秒 poll 看到串流。
 1. 使用者標完 CSV → 跑 `import-labels` → `train` → 產 `refusal_clf_*.pkl`
 2. 實作 Phase C4-C5 `run full`（目前只有 smoke-test）：300 persona × 10
    sim_day × 5 vendor × 3 scenario = 45k call，預估 USD 50–100
-3. 實作 Phase C7 `analyze`（JSD / NEMD / refusal rate / bootstrap CI）
+3. ~~實作 Phase C7 `analyze`~~ → **已完成（2026-04-20）**：`analytics/`
+   模組 5 檔（jsd / nemd / refusal / bootstrap / corrections / pipelines）+
+   CLI 3 個 subcommand（`analyze distribution` / `refusal` / `all`）。
+   詳見 Stage 10。
 4. 實作 Phase D `dashboard`（單檔 HTML + Chart.js，與 webui 共用 preview 端點概念）
 5. 實作 Phase C9 `paper`（Figure 1/2/3 + Table 1/2/3 via matplotlib → PDF）
 
@@ -918,6 +921,104 @@ cd Paper
 
 前置條件：`Paper/.env` 需有 5 家 vendor API key + `SERPER_API_KEY`；
 `Paper/experiments/news_pool_2024_jan/merged_pool.jsonl` 已存在（Stage 9 之前就有）。
+
+---
+
+## Stage 10 — Phase C7 `analyze` pipelines（2026-04-20）
+
+補 Stage 9 結尾 TODO#3：實作統計分析 pipeline。Phase C7 從 stub 變成可用。
+
+### 新增 `src/ctw_va/analytics/` 模組（5 檔 + pipelines orchestrator）
+
+- **`jsd.py`**：Jensen-Shannon divergence（log base 2，bounded [0, 1]）；
+  `counts_to_probs` / `align_distributions` / `party_distribution_from_choices`
+  等 helper。
+- **`nemd.py`**：Normalized Earth Mover's Distance，專給 5-bucket ordinal
+  party_lean（深綠/偏綠/中間/偏藍/深藍），`EMD = Σ|CDF_P − CDF_Q|` 除以 (k−1)。
+- **`corrections.py`**：Holm-Bonferroni（FWER）+ Benjamini-Hochberg（FDR）
+  step-up/step-down p-value 校正，返回值 align 輸入順序。
+- **`bootstrap.py`**：paired bootstrap（重抽 persona 群組，不是個別 row，
+  維持 within-persona 相關結構）+ BCa CI（偏差校正 + 加速因子透過 jackknife 估計）；
+  n < 3 或加速分母 degenerate 時自動 fallback 到 percentile CI。
+- **`refusal.py`**：`RefusalClassifier.load()` 讀取 Phase A5 `calibration train`
+  產的 `.pkl`，對任意 row iterable 做分類，產出 by_vendor (× by_topic 若有) 統計。
+- **`pipelines.py`**：`pipeline_distribution()` / `pipeline_refusal()`
+  從 SQLite 讀取 → 呼叫上述 5 檔算指標 → 寫 JSON。`load_final_day_rows()`
+  預設取每個 persona×vendor 的 MAX(sim_day)，避免指定 sim_day 時踩到「某 persona
+  中斷」的坑。
+
+### CLI 3 個 subcommand
+
+```
+civatas-exp analyze distribution --experiment-id X [--sim-day N]
+                                 [--n-resamples 10000] [--no-bootstrap]
+    → 產 metrics/<X>/distribution.json：
+        • party_distribution（per-vendor，5 類：DPP/KMT/TPP/IND/undecided）
+        • lean_distribution（per-vendor，5-bucket 藍綠）
+        • jsd_vs_truth（vs CEC 2024：40.05% / 33.49% / 26.46%，帶 BCa CI）
+        • jsd_pairwise（vendor 兩兩，含 p_value / p_adj_holm / p_adj_bh）
+        • nemd_pairwise（同上但用 ordinal 距離）
+
+civatas-exp analyze refusal --classifier PATH
+                            (--experiment-id X | --labeled PATH)
+    → 產 metrics/<X>/refusal.json：
+        • by_vendor{total, hard/soft/on_task counts + rates, refusal_rate}
+        • by_vendor_topic（若 input 帶 topic 欄，目前僅 calibration JSONL）
+
+civatas-exp analyze all --experiment-id X [--classifier PATH]
+    → 跑 distribution 必做 + refusal（若有 classifier）+ 寫 summary.json
+      給 dashboard / paper phase 吃 headline 欄位。
+```
+
+### 設計決策
+
+1. **JSD vs truth 只算 party_choice 的 3-way 子集**（DPP/KMT/TPP），drop
+   undecided/IND：CEC 真實結果是「三黨得票率」，和 agent 的「undecided」比
+   沒意義。`_stat_jsd_vs_truth` 先 reproject 到 {DPP, KMT, TPP} 再算。
+2. **Paired bootstrap 重抽 persona，不是 row**：每個 persona 在 5 家 vendor
+   各有一筆 → 若逐列重抽會打破 within-persona 相關結構，導致 CI 低估。
+   實作上 `paired_bootstrap()` 收 `data[i]` = 整個 persona 的 bundle，
+   statistic 自己決定怎麼從 bundle 拿 per-vendor 資料。
+3. **pairwise p-value 用 bootstrap CDF 對 0 算**：兩 vendor JSD 的 null 是 0
+   （分佈相同），所以 `p = 2 · P(bootstrap_sample ≤ 0)`。clip 到 [1e-6, 1]
+   避免 log 0；對 JSD ≥ 0 的 domain 是 conservative upper bound。
+4. **5-bucket ordinal 用 NEMD 而非 JSD**：JSD 把 5 類當 nominal，
+   「深綠 → 偏綠」和「深綠 → 深藍」距離相同。NEMD 用 CDF 差累積捕捉有序結構。
+5. **corrections 返回 input-order array**：Holm / BH 實作內部排序，但輸出
+   對齊輸入索引，caller 不用 un-permute。
+6. **BCa fallback**：acceleration 分母為 0（所有 jackknife 值相同）時自動
+   退回 percentile CI 而非 NaN；常數資料（全同值）的 CI 寬度會收斂到 0。
+
+### 測試
+
+5 個 test 檔共 27 test：
+- `test_analytics_jsd.py` — identity = 0、對稱、bounded [0, 1]、disjoint
+  support = 1、zero-mass 錯誤
+- `test_analytics_nemd.py` — adjacent shift < extreme shift、對稱、manual
+  formula 驗證
+- `test_analytics_corrections.py` — Holm 手算對照、BH monotonicity、clip
+- `test_analytics_bootstrap.py` — CI 包真值、常數 collapse 為 0 寬度、
+  n < 3 自動 fallback percentile
+- `test_analytics_pipelines.py` — synthetic SQLite fixture 跑完整 pipeline，
+  assert `n_rows` / `vendors` / JSD bounded / p_adj 欄位齊全
+
+全 70 test（含既有 A3/B/storage/router）通過。
+
+### Webui 整合
+
+`webui/spec.py` 原 `analyze/placeholder` stub 刪除，換成 3 個實際 spec entry
+（distribution / refusal / all）。每個都有完整 why / details / outputs schema /
+fields 宣告；`run/smoke-test` 與 `calibration/train` 的 unblocks 更新指向
+新的 analyze subcommand。`dashboard/paper` 的 depends_on 從
+`analyze/placeholder` 改為 `analyze/all`。
+
+### Stage 10 後續若繼續
+
+- Dashboard（Phase D）：單檔 HTML + Chart.js 讀 `metrics/<id>/*.json`
+  繪 pairwise JSD heatmap、vendor bar、refusal-by-topic 交叉表
+- Paper figures（Phase C9）：matplotlib 產 Figure 1/2/3 + Table 1/2/3
+- 真實 full run：目前 analyze 能跑，但需要 Phase C4-C5 `run full` 先寫
+  `agent_day_vendor` 才有真資料可分析（smoke-test 不寫這張表）
 
 ---
 

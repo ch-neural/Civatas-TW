@@ -57,7 +57,12 @@ CATEGORY_INTROS: dict[str, str] = {
         "流程：burn（已花多少）/ forecast（剩下還要花多少）—— 兩者無先後，按需叫用。"
     ),
     "Phase C7 — 統計分析": (
-        "前置：需要完整 run 跑完（analyze 處理的是 vendor_call_log + agent_day_vendor 表）。\n"
+        "流程：\n"
+        "  distribution ──┐\n"
+        "                 ├──→ all（寫 summary.json）\n"
+        "  refusal ───────┘\n"
+        "前置：需要完整 run 跑完（distribution 讀 agent_day_vendor；refusal 讀 vendor_call_log）。\n"
+        "refusal pipeline 需要 calibration/train 產出的 .pkl 分類器。\n"
         "產出會被 Phase D（dashboard）和 Phase C9（paper）消費。"
     ),
     "Phase D — 儀表板": (
@@ -699,8 +704,8 @@ COMMANDS: list[dict[str, Any]] = [
              "note": "需要 labeled JSONL 且至少 30 筆、每類別 ≥3 筆"},
         ],
         "unblocks": [
-            {"group": "analyze", "subcommand": "placeholder",
-             "note": "analyze 的 refusal pipeline 會用這顆 classifier"},
+            {"group": "analyze", "subcommand": "refusal",
+             "note": "analyze refusal 會載入這顆 classifier"},
         ],
         "fields": [
             {"name": "input", "flag": "--input", "type": "path",
@@ -771,7 +776,8 @@ COMMANDS: list[dict[str, Any]] = [
         "unblocks": [
             {"group": "cost", "subcommand": "burn"},
             {"group": "cost", "subcommand": "forecast"},
-            {"group": "analyze", "subcommand": "placeholder"},
+            {"group": "analyze", "subcommand": "distribution"},
+            {"group": "analyze", "subcommand": "refusal"},
         ],
         "fields": [
             {
@@ -853,33 +859,201 @@ COMMANDS: list[dict[str, Any]] = [
     },
 
     # =========================================================
-    # Phase C7 — Analyze (stub)
+    # Phase C7 — Analyze
     # =========================================================
     {
         "group": "analyze",
-        "subcommand": "placeholder",
-        "title": "JSD / NEMD / refusal 統計（未實作）",
-        "summary": "Phase C7 stub。",
-        "why": (
-            "跑完實驗有 15k 筆 vendor 回應 raw 資料，但『5 家 vendor 的民意分佈有多"
-            "不一樣』需要量化指標：JSD（Jensen-Shannon divergence）量測黨派選擇機率"
-            "分佈差異，NEMD 量測有序類別（滿意度 / 焦慮分）的距離，refusal rate 算"
-            "拒答率。這些 metric 是論文的 main result —— 沒跑這 phase 就只有 raw 資料，"
-            "沒有可以放 Table 1 的數字。"
+        "subcommand": "distribution",
+        "title": "① 黨派分佈：JSD vs CEC + pairwise JSD + NEMD",
+        "summary": (
+            "讀 agent_day_vendor 的最終日 party_choice / party_lean_5，per-vendor 聚合成"
+            "機率分佈，算 vendor→CEC 2024 真實結果的 Jensen-Shannon divergence、"
+            "vendor 兩兩之間的 JSD（名目類別）+ NEMD（5-bucket 有序）、10k 次"
+            "paired bootstrap 的 BCa 95% CI，以及 Holm-Bonferroni + Benjamini-Hochberg 校正後的 p-value。"
         ),
+        "why": (
+            "JSD 是論文的 main result —— 量化『5 家 vendor 餵同一 persona + 同一新聞後，"
+            "民意分佈差多少』。低 JSD 表示該 vendor 與 CEC 2024 官方結果（賴 40.05% / "
+            "侯 33.49% / 柯 26.46%）對齊良好；高 JSD 表示該 vendor 有系統性偏差。"
+            "NEMD 進一步用 ordinal 距離檢查 5-bucket 藍綠分佈（深綠→深藍 的 shift 比"
+            "深綠→偏綠 更大）。paired bootstrap 重抽 persona（而非個別 row）維持"
+            "within-persona 相關結構，避免 CI 過窄。"
+        ),
+        "details": [
+            "Ground truth（CEC 2024 三黨得票率）：DPP 0.4005 / KMT 0.3349 / TPP 0.2646",
+            "JSD 用 log base 2，bounded [0, 1]",
+            "NEMD = EMD / (k-1)，k=5 buckets，bounded [0, 1]",
+            "Bootstrap：paired-on-persona，10k 次，BCa CI",
+            "n_personas < 3 時自動 fallback 到 percentile CI",
+            "多重檢定校正：Holm-Bonferroni（FWER）+ Benjamini-Hochberg（FDR）",
+            "不呼叫外部 API；100 persona × 5 vendor 的 10k bootstrap 大約 30–60 秒",
+        ],
+        "outputs": [
+            {
+                "path": "metrics/{experiment_id}/distribution.json",
+                "kind": "JSON — 完整 metric 結果",
+                "schema": (
+                    "experiment_id / computed_at / n_rows / n_personas / vendors[] / "
+                    "party_categories[] / lean_categories[] / party_distribution / "
+                    "lean_distribution / ground_truth / jsd_vs_truth{vendor: {value, ci_low, ci_high, ci_method}} / "
+                    "jsd_pairwise{v1|v2: {value, ci, p_value, p_adj_holm, p_adj_bh}} / "
+                    "nemd_pairwise{...} / config"
+                ),
+                "next_step": "Phase D dashboard + Phase C9 paper 都讀這個 JSON",
+            },
+        ],
         "category": "Phase C7 — 統計分析",
         "depends_on": [
             {"kind": "step", "what": "run/smoke-test",
-             "note": "需要完整 full run 的 vendor_call_log + agent_day_vendor 兩張表"},
+             "note": "需要 runs/<id>/data.db 的 agent_day_vendor 有資料；smoke-test 不會寫這張表，得等 full run"},
+        ],
+        "parallel_with": [
+            {"group": "analyze", "subcommand": "refusal"},
+        ],
+        "unblocks": [
+            {"group": "analyze", "subcommand": "all"},
+            {"group": "dashboard", "subcommand": "placeholder"},
+            {"group": "paper", "subcommand": "placeholder"},
+        ],
+        "fields": [
+            {"name": "experiment_id", "flag": "--experiment-id", "type": "str",
+             "default": "", "required": True,
+             "help": "experiment_id（需存在對應的 runs/<id>/data.db）"},
+            {"name": "db", "flag": "--db", "type": "path",
+             "default": "", "help": "可選：覆寫 SQLite 路徑"},
+            {"name": "sim_day", "flag": "--sim-day", "type": "int",
+             "default": 0, "help": "0 或空白 = 每個 persona×vendor 取最後一天"},
+            {"name": "output", "flag": "--output", "type": "path",
+             "default": "", "help": "預設 metrics/<experiment_id>/distribution.json"},
+            {"name": "n_resamples", "flag": "--n-resamples", "type": "int",
+             "default": 10000, "promote": True,
+             "help": "bootstrap 次數；小 run 可設 1000 加速"},
+            {"name": "confidence", "flag": "--confidence", "type": "str",
+             "default": "0.95", "help": "CI 置信水準 (0–1)"},
+            {"name": "seed", "flag": "--seed", "type": "int",
+             "default": 20240113, "help": "bootstrap RNG seed"},
+        ],
+    },
+    {
+        "group": "analyze",
+        "subcommand": "refusal",
+        "title": "② 拒答率：classifier 套到 vendor 回應",
+        "summary": (
+            "載入 calibration/train 產出的 .pkl 分類器，對 vendor_call_log 的 response_raw "
+            "（或 calibration labeled JSONL）做 hard_refusal / soft_refusal / on_task 分類，"
+            "per-vendor 統計比例。"
+        ),
+        "why": (
+            "拒答率是論文的次要 key result。『拒答』包含 API content filter（hard）+ "
+            "alignment-tuned 模型的『裝傻轉移話題』（soft）。用同一顆分類器對五家 vendor "
+            "apples-to-apples 比較：Kimi / DeepSeek（中國 vendor）對兩岸題預期 refusal rate 高；"
+            "OpenAI / Grok 預期低。"
+        ),
+        "details": [
+            "分類器：TF-IDF(char_wb, 2–4 gram) + LogisticRegression，~< 100 KB pickle",
+            "若 input 帶 topic 欄（calibration JSONL 才有）會額外產出 by_vendor_topic 交叉表",
+            "vendor_call_log 沒有 topic → 只產 by_vendor 聚合",
+            "純 CPU，秒級完成",
+        ],
+        "outputs": [
+            {
+                "path": "metrics/{experiment_id}/refusal.json",
+                "kind": "JSON — per-vendor refusal 統計",
+                "schema": (
+                    "source / classifier_path / classifier_meta{train_size, test_accuracy, test_macro_f1} / "
+                    "n_rows / by_vendor{vendor: {total, hard_refusal, soft_refusal, on_task, "
+                    "hard_rate, soft_rate, on_task_rate, refusal_rate}} / by_vendor_topic(nullable)"
+                ),
+            },
+        ],
+        "category": "Phase C7 — 統計分析",
+        "depends_on": [
             {"kind": "step", "what": "calibration/train",
-             "note": "refusal pipeline 會載入 calibration 訓出的分類器"},
+             "note": "需要 refusal_clf_n*.pkl"},
+            {"kind": "step", "what": "run/smoke-test",
+             "note": "若走 --experiment-id 需要 vendor_call_log 有資料；或改用 --labeled 指向 calibration JSONL"},
+        ],
+        "parallel_with": [
+            {"group": "analyze", "subcommand": "distribution"},
+        ],
+        "unblocks": [
+            {"group": "analyze", "subcommand": "all"},
+            {"group": "dashboard", "subcommand": "placeholder"},
+        ],
+        "fields": [
+            {"name": "classifier", "flag": "--classifier", "type": "path",
+             "default": "experiments/refusal_calibration/refusal_clf_n20.pkl",
+             "required": True, "help": "train 產出的 .pkl 路徑"},
+            {"name": "experiment_id", "flag": "--experiment-id", "type": "str",
+             "default": "", "help": "走 vendor_call_log 路徑時必填"},
+            {"name": "db", "flag": "--db", "type": "path",
+             "default": "", "help": "可選：SQLite 路徑覆寫"},
+            {"name": "labeled", "flag": "--labeled", "type": "path",
+             "default": "", "help": "改為分析 labeled/responses JSONL；與 --experiment-id 擇一"},
+            {"name": "output", "flag": "--output", "type": "path",
+             "default": "", "help": "metric JSON 輸出"},
+        ],
+    },
+    {
+        "group": "analyze",
+        "subcommand": "all",
+        "title": "③ distribution + refusal 一次跑完 + summary",
+        "summary": (
+            "便利 wrapper：distribution pipeline 必跑；若給 --classifier 就順便跑 refusal；"
+            "最後寫一份 summary.json（headline JSD / refusal_rate 給 dashboard 吃）。"
+        ),
+        "why": (
+            "論文與 dashboard 需要一份統一入口的 summary，這個指令把 metric 產線整合成"
+            "單一檔，避免下游零散讀 distribution.json + refusal.json 各自 parse。"
+        ),
+        "details": [
+            "產出固定在 metrics/<experiment_id>/{distribution.json, refusal.json?, summary.json}",
+            "--classifier 空 → 只跑 distribution，summary 的 refusal 欄位為 null",
+            "bootstrap 預設 10k；dev 迭代時可 --n-resamples 1000 加速",
+        ],
+        "outputs": [
+            {
+                "path": "metrics/{experiment_id}/distribution.json",
+                "kind": "同 analyze distribution 產出",
+            },
+            {
+                "path": "metrics/{experiment_id}/refusal.json",
+                "kind": "同 analyze refusal 產出（若給 --classifier 才有）",
+            },
+            {
+                "path": "metrics/{experiment_id}/summary.json",
+                "kind": "JSON — headline 欄位（dashboard / paper 讀這個）",
+                "schema": "experiment_id / computed_at / vendors / n_personas / headline{jsd_vs_truth, refusal_rate}",
+            },
+        ],
+        "category": "Phase C7 — 統計分析",
+        "depends_on": [
+            {"kind": "step", "what": "run/smoke-test",
+             "note": "需要 full run 的 data.db"},
         ],
         "unblocks": [
             {"group": "dashboard", "subcommand": "placeholder"},
             {"group": "paper", "subcommand": "placeholder"},
         ],
-        "is_stub": True,
-        "fields": [],
+        "fields": [
+            {"name": "experiment_id", "flag": "--experiment-id", "type": "str",
+             "default": "", "required": True, "help": "experiment_id"},
+            {"name": "db", "flag": "--db", "type": "path",
+             "default": "", "help": "SQLite 路徑覆寫"},
+            {"name": "classifier", "flag": "--classifier", "type": "path",
+             "default": "experiments/refusal_calibration/refusal_clf_n20.pkl",
+             "help": "若空則只跑 distribution"},
+            {"name": "sim_day", "flag": "--sim-day", "type": "int",
+             "default": 0, "help": "0 / 空白 = 取每個 persona-vendor 的最後一天"},
+            {"name": "output_dir", "flag": "--output-dir", "type": "path",
+             "default": "", "help": "預設 metrics/<experiment_id>/"},
+            {"name": "n_resamples", "flag": "--n-resamples", "type": "int",
+             "default": 10000, "promote": True, "help": "bootstrap 次數"},
+            {"name": "confidence", "flag": "--confidence", "type": "str",
+             "default": "0.95", "help": "CI 水準"},
+            {"name": "seed", "flag": "--seed", "type": "int",
+             "default": 20240113, "help": "RNG seed"},
+        ],
     },
 
     # =========================================================
@@ -897,8 +1071,8 @@ COMMANDS: list[dict[str, Any]] = [
         ),
         "category": "Phase D — 儀表板",
         "depends_on": [
-            {"kind": "step", "what": "analyze/placeholder",
-             "note": "儀表板呈現的是 analyze 算出的 JSD / NEMD / refusal metric"},
+            {"kind": "step", "what": "analyze/all",
+             "note": "儀表板讀 metrics/<experiment_id>/summary.json + distribution.json + refusal.json"},
         ],
         "unblocks": [],
         "is_stub": True,
@@ -921,8 +1095,8 @@ COMMANDS: list[dict[str, Any]] = [
         ),
         "category": "Phase C9 — 論文輸出",
         "depends_on": [
-            {"kind": "step", "what": "analyze/placeholder",
-             "note": "論文圖表直接讀 analyze 產出的 metric JSON"},
+            {"kind": "step", "what": "analyze/all",
+             "note": "論文圖表讀 metrics/<experiment_id>/ 下的三份 JSON"},
         ],
         "parallel_with": [
             {"group": "dashboard", "subcommand": "placeholder",
