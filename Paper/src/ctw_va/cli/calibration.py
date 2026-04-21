@@ -1,9 +1,11 @@
 """CLI: civatas-exp calibration ... (Phase A5 — refusal calibration)."""
 from __future__ import annotations
 
+import json as _json
+
 import click
 
-from ..refusal import fetcher, csv_io, classifier
+from ..refusal import fetcher, csv_io, classifier, stats as stats_mod
 from ..refusal.prompts import VALID_LABELS
 
 
@@ -75,6 +77,22 @@ def import_labels_cmd(csv_path, output):
             click.echo(f"    - {bad}")
         if len(result["bad_labels"]) > 5:
             click.echo(f"    ... and {len(result['bad_labels']) - 5} more")
+
+
+@calibration.command("stats")
+@click.option("--csv", "csv_path", type=click.Path(exists=True), required=True,
+              help="Responses CSV (with or without hand-labels)")
+@click.option("--sidecar", type=click.Path(), default=None,
+              help="AI suggestion JSONL sidecar. Default: <csv_stem>.ai_suggest.jsonl")
+@click.option("--json", "as_json", is_flag=True,
+              help="Emit machine-readable JSON instead of the text report")
+def stats_cmd(csv_path, sidecar, as_json):
+    """Report labeling progress + label distribution + AI-sidecar overlap."""
+    s = stats_mod.compute(csv_path, sidecar_path=sidecar)
+    if as_json:
+        click.echo(_json.dumps(s, ensure_ascii=False, indent=2))
+    else:
+        click.echo(stats_mod.format_text(s, csv_path=csv_path))
 
 
 @calibration.command("train")

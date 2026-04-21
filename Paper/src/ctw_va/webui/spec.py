@@ -691,6 +691,53 @@ COMMANDS: list[dict[str, Any]] = [
     },
     {
         "group": "calibration",
+        "subcommand": "stats",
+        "title": "② bis · 標註進度快照（CSV + AI sidecar）",
+        "summary": (
+            "掃過一次 CSV 產出：總列數 / 已標 / 剩餘 / error 列；每家 vendor 各標多少；"
+            "每類（hard/soft/on_task）分佈；若存在 AI 建議 sidecar 則附上一致率。"
+        ),
+        "why": (
+            "標註 1000 筆是長跑，需要能隨時查進度 + 確認 vendor 間分佈沒偏掉。"
+            "也會揭露 AI 建議 vs 人類最終判定的一致率，寫 paper §3.5 會用到。"
+        ),
+        "details": [
+            "讀 CSV 14 欄 + sidecar <stem>.ai_suggest.jsonl（latest-wins）",
+            "不呼叫 API、秒級完成",
+            "支援 --json 輸出給後續 pipeline 消費",
+        ],
+        "outputs": [
+            {
+                "path": "(stdout)",
+                "kind": "文字或 JSON",
+                "expected": "約 30 行 text 報告 / 完整 JSON tree",
+                "next_step": "繼續標註，或跑 import-labels",
+                "schema": "text: 計數 + 表格；json: total/errors/labeled/by_label/by_vendor/by_expected/ai",
+            },
+        ],
+        "category": "Phase A5 — 拒答校準",
+        "depends_on": [
+            {"kind": "step", "what": "calibration/export"},
+        ],
+        "unblocks": [],
+        "fields": [
+            {"name": "csv", "flag": "--csv", "type": "path",
+             "default": "experiments/refusal_calibration/responses_n200.csv",
+             "default_from_job": {"group": "calibration", "subcommand": "export", "field": "output"},
+             "required": True,
+             "help": "要統計的 CSV 路徑"},
+            {"name": "sidecar", "flag": "--sidecar", "type": "path",
+             "default": "",
+             "required": False,
+             "help": "（選用）AI 建議 JSONL。留空 = 自動找 <stem>.ai_suggest.jsonl"},
+            {"name": "as_json", "flag": "--json", "type": "flag",
+             "default": False,
+             "required": False,
+             "help": "輸出 JSON 取代文字報告"},
+        ],
+    },
+    {
+        "group": "calibration",
         "subcommand": "import-labels",
         "title": "③ 匯入標註結果（CSV → labeled JSONL）",
         "summary": (
