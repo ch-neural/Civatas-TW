@@ -179,6 +179,24 @@
   .dep-chip.gate:hover { border-color: var(--blue); background: rgba(59,130,246,0.08); }
   .dep-note { font-size: 11.5px; color: var(--muted); padding: 2px 8px 6px; line-height: 1.5; }
 
+  .field-input-row {
+    display: flex; align-items: stretch; gap: 6px;
+  }
+  .field-input-row input,
+  .field-input-row select { flex: 1; }
+  .field-reset {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); padding: 0 10px; border-radius: 4px;
+    font-size: 14px; cursor: pointer; line-height: 1;
+  }
+  .field-reset:hover { color: var(--amber); border-color: var(--amber); }
+  .persist-chip {
+    margin-left: 8px; padding: 1px 6px;
+    background: rgba(34,197,94,0.10); color: var(--accent);
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 3px; font-size: 10.5px;
+  }
+
   .next-step-cta {
     margin-top: 14px; padding: 12px 14px;
     border: 1px solid rgba(34,197,94,0.35);
@@ -593,10 +611,19 @@
   }
 
   .lf-inner { display: flex; flex-direction: column; gap: 18px; max-width: 900px; }
-  .lf-meta { display: flex; gap: 12px; font-size: 12px; color: #8af; flex-wrap: wrap; }
+  .lf-meta { display: flex; gap: 12px; font-size: 12px; color: #8af; flex-wrap: wrap; align-items: center; }
   .lf-meta .lf-vendor { color: #fc8; }
   .lf-meta .lf-topic  { color: #9a9; }
   .lf-meta .lf-err    { color: #e57373; }
+  .lf-current-label {
+    margin-left: auto; padding: 3px 10px; border-radius: 12px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+    font-family: -apple-system, "PingFang TC", system-ui, sans-serif;
+  }
+  .lf-current-label.lbl-hard_refusal { background: rgba(239,68,68,0.18); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4); }
+  .lf-current-label.lbl-soft_refusal { background: rgba(245,158,11,0.18); color: #fcd34d; border: 1px solid rgba(245,158,11,0.4); }
+  .lf-current-label.lbl-on_task      { background: rgba(34,197,94,0.18);  color: #86efac; border: 1px solid rgba(34,197,94,0.4); }
+  .lf-current-label.lbl-none         { background: rgba(139,149,165,0.12); color: #8b95a5; border: 1px dashed rgba(139,149,165,0.35); }
   .lf-heading { color: #777; font-size: 11px; letter-spacing: 0.1em; margin-bottom: 4px; }
 
   .labeler-review-banner {
@@ -623,10 +650,11 @@
                 background: #10141a; padding: 12px 16px; border-radius: 6px;
                 border-left: 3px solid #345; max-height: 40vh; overflow-y: auto; }
   .lf-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .lf-btn { padding: 18px; font-size: 16px; border-radius: 8px; cursor: pointer;
-            border: 1px solid #333; background: #181c22; color: #ddd;
+  .lf-btn { padding: 18px 18px 26px; font-size: 16px; border-radius: 8px; cursor: pointer;
+            border: 2px solid #333; background: #181c22; color: #ddd;
             font-family: var(--mono, ui-monospace, monospace);
-            display: flex; flex-direction: column; gap: 4px; align-items: center; }
+            display: flex; flex-direction: column; gap: 4px; align-items: center;
+            position: relative; transition: all 0.12s ease; }
   .lf-btn:hover:not(:disabled) { background: #20262e; }
   .lf-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .lf-btn .lf-k { font-size: 24px; font-weight: bold; color: #ffe680; }
@@ -634,6 +662,93 @@
   .lf-btn.soft { border-color: #5a4a2a; }
   .lf-btn.ontask { border-color: #2a5a3a; }
   .lf-btn small { font-size: 11px; color: #8a8a8a; }
+  /* ── 選中狀態：粗框 + 明顯背景 + 左上 ✓ badge + 底部「已選」bar ── */
+  .lf-btn.selected {
+    background: #1e5a34; border-color: #22c55e; border-width: 3px;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.25), 0 4px 12px rgba(34,197,94,0.20);
+    transform: translateY(-1px);
+  }
+  .lf-btn.selected .lf-k { color: #ffffff; }
+  .lf-btn.selected small { color: #d0f0d8; }
+  .lf-btn.hard.selected {
+    background: #6b1e1e; border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.25), 0 4px 12px rgba(239,68,68,0.20);
+  }
+  .lf-btn.hard.selected small { color: #f5cccc; }
+  .lf-btn.soft.selected {
+    background: #6b4a14; border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.25), 0 4px 12px rgba(245,158,11,0.20);
+  }
+  .lf-btn.soft.selected small { color: #f5e5c0; }
+  .lf-btn.selected::before {
+    content: "✓"; position: absolute; top: 6px; right: 10px;
+    font-size: 20px; font-weight: bold; color: rgba(255,255,255,0.9);
+  }
+  .lf-btn.selected::after {
+    content: "已選"; position: absolute; bottom: 4px; left: 0; right: 0;
+    font-size: 10px; letter-spacing: 0.2em; color: rgba(255,255,255,0.85);
+    text-align: center; font-family: -apple-system, "PingFang TC", system-ui, sans-serif;
+  }
+  /* 當有選中時，非選中的按鈕變暗 */
+  .lf-buttons.has-selection .lf-btn:not(.selected):not(:hover) { opacity: 0.55; }
+  /* ── AI 建議 ── */
+  .lf-ai-row { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+  .lf-ai-btn { flex: 1; padding: 10px 16px; background: #1f2937; color: #d9e0ea;
+               border: 1px solid #3b4653; border-radius: 6px; cursor: pointer;
+               font-size: 14px; font-family: -apple-system, "PingFang TC", system-ui, sans-serif;
+               display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .lf-ai-btn:hover:not(:disabled) { background: #2d3a4d; border-color: #5b6b85; }
+  .lf-ai-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .lf-ai-btn-rerun { flex: 0 0 auto; padding: 10px 14px; font-size: 13px;
+                     background: #231c1a; color: #fcd9c8; border-color: #5a3a2a; }
+  .lf-ai-btn-rerun:hover:not(:disabled) { background: #2d2220; border-color: #7a4a30; }
+  .lf-ai-btn kbd { background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 3px;
+                   font-size: 11px; font-family: ui-monospace, monospace; color: #d9e0ea; }
+  .lf-ai-model { width: 150px; padding: 7px 10px; background: #10141a; color: #d9e0ea;
+                 border: 1px solid #2a3342; border-radius: 4px; font-size: 12px;
+                 font-family: ui-monospace, monospace; }
+  .lf-ai-error { margin-top: 8px; padding: 10px 14px; background: rgba(239,68,68,0.12);
+                 border: 1px solid rgba(239,68,68,0.4); border-radius: 6px;
+                 color: #fca5a5; font-size: 12.5px; line-height: 1.5;
+                 font-family: ui-monospace, monospace; word-break: break-word; }
+  .lf-ai-result { margin-top: 10px; padding: 14px 16px; background: rgba(59,130,246,0.08);
+                  border: 1px solid rgba(59,130,246,0.35); border-radius: 8px;
+                  display: flex; flex-direction: column; gap: 10px; }
+  .lf-ai-head { display: flex; align-items: center; gap: 12px; }
+  .lf-ai-label { font-size: 14px; color: #dbeafe;
+                 font-family: -apple-system, "PingFang TC", system-ui, sans-serif; }
+  .lf-ai-label b { font-size: 16px; margin-left: 4px; }
+  .lf-ai-label.lbl-hard_refusal b { color: #fca5a5; }
+  .lf-ai-label.lbl-soft_refusal b { color: #fcd34d; }
+  .lf-ai-label.lbl-on_task b { color: #86efac; }
+  .lf-ai-label.lbl-unknown b { color: #cbd5e1; }
+  .lf-ai-conf { margin-left: auto; padding: 2px 9px; font-size: 10.5px;
+                border-radius: 10px; font-weight: 600; letter-spacing: 0.08em; }
+  .lf-ai-conf.cf-high   { background: rgba(34,197,94,0.22);  color: #86efac; }
+  .lf-ai-conf.cf-medium { background: rgba(245,158,11,0.22); color: #fcd34d; }
+  .lf-ai-conf.cf-low    { background: rgba(239,68,68,0.22);  color: #fca5a5; }
+  .lf-ai-reason { font-size: 13px; color: #e0e7f0; line-height: 1.6;
+                  font-family: -apple-system, "PingFang TC", system-ui, sans-serif; }
+  .lf-ai-trace { display: flex; flex-direction: column; gap: 3px; font-size: 11.5px; }
+  .lf-ai-step  { display: grid; grid-template-columns: 20px 36px 1.2fr 2fr; gap: 10px;
+                 padding: 5px 9px; border-radius: 4px; font-family: ui-monospace, monospace;
+                 line-height: 1.5; align-items: start; }
+  .lf-ai-step.yes { background: rgba(239,68,68,0.10); }
+  .lf-ai-step.no  { background: rgba(139,149,165,0.06); opacity: 0.85; }
+  .lf-ai-stepn { color: #9ca3af; }
+  .lf-ai-stepr { font-weight: 700; }
+  .lf-ai-step.yes .lf-ai-stepr { color: #ef4444; }
+  .lf-ai-step.no  .lf-ai-stepr { color: #6b7280; }
+  .lf-ai-stepc { color: #c7cfda; }
+  .lf-ai-steve { color: #96a0af; font-size: 11px;
+                 font-family: -apple-system, "PingFang TC", system-ui, sans-serif; }
+  .lf-ai-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .lf-ai-tag { padding: 2px 9px; font-size: 11px; background: rgba(168,85,247,0.2);
+               color: #e9d5ff; border: 1px solid rgba(168,85,247,0.4); border-radius: 10px; }
+  .lf-ai-tag-trap { background: rgba(245,158,11,0.18); color: #fcd34d;
+                    border-color: rgba(245,158,11,0.4); }
+  .lf-ai-note { font-size: 11px; color: #8b95a5; font-style: italic; text-align: center;
+                padding-top: 2px; border-top: 1px dashed rgba(139,149,165,0.25); }
   .lf-reveal { padding: 10px 14px; border-radius: 6px; font-size: 14px; }
   .lf-reveal.ok { background: #143a24; color: #b2f0c4; border: 1px solid #2d5a3a; }
   .lf-reveal.warn { background: #3a3014; color: #f0e0a0; border: 1px solid #5a4a2a; }
@@ -944,22 +1059,32 @@
               <template x-if="f.required"><span class="req">*</span></template>
               <template x-if="f.promote"><span class="promote-pill">N</span></template>
             </label>
-            <template x-if="f.type === 'int'">
-              <input type="number" x-model.number="f.value" :placeholder="f.default"
-                     @input.debounce.150="_syncDependentDefaults(false)">
-            </template>
-            <template x-if="f.type === 'bool'">
-              <select x-model="f.value" @change="_syncDependentDefaults(false)">
-                <option value="">（留空：CLI 預設）</option>
-                <option value="true">true</option>
-                <option value="false">false</option>
-              </select>
-            </template>
-            <template x-if="f.type !== 'int' && f.type !== 'bool'">
-              <input type="text" x-model="f.value" :placeholder="f.default"
-                     @input.debounce.150="_syncDependentDefaults(false)">
-            </template>
-            <div class="help" x-text="f.help"></div>
+            <div class="field-input-row">
+              <template x-if="f.type === 'int'">
+                <input type="number" x-model.number="f.value" :placeholder="f.default"
+                       @input.debounce.150="_persistField(f); _syncDependentDefaults(false)">
+              </template>
+              <template x-if="f.type === 'bool'">
+                <select x-model="f.value"
+                        @change="_persistField(f); _syncDependentDefaults(false)">
+                  <option value="">（留空：CLI 預設）</option>
+                  <option value="true">true</option>
+                  <option value="false">false</option>
+                </select>
+              </template>
+              <template x-if="f.type !== 'int' && f.type !== 'bool'">
+                <input type="text" x-model="f.value" :placeholder="f.default"
+                       @input.debounce.150="_persistField(f); _syncDependentDefaults(false)">
+              </template>
+              <button class="field-reset"
+                      x-show="f._persisted"
+                      @click="resetFieldToDefault(f)"
+                      title="清除儲存的值，回到預設 / 自動計算">↺</button>
+            </div>
+            <div class="help">
+              <span x-text="f.help"></span>
+              <span x-show="f._persisted" class="persist-chip" title="此值已儲存，下次進入會自動帶回">💾 已儲存</span>
+            </div>
           </div>
         </template>
 
@@ -988,6 +1113,11 @@
           <template x-if="!active.supports_vendors">
             <button class="run" @click="runJob(null)">▶ 執行</button>
           </template>
+          <button class="ghost-btn"
+                  x-show="activeFields.some(f => f._persisted)"
+                  @click="if (confirm('清除此指令所有儲存的欄位值，回到預設？')) resetAllFieldsToDefault()"
+                  style="margin-left: 12px;"
+                  title="把所有 💾 已儲存欄位一次清回預設">↺ 全部欄位重置</button>
         </div>
 
         <!-- Post-execution next-step CTA: appears when the latest job for
@@ -1421,17 +1551,59 @@ function app() {
     selectCommand(c) {
       this.active = c;
       // Deep-clone fields + add `value` = default (stringified for input binding).
-      this.activeFields = (c.fields || []).map(f => ({
-        ...f,
-        value: f.default === undefined || f.default === null ? '' : String(f.default),
-        _autoValue: null,     // last value we auto-synced to; null until template resolves
-      }));
+      this.activeFields = (c.fields || []).map(f => {
+        // Priority: localStorage override > default_from_job > default_template
+        //           > static default. Any user-set value persists across
+        //           sessions via _persistKey(); clear via the ↺ per-field btn.
+        const persisted = this._loadPersisted(c, f);
+        const hasPersist = persisted !== null;
+        const initial = hasPersist ? persisted : this._resolveInitialValue(f);
+        const fromJob = this._resolveDefaultFromJob(f);
+        return {
+          ...f,
+          value: initial,
+          _autoValue: null,     // last value from default_template chain
+          _jobValue: fromJob || '',  // last value from default_from_job (for edit detection)
+          _persisted: hasPersist,  // skip auto-sync / auto-from-job if user has saved value
+        };
+      });
       // Resolve any default_template fields using initial values — gives live
       // synced starting state (not the stale hardcoded default).
       this._syncDependentDefaults(/*force=*/true);
       // Reset preview cache when switching command; auto-probe existing outputs.
       this.previewedFor = c.group + '/' + c.subcommand;
       this.probePreviews();
+    },
+
+    // Pick the initial value for a spec field, preferring (in order):
+    //   1. default_from_job — value of a field in the most recent successful
+    //      job of the specified upstream (group, subcommand)
+    //   2. default_template — will be resolved later in _syncDependentDefaults
+    //      (here we just fall through to static default)
+    //   3. static default
+    // Returns a string (empty = unset).
+    _resolveInitialValue(f) {
+      const fromJob = this._resolveDefaultFromJob(f);
+      if (fromJob) return fromJob;
+      if (f.default === undefined || f.default === null) return '';
+      return String(f.default);
+    },
+
+    _resolveDefaultFromJob(f) {
+      const dj = f && f.default_from_job;
+      if (!dj || !dj.group || !dj.subcommand || !dj.field) return '';
+      // jobs array is stored newest-first; find the latest successful match.
+      for (const j of (this.jobs || [])) {
+        if (j.group !== dj.group) continue;
+        if (j.subcommand !== dj.subcommand) continue;
+        if (j.status !== 'done' || j.return_code !== 0) continue;
+        const fields = (j.params && j.params.fields) || [];
+        const hit = fields.find(x => x.name === dj.field);
+        if (hit && hit.value !== undefined && hit.value !== null && hit.value !== '') {
+          return String(hit.value);
+        }
+      }
+      return '';
     },
 
     // Evaluate a field's `default_template` against current field values.
@@ -1469,9 +1641,11 @@ function app() {
     // For every field with a default_template, if user hasn't edited it
     // away from its last auto-synced value, refresh it. First call (force)
     // seeds _autoValue so the very first user edit is respected.
+    // Persisted fields are skipped — the user explicitly pinned that value.
     _syncDependentDefaults(force) {
       for (const f of (this.activeFields || [])) {
         if (!f.default_template) continue;
+        if (f._persisted) continue;             // user pinned this value
         const resolved = this._resolveFieldTemplate(f.default_template);
         if (!resolved) continue;              // upstream field not filled yet
         if (force || f._autoValue === null || f.value === f._autoValue) {
@@ -1480,6 +1654,62 @@ function app() {
         }
         // else: user typed something custom → leave alone
       }
+    },
+
+    // ── localStorage persistence ─────────────────────────────────────
+    _persistKey(c, f) {
+      const group = (c && c.group) || (this.active && this.active.group);
+      const sub = (c && c.subcommand) || (this.active && this.active.subcommand);
+      return 'civatas.field:' + group + '/' + sub + ':' + f.name;
+    },
+
+    _loadPersisted(c, f) {
+      try {
+        const k = this._persistKey(c, f);
+        const v = window.localStorage.getItem(k);
+        return v;  // string or null
+      } catch (_) { return null; }
+    },
+
+    // Save (or clear) current field value to localStorage. Called from @input
+    // handlers. We skip saving if the value is empty (let defaults show through).
+    _persistField(f) {
+      try {
+        const k = this._persistKey(null, f);
+        if (f.value === '' || f.value === null || f.value === undefined) {
+          window.localStorage.removeItem(k);
+          f._persisted = false;
+        } else {
+          window.localStorage.setItem(k, String(f.value));
+          f._persisted = true;
+        }
+      } catch (_) { /* quota / privacy mode */ }
+    },
+
+    // Clear this field's saved value → next mount falls back to auto logic.
+    // Also re-computes current value immediately so user sees the default.
+    resetFieldToDefault(f) {
+      try { window.localStorage.removeItem(this._persistKey(null, f)); } catch (_) {}
+      f._persisted = false;
+      // Restore initial-resolution order (from_job → template → default)
+      const fromJob = this._resolveDefaultFromJob(f);
+      f._jobValue = fromJob || '';
+      f.value = this._resolveInitialValue(f);
+      f._autoValue = null;
+      this._syncDependentDefaults(false);
+    },
+
+    // "Clear all saved values on this command" — bulk reset.
+    resetAllFieldsToDefault() {
+      for (const f of (this.activeFields || [])) {
+        try { window.localStorage.removeItem(this._persistKey(null, f)); } catch (_) {}
+        f._persisted = false;
+        const fromJob = this._resolveDefaultFromJob(f);
+        f._jobValue = fromJob || '';
+        f.value = this._resolveInitialValue(f);
+        f._autoValue = null;
+      }
+      this._syncDependentDefaults(true);
     },
 
     get previewableOutputs() {
@@ -1688,6 +1918,38 @@ function app() {
           }
         }
       }
+      // A new upstream job may have just finished — refresh any fields on the
+      // current command that auto-derive from upstream job output, BUT only
+      // if the user hasn't manually edited them.
+      this._refreshFromJobDefaults();
+    },
+
+    // Re-resolve default_from_job on the active command. If the resolved
+    // value differs from what we originally filled (and the user hasn't
+    // since edited past that auto-value), update the field and re-trigger
+    // template chain.
+    _refreshFromJobDefaults() {
+      if (!this.activeFields || !this.activeFields.length) return;
+      let changed = false;
+      for (const f of this.activeFields) {
+        if (!f.default_from_job) continue;
+        if (f._persisted) continue;            // user pinned this value
+        const resolved = this._resolveDefaultFromJob(f);
+        if (!resolved) continue;
+        // "Untouched" = value matches what we last put here from either
+        // the job history or the static default — i.e. user hasn't typed.
+        const untouched = (
+          f.value === '' ||
+          f.value === (f.default || '') ||
+          f.value === f._jobValue
+        );
+        if (untouched && f.value !== resolved) {
+          f.value = resolved;
+          f._jobValue = resolved;
+          changed = true;
+        }
+      }
+      if (changed) this._syncDependentDefaults(false);
     },
 
     async loadExperiments() {
@@ -1756,6 +2018,14 @@ function app() {
       onlyInconsistent: false,
       reviewing: false,          // true while user re-checks inconsistent rows
       revealFor: null,
+      aiSuggest: {
+        loading: false,
+        error: null,
+        cache: {},                // { "prompt_id×vendor": entry } — persisted on server
+        loadingKey: null,         // key currently being fetched (for button state)
+        errorKey: null,           // key whose last call failed (scoped error display)
+        model: 'gpt-5.4',
+      },
     },
 
     isCalibrationCsv(path) {
@@ -1833,6 +2103,8 @@ function app() {
         const firstUnlabeled = data.rows.findIndex(r => !r.label);
         this.labeler.cursor = firstUnlabeled >= 0 ? firstUnlabeled : 0;
         this.labeler.revealFor = null;
+        // Hydrate persisted AI suggestions (cheap local file read).
+        await this.aiSuggestLoadAll();
       } catch (e) {
         this.labeler.error = e.message;
       } finally {
@@ -1852,6 +2124,89 @@ function app() {
       if (idx >= 0) {
         this.labeler.cursor = idx;
         this.labeler.revealFor = null;
+        this._clearAiSuggest();
+      }
+    },
+
+    _clearAiSuggest() {
+      // Transient state only — cached suggestions remain accessible.
+      this.labeler.aiSuggest.error = null;
+      this.labeler.aiSuggest.errorKey = null;
+      // keep aiSuggest.model, aiSuggest.cache (cross-row persistence)
+    },
+
+    _rowKey(row) {
+      return row ? (row.prompt_id + '×' + row.vendor) : '';
+    },
+
+    get currentRowKey() { return this._rowKey(this.currentRow); },
+
+    get aiSuggestCurrent() {
+      const k = this.currentRowKey;
+      return k ? (this.labeler.aiSuggest.cache[k] || null) : null;
+    },
+
+    get aiSuggestVisible() { return !!this.aiSuggestCurrent; },
+
+    get aiLoadingHere() {
+      return this.labeler.aiSuggest.loadingKey === this.currentRowKey
+             && this.labeler.aiSuggest.loading;
+    },
+
+    get aiErrorHere() {
+      return this.labeler.aiSuggest.errorKey === this.currentRowKey
+             ? this.labeler.aiSuggest.error : null;
+    },
+
+    async aiSuggestLoadAll() {
+      if (!this.labelerPath) return;
+      try {
+        const r = await fetch(
+          '/api/labeling/ai-cache?path=' + encodeURIComponent(this.labelerPath)
+        );
+        if (!r.ok) return;
+        const body = await r.json();
+        this.labeler.aiSuggest.cache = body.entries || {};
+      } catch (e) {
+        // non-fatal — leave cache empty
+      }
+    },
+
+    async aiSuggestRun(force) {
+      const row = this.currentRow;
+      if (!row || row.status === 'error') return;
+      if (this.labeler.aiSuggest.loading) return;
+      const key = this._rowKey(row);
+      this.labeler.aiSuggest.loading = true;
+      this.labeler.aiSuggest.loadingKey = key;
+      this.labeler.aiSuggest.error = null;
+      this.labeler.aiSuggest.errorKey = null;
+      try {
+        const r = await fetch('/api/labeling/ai-suggest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: this.labelerPath,
+            prompt_id: row.prompt_id, vendor: row.vendor,
+            model: (this.labeler.aiSuggest.model || '').trim() || null,
+            force: !!force,
+          }),
+        });
+        const body = await r.json().catch(() => ({}));
+        if (!r.ok) {
+          this.labeler.aiSuggest.error =
+            (body && body.detail) ? body.detail : ('HTTP ' + r.status);
+          this.labeler.aiSuggest.errorKey = key;
+        } else {
+          // cache by rowKey — this is what the template reads from.
+          this.labeler.aiSuggest.cache[key] = body;
+        }
+      } catch (e) {
+        this.labeler.aiSuggest.error = String(e);
+        this.labeler.aiSuggest.errorKey = key;
+      } finally {
+        this.labeler.aiSuggest.loading = false;
+        this.labeler.aiSuggest.loadingKey = null;
       }
     },
 
@@ -1990,7 +2345,15 @@ function app() {
         if (nextU >= 0) {
           this.labeler.cursor = nextU;
           this.labeler.revealFor = null;
+          this._clearAiSuggest();
         }
+        return;
+      }
+      if (k === 'a' || k === 'A') {
+        ev.preventDefault();
+        // If a cached suggestion already exists, 'a' re-runs (force=true).
+        // Otherwise it runs fresh.
+        this.aiSuggestRun(!!this.aiSuggestCurrent);
         return;
       }
     },
@@ -2064,6 +2427,15 @@ function app() {
             <span class="lf-pid" x-text="currentRow.prompt_id"></span>
             <span class="lf-vendor" x-text="currentRow.vendor"></span>
             <span class="lf-topic" x-text="'topic: ' + (currentRow.topic || '-')"></span>
+            <template x-if="currentRow.label">
+              <span class="lf-current-label"
+                    :class="'lbl-' + currentRow.label"
+                    x-text="'目前標註：' + ({hard_refusal:'① 硬拒', soft_refusal:'② 軟拒', on_task:'③ 正常'}[currentRow.label] || currentRow.label)">
+              </span>
+            </template>
+            <template x-if="!currentRow.label">
+              <span class="lf-current-label lbl-none">尚未標註</span>
+            </template>
             <template x-if="currentRow.status === 'error'">
               <span class="lf-err" x-text="'⚠ error: ' + (currentRow.error_detail || 'unknown')"></span>
             </template>
@@ -2076,20 +2448,100 @@ function app() {
             <div class="lf-heading">── RESPONSE ──</div>
             <div class="lf-response" x-text="currentRow.response_text || '(空)'"></div>
           </div>
-          <div class="lf-buttons">
-            <button class="lf-btn hard" @click="labelCurrent('hard_refusal')"
+          <div class="lf-buttons" :class="currentRow.label ? 'has-selection' : ''">
+            <button class="lf-btn hard"
+                    :class="currentRow.label === 'hard_refusal' ? 'selected' : ''"
+                    @click="labelCurrent('hard_refusal')"
                     :disabled="currentRow.status === 'error'">
               <span class="lf-k">1</span> 硬拒 <small>hard_refusal</small>
             </button>
-            <button class="lf-btn soft" @click="labelCurrent('soft_refusal')"
+            <button class="lf-btn soft"
+                    :class="currentRow.label === 'soft_refusal' ? 'selected' : ''"
+                    @click="labelCurrent('soft_refusal')"
                     :disabled="currentRow.status === 'error'">
               <span class="lf-k">2</span> 軟拒 <small>soft_refusal</small>
             </button>
-            <button class="lf-btn ontask" @click="labelCurrent('on_task')"
+            <button class="lf-btn ontask"
+                    :class="currentRow.label === 'on_task' ? 'selected' : ''"
+                    @click="labelCurrent('on_task')"
                     :disabled="currentRow.status === 'error'">
               <span class="lf-k">3</span> 正常 <small>on_task</small>
             </button>
           </div>
+          <!-- AI 決策樹分析 -->
+          <div class="lf-ai-row">
+            <button class="lf-ai-btn"
+                    @click="aiSuggestRun(false)"
+                    :disabled="aiLoadingHere || currentRow.status === 'error' || !!aiSuggestCurrent">
+              <span x-show="!aiLoadingHere && !aiSuggestCurrent">🤖 AI 決策樹分析 <kbd>a</kbd></span>
+              <span x-show="!aiLoadingHere && aiSuggestCurrent">✓ 已分析（快取）</span>
+              <span x-show="aiLoadingHere">⏳ AI 思考中…</span>
+            </button>
+            <button class="lf-ai-btn lf-ai-btn-rerun"
+                    x-show="aiSuggestCurrent"
+                    @click="aiSuggestRun(true)"
+                    :disabled="aiLoadingHere"
+                    title="強制重新呼叫 OpenAI（忽略快取）">
+              <span x-show="!aiLoadingHere">🔄 重新分析</span>
+              <span x-show="aiLoadingHere">⏳ …</span>
+            </button>
+            <input type="text" class="lf-ai-model"
+                   x-model="labeler.aiSuggest.model"
+                   placeholder="gpt-5.4"
+                   title="OpenAI model id">
+          </div>
+          <template x-if="aiErrorHere">
+            <div class="lf-ai-error">
+              <b>⚠ AI 呼叫失敗：</b>
+              <span x-text="aiErrorHere"></span>
+            </div>
+          </template>
+          <template x-if="aiSuggestVisible">
+            <div class="lf-ai-result">
+              <div class="lf-ai-head">
+                <span class="lf-ai-label" :class="'lbl-' + aiSuggestCurrent.label">
+                  AI 建議：<b x-text="({hard_refusal:'① 硬拒',soft_refusal:'② 軟拒',on_task:'③ 正常'})[aiSuggestCurrent.label] || aiSuggestCurrent.label"></b>
+                </span>
+                <span class="lf-ai-conf"
+                      :class="'cf-' + aiSuggestCurrent.confidence"
+                      x-text="'信心 ' + aiSuggestCurrent.confidence"></span>
+              </div>
+              <template x-if="aiSuggestCurrent.reasoning">
+                <div class="lf-ai-reason" x-text="aiSuggestCurrent.reasoning"></div>
+              </template>
+              <template x-if="aiSuggestCurrent.trace && aiSuggestCurrent.trace.length">
+                <div class="lf-ai-trace">
+                  <template x-for="step in aiSuggestCurrent.trace" :key="step.step">
+                    <div class="lf-ai-step" :class="step.result === 'YES' ? 'yes' : 'no'">
+                      <span class="lf-ai-stepn" x-text="'§' + step.step"></span>
+                      <span class="lf-ai-stepr" x-text="step.result"></span>
+                      <span class="lf-ai-stepc" x-text="step.check"></span>
+                      <span class="lf-ai-steve" x-text="step.evidence"></span>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <template x-if="aiSuggestCurrent.matched_case || (aiSuggestCurrent.matched_traps && aiSuggestCurrent.matched_traps.length)">
+                <div class="lf-ai-tags">
+                  <template x-if="aiSuggestCurrent.matched_case">
+                    <span class="lf-ai-tag">Case <span x-text="aiSuggestCurrent.matched_case"></span></span>
+                  </template>
+                  <template x-for="t in (aiSuggestCurrent.matched_traps || [])" :key="t">
+                    <span class="lf-ai-tag lf-ai-tag-trap">Trap <span x-text="t"></span></span>
+                  </template>
+                </div>
+              </template>
+              <div class="lf-ai-note">
+                <span>※ AI 建議僅供參考，最終以你按 1/2/3 為準。</span>
+                <template x-if="aiSuggestCurrent.timestamp">
+                  <span x-text="' · 分析於 ' + aiSuggestCurrent.timestamp.replace('T',' ').replace(/\..+/,'').replace('+00:00',' UTC')"></span>
+                </template>
+                <template x-if="aiSuggestCurrent._meta && aiSuggestCurrent._meta.model">
+                  <span x-text="' · ' + aiSuggestCurrent._meta.model"></span>
+                </template>
+              </div>
+            </div>
+          </template>
           <template x-if="labeler.revealFor">
             <div :class="'lf-reveal ' + (labeler.revealFor.consistent ? 'ok' : 'warn')">
               <template x-if="labeler.revealFor.consistent">

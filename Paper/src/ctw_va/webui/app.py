@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from . import jobs as jobs_mod
 from . import labeling as labeling_mod
+from . import labeling_ai as labeling_ai_mod
 from . import spec as spec_mod
 from . import status as status_mod
 from ..adapter.clients import register_default_clients
@@ -347,6 +348,9 @@ def path_exists(path: str) -> dict:
 
 labeling_mod.configure(path_resolver=_resolve_safe)
 app.include_router(labeling_mod.router)
+
+labeling_ai_mod.configure(path_resolver=_resolve_safe)
+app.include_router(labeling_ai_mod.router)
 
 
 # -------- Static index --------
