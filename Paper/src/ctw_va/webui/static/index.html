@@ -175,8 +175,34 @@
   }
   .dep-chip:hover { border-color: var(--accent); color: var(--accent); }
   .dep-chip.env { cursor: default; color: var(--amber); border-color: rgba(245,158,11,0.3); }
-  .dep-chip.gate { cursor: default; color: var(--blue); border-color: rgba(59,130,246,0.3); }
+  .dep-chip.gate { cursor: pointer; color: var(--blue); border-color: rgba(59,130,246,0.3); }
+  .dep-chip.gate:hover { border-color: var(--blue); background: rgba(59,130,246,0.08); }
   .dep-note { font-size: 11.5px; color: var(--muted); padding: 2px 8px 6px; line-height: 1.5; }
+
+  .next-step-cta {
+    margin-top: 14px; padding: 12px 14px;
+    border: 1px solid rgba(34,197,94,0.35);
+    background: rgba(34,197,94,0.08);
+    border-radius: 6px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .next-step-cta .cta-head {
+    font-size: 12px; color: var(--accent); font-weight: 600;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .next-step-cta .cta-head .job-id {
+    font-family: ui-monospace, monospace; color: var(--muted);
+    font-weight: normal; font-size: 11px;
+  }
+  .next-step-cta .cta-head .dur {
+    color: var(--muted); font-weight: normal; font-size: 11px;
+  }
+  .next-step-cta .cta-body {
+    font-size: 12.5px; color: var(--text);
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .next-step-cta .cta-body .label { color: var(--muted); font-size: 11.5px; }
+  .next-step-cta .cta-none { color: var(--muted); font-size: 11.5px; font-style: italic; }
   .dep-none { font-size: 11.5px; color: var(--muted); font-style: italic; padding-left: 14px; }
   .details-box {
     background: var(--panel); border: 1px solid var(--border);
@@ -572,6 +598,26 @@
   .lf-meta .lf-topic  { color: #9a9; }
   .lf-meta .lf-err    { color: #e57373; }
   .lf-heading { color: #777; font-size: 11px; letter-spacing: 0.1em; margin-bottom: 4px; }
+
+  .labeler-review-banner {
+    padding: 10px 18px;
+    background: rgba(245,158,11,0.10);
+    border-bottom: 1px solid rgba(245,158,11,0.35);
+    color: var(--amber);
+    font-size: 12.5px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .labeler-review-banner kbd {
+    background: rgba(255,255,255,0.08); padding: 1px 5px;
+    border-radius: 3px; font-family: ui-monospace, monospace; font-size: 11px;
+    color: var(--text);
+  }
+  .labeler-review-exit {
+    background: transparent; border: 1px solid rgba(245,158,11,0.5);
+    color: var(--amber); padding: 4px 10px; border-radius: 4px;
+    font-size: 12px; cursor: pointer;
+  }
+  .labeler-review-exit:hover { background: rgba(245,158,11,0.15); }
   .lf-prompt  { font-size: 18px; line-height: 1.55; color: #f0f0f0; }
   .lf-response{ font-size: 15px; line-height: 1.6; color: #cfd4da; white-space: pre-wrap;
                 background: #10141a; padding: 12px 16px; border-radius: 6px;
@@ -715,7 +761,11 @@
                   <span class="dep-chip"
                         :class="d.kind === 'env' ? 'env' : (d.kind === 'gate' ? 'gate' : '')"
                         @click="jumpToDep(d)"
-                        :title="d.kind === 'env' ? '環境變數 — 在 .env 設定' : (d.kind === 'gate' ? '驗收 gate — 非指令' : '點擊跳至該步驟')">
+                        :title="d.kind === 'env'
+                                  ? '環境變數 — 在 .env 設定'
+                                  : (d.kind === 'gate'
+                                      ? (d.target_step ? '人工步驟 — 點擊跳至 ' + d.target_step.group + '/' + d.target_step.subcommand : '人工步驟 — 點擊看說明')
+                                      : '點擊跳至該步驟')">
                     <span x-text="d.kind === 'env' ? '🔑' : (d.kind === 'gate' ? '🚦' : '▶')"></span>
                     <span x-text="d.what"></span>
                   </span>
@@ -750,7 +800,9 @@
                   <span class="dep-chip"
                         :class="d.kind === 'gate' ? 'gate' : ''"
                         @click="jumpToDep(d)"
-                        :title="d.kind === 'gate' ? '驗收 gate — 非指令' : '點擊跳至該步驟'">
+                        :title="d.kind === 'gate'
+                                  ? (d.target_step ? '人工步驟 — 點擊跳至 ' + d.target_step.group + '/' + d.target_step.subcommand : '人工步驟 — 點擊看說明')
+                                  : '點擊跳至該步驟'">
                     <span x-text="d.kind === 'gate' ? '🚦' : '▶'"></span>
                     <span x-text="d.kind === 'gate' ? d.what : (d.group + '/' + d.subcommand)"></span>
                   </span>
@@ -936,6 +988,39 @@
           </template>
         </div>
 
+        <!-- Post-execution next-step CTA: appears when the latest job for
+             this step finished successfully. Chips reuse the existing
+             jumpToDep() handler so clicks navigate to the downstream step. -->
+        <template x-if="lastDoneJobForActive">
+          <div class="next-step-cta">
+            <div class="cta-head">
+              <span>✓ 完成</span>
+              <span class="job-id" x-text="lastDoneJobForActive.job_id"></span>
+              <span class="dur"
+                    x-text="lastDoneJobForActive.duration_s ? '· ' + lastDoneJobForActive.duration_s.toFixed(1) + 's' : ''"></span>
+            </div>
+            <template x-if="(active.unblocks || []).length > 0">
+              <div class="cta-body">
+                <span class="label">下一步建議：</span>
+                <template x-for="(d, di) in active.unblocks || []" :key="di">
+                  <span class="dep-chip"
+                        :class="d.kind === 'gate' ? 'gate' : ''"
+                        @click="jumpToDep(d)"
+                        :title="d.kind === 'gate'
+                                  ? (d.target_step ? '人工步驟 — 點擊跳至 ' + d.target_step.group + '/' + d.target_step.subcommand : '人工步驟 — 點擊看說明')
+                                  : '點擊跳至該步驟'">
+                    <span x-text="d.kind === 'gate' ? '🚦' : '▶'"></span>
+                    <span x-text="d.kind === 'gate' ? d.what : (d.group + '/' + d.subcommand)"></span>
+                  </span>
+                </template>
+              </div>
+            </template>
+            <template x-if="!active.unblocks || active.unblocks.length === 0">
+              <div class="cta-none">此步為管線終點或獨立工具 — 無後續自動建議。</div>
+            </template>
+          </div>
+        </template>
+
         <!-- Experiment stats — only meaningful for commands that write SQLite -->
         <template x-if="showsStats">
           <div style="margin-top: 28px;">
@@ -1085,6 +1170,21 @@ function app() {
       return lines.length ? lines[lines.length - 1] : '';
     },
 
+    // Most-recent successful job matching the currently selected command.
+    // Drives the "下一步建議" CTA. Returns null if nothing matches.
+    get lastDoneJobForActive() {
+      if (!this.active) return null;
+      for (const j of this.jobs) {   // jobs are loaded newest-first
+        if (j.group === this.active.group
+            && j.subcommand === this.active.subcommand
+            && j.status === 'done'
+            && j.return_code === 0) {
+          return j;
+        }
+      }
+      return null;
+    },
+
     get showsStats() {
       // Only commands that write to SQLite benefit from the stats section.
       if (!this.active) return false;
@@ -1146,21 +1246,66 @@ function app() {
 
     jumpToDep(d) {
       if (!d) return;
+
+      // Gate with an inline action (e.g. open labeler): try action first,
+      // fall back to target_step navigation if the action can't resolve.
+      if (d.kind === 'gate' && d.action && d.action.kind === 'open_labeler') {
+        const csvPath = this._findLabelableCsvPath();
+        if (csvPath) {
+          this.openLabeler(csvPath);
+          return;
+        }
+        // No CSV here → navigate to target_step so user lands where CSV lives.
+      }
+
       let group = d.group;
       let sub = d.subcommand;
       // depends_on entries use {kind: "step", what: "group/subcommand"} shape;
-      // unblocks entries use {group, subcommand} directly. Handle both.
+      // unblocks entries use {group, subcommand} directly. Gate entries can
+      // opt in to navigation via {kind: "gate", target_step: {group, subcommand}}
+      // — otherwise we surface the note so the user knows what to do manually.
       if ((!group || !sub) && d.kind === 'step' && typeof d.what === 'string') {
         const parts = d.what.split('/');
         if (parts.length === 2) {
           group = parts[0]; sub = parts[1];
         }
       }
-      if (!group || !sub) return;
+      if ((!group || !sub) && d.kind === 'gate' && d.target_step) {
+        group = d.target_step.group;
+        sub = d.target_step.subcommand;
+      }
+      if (!group || !sub) {
+        if (d.kind === 'gate' && d.note) {
+          alert('🚦 ' + (d.what || '人工步驟') + '\n\n' + d.note);
+        }
+        return;
+      }
       const target = this.commands.find(
         c => c.group === group && c.subcommand === sub
       );
       if (target) this.selectCommand(target);
+    },
+
+    // Look for a responses_n*.csv within reach of the current step, so the
+    // 人工標註 CSV gate can open the labeler directly instead of requiring
+    // the user to find the preview and click ✏️ manually.
+    _findLabelableCsvPath() {
+      if (!this.active) return null;
+      // 1. Current step's outputs (covers calibration/export after run).
+      for (const o of (this.active.outputs || [])) {
+        const p = this._resolveOutputPath(o.path);
+        if (p && this.isCalibrationCsv(p)
+            && this.previews[p] && this.previews[p].meta) {
+          return p;
+        }
+      }
+      // 2. Current step's string fields (covers import-labels' --input).
+      for (const f of (this.activeFields || [])) {
+        if (typeof f.value === 'string' && this.isCalibrationCsv(f.value)) {
+          return f.value;
+        }
+      }
+      return null;
     },
 
     get nonEmptyExperiments() {
@@ -1401,6 +1546,18 @@ function app() {
     },
 
     async runJob(vendor) {
+      // Pre-flight: block on empty required fields so the CLI never gets
+      // called with missing positionals (which fail silently as exit=2).
+      const missing = this.activeFields.filter(
+        f => f.required && (f.value === '' || f.value === null || f.value === undefined)
+      );
+      if (missing.length) {
+        alert(
+          '缺少必填欄位：\n  ' +
+          missing.map(f => '• ' + f.name + (f.flag ? ' (' + f.flag + ')' : ' (positional)')).join('\n  ')
+        );
+        return;
+      }
       const body = {
         group: this.active.group,
         subcommand: this.active.subcommand,
@@ -1542,6 +1699,8 @@ function app() {
       progress: { total: 0, labeled: 0, unlabeled: 0, inconsistent: 0 },
       cursor: 0,
       onlyUnlabeled: false,
+      onlyInconsistent: false,
+      reviewing: false,          // true while user re-checks inconsistent rows
       revealFor: null,
     },
 
@@ -1552,6 +1711,11 @@ function app() {
     },
 
     get visibleRows() {
+      if (this.labeler.onlyInconsistent) {
+        return this.labeler.rows.filter(
+          r => r.label && r.expected && r.expected !== (r.label + '_expected')
+        );
+      }
       if (!this.labeler.onlyUnlabeled) return this.labeler.rows;
       return this.labeler.rows.filter(r => !r.label);
     },
@@ -1594,6 +1758,8 @@ function app() {
     async openLabeler(path) {
       this.labelerPath = path;
       this.labelerOpen = true;
+      this.labeler.reviewing = false;
+      this.labeler.onlyInconsistent = false;
       await this.labelerLoad();
     },
 
@@ -1651,7 +1817,16 @@ function app() {
       const idx = this.labeler.rows.findIndex(
         r => r.label && r.expected && r.expected !== (r.label + '_expected')
       );
-      if (idx >= 0) this.labeler.cursor = idx;
+      if (idx < 0) return;
+      this.labeler.cursor = idx;
+      this.labeler.onlyUnlabeled = false;
+      this.labeler.onlyInconsistent = true;
+      this.labeler.reviewing = true;     // hides the 🎉 completion card
+    },
+
+    exitReviewing() {
+      this.labeler.reviewing = false;
+      this.labeler.onlyInconsistent = false;
     },
 
     _recomputeProgress() {
@@ -1811,9 +1986,18 @@ function app() {
       · 不一致 <span x-text="labeler.progress.inconsistent"></span>
     </span>
     <label class="labeler-toggle">
-      <input type="checkbox" x-model="labeler.onlyUnlabeled"> 只看未標
+      <input type="checkbox" x-model="labeler.onlyUnlabeled"
+             @change="labeler.onlyUnlabeled && (labeler.onlyInconsistent = false, labeler.reviewing = false)"> 只看未標
     </label>
   </div>
+  <template x-if="labeler.reviewing">
+    <div class="labeler-review-banner">
+      <span>⚠️ 檢視不一致中 ·
+        <b x-text="visibleRows.length"></b> / <b x-text="labeler.progress.inconsistent"></b> rows ·
+        重新評估後可改 label（<kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd>）或保留</span>
+      <button class="labeler-review-exit" @click="exitReviewing()">✕ 結束檢視 · 回總結</button>
+    </div>
+  </template>
   <div class="labeler-body">
     <div class="labeler-focus">
       <template x-if="labeler.loading"><div>讀取中…</div></template>
@@ -1878,7 +2062,7 @@ function app() {
       <template x-if="!labeler.loading && !labeler.error && labeler.rows.length && !currentRow && labeler.onlyUnlabeled && labeler.progress.labeled < labeler.progress.total">
         <div>🎉 沒有未標的 row 了（關掉「只看未標」可回看全部）</div>
       </template>
-      <template x-if="!labeler.loading && !labeler.error && labeler.rows.length && labeler.progress.labeled >= labeler.progress.total">
+      <template x-if="!labeler.loading && !labeler.error && labeler.rows.length && labeler.progress.labeled >= labeler.progress.total && !labeler.reviewing">
         <div class="lf-done">
           <h2>🎉 全部標註完成</h2>
           <div class="lf-done-counts">
@@ -1889,7 +2073,7 @@ function app() {
             <div>與 expected 不一致：<b x-text="labeler.progress.inconsistent"></b> rows</div>
           </div>
           <div class="lf-done-actions">
-            <button @click="labeler.onlyUnlabeled = false; gotoInconsistent()"
+            <button @click="gotoInconsistent()"
                     :disabled="!labeler.progress.inconsistent">
               🔁 回列表檢視不一致的 rows
             </button>

@@ -368,7 +368,8 @@ COMMANDS: list[dict[str, Any]] = [
         ],
         "unblocks": [
             {"kind": "gate", "what": "實驗進入 Phase B/C",
-             "note": "分佈符合目標後才該進入 run（不符就回去調 fetch-b/c）"},
+             "note": "分佈符合目標後才該進入 run（不符就回去調 fetch-b/c）",
+             "target_step": {"group": "run", "subcommand": "smoke-test"}},
         ],
         "fields": [
             {
@@ -469,7 +470,8 @@ COMMANDS: list[dict[str, Any]] = [
         ],
         "unblocks": [
             {"kind": "gate", "what": "實驗進入 Phase B/C",
-             "note": "分佈通過容差才能拿這份 slate 去跑正式實驗"},
+             "note": "分佈通過容差才能拿這份 slate 去跑正式實驗",
+             "target_step": {"group": "run", "subcommand": "smoke-test"}},
         ],
         "fields": [
             {
@@ -498,8 +500,8 @@ COMMANDS: list[dict[str, Any]] = [
         "fields": [
             {
                 "name": "persona_id", "flag": "", "type": "str",
-                "default": "", "required": True,
-                "help": "persona_id（positional）",
+                "default": "p_000001", "required": True, "promote": True,
+                "help": "persona_id（positional，格式 p_000001 ~ p_00000N）",
             },
             {
                 "name": "slate", "flag": "--slate", "type": "path",
@@ -611,7 +613,9 @@ COMMANDS: list[dict[str, Any]] = [
         ],
         "unblocks": [
             {"kind": "gate", "what": "人工標註 CSV",
-             "note": "在 Excel/Numbers 填 label 欄後存檔，再跑 import-labels"},
+             "note": "點擊會直接開啟標註模式。也可用 Excel/Numbers 填 label 欄後再跑 import-labels",
+             "action": {"kind": "open_labeler"},
+             "target_step": {"group": "calibration", "subcommand": "export"}},
         ],
         "fields": [
             {"name": "input", "flag": "--input", "type": "path",
@@ -651,7 +655,9 @@ COMMANDS: list[dict[str, Any]] = [
         "category": "Phase A5 — 拒答校準",
         "depends_on": [
             {"kind": "gate", "what": "人工標註 CSV",
-             "note": "CSV 的 label 欄必須先用 Excel 填好（非 fetch 完就可以跑）"},
+             "note": "CSV 的 label 欄必須先標好（點擊開啟標註模式，或用 Excel）才能跑 import",
+             "action": {"kind": "open_labeler"},
+             "target_step": {"group": "calibration", "subcommand": "export"}},
         ],
         "unblocks": [
             {"group": "calibration", "subcommand": "train"},
