@@ -40,8 +40,10 @@ CATEGORY_INTROS: dict[str, str] = {
     ),
     "Phase A5 — 拒答校準": (
         "流程：\n"
-        "  fetch ──→ export ──→ [人工標註 CSV] ──→ import-labels ──→ train\n"
-        "  （fetch 打 5 vendor / 匯出 CSV / 你用 Excel 填 label 欄 / 匯入回 JSONL / 訓分類器）\n"
+        "  fetch ─┬─→ export ──→ [標註 CSV] ──→ import-labels ──→ train\n"
+        "         └─→ retry-errors (若有 error 筆) ──→ export\n"
+        "  （fetch 打 5 vendor / retry-errors 只補 error 筆 / 匯出 CSV /\n"
+        "   webui 或 Excel 填 label 欄 / 匯回 JSONL / 訓分類器）\n"
         "前置：五家 vendor API key 已設在 .env。\n"
         "標註類別：hard_refusal（硬拒）/ soft_refusal（軟拒）/ on_task（正常回應）。\n"
         "建議流程：先用 n=20 跑完走一次全流程，再擴到 n=200 取得訓練樣本。"
@@ -565,6 +567,8 @@ COMMANDS: list[dict[str, Any]] = [
              "note": "缺哪家那家就 skip；至少需要 1 家有效"},
         ],
         "unblocks": [
+            {"group": "calibration", "subcommand": "retry-errors",
+             "note": "有 status=error 的筆（通常網路抖動）先重抓再 export，避免浪費標註時間"},
             {"group": "calibration", "subcommand": "export",
              "note": "export 讀這步產出的 JSONL"},
         ],
@@ -574,10 +578,64 @@ COMMANDS: list[dict[str, Any]] = [
              "help": "prompt 數。先用 20 驗證全流程（~100 call, ~USD 0.05）；要訓練時擴到 200。"},
             {"name": "output", "flag": "--output", "type": "path",
              "default": "experiments/refusal_calibration/responses_n20.jsonl",
+             "default_template": "experiments/refusal_calibration/responses_n{N}.jsonl",
              "required": True,
-             "help": "輸出 JSONL 路徑；建議檔名含 N（responses_n20.jsonl）"},
+             "help": "輸出 JSONL 路徑。🔗 未手動改過時會跟 --n 自動同步；改過後停止同步"},
             {"name": "seed", "flag": "--seed", "type": "int",
              "default": 20240113, "help": "抽樣 + per-call seed"},
+        ],
+    },
+    {
+        "group": "calibration",
+        "subcommand": "retry-errors",
+        "title": "①b 重抓 error 筆（補足 fetch 失敗）",
+        "summary": (
+            "只重打 responses_n*.jsonl 裡 status=error 的筆，其他 ok/refusal_filter "
+            "的保留不動。網路短暫抖動丟的筆能救回；vendor 內容政策擋的筆仍會 error。"
+        ),
+        "why": (
+            "原 fetch 是 all-or-nothing 的長跑（1000 call / 20 分鐘），中間任何 "
+            "一段網路抖動都會讓那段 5 家一起丟。重抓只針對 error 筆 → 成本 ~USD 0.02、"
+            "時間 ~2 分鐘。比整個 fetch 重跑便宜 20 倍。"
+        ),
+        "details": [
+            "從既有 JSONL 讀取 → 過濾 status=error → 只對那些 (prompt_id, vendor) 重新呼叫",
+            "Order-preserving：成功的 error 筆就地被 ok 筆替換，ok 筆完全不動",
+            "Incremental 寫檔：每筆重抓後 flush，^C/crash 不會丟進度",
+            "仍失敗的筆通常是 Kimi 內容過濾（ContentFilterError）— 那**本身就是 paper 的 data**，"
+            "不要試圖繞過",
+            "預設覆寫 --input 同一檔；要保留原檔可指定 --output 另存",
+        ],
+        "outputs": [
+            {
+                "path": "experiments/refusal_calibration/responses_n{N}.jsonl",
+                "kind": "原檔就地覆寫（或 --output 指定另存）",
+                "expected": "error 筆數應大幅下降，仍 err 者多為 Kimi 內容過濾",
+                "next_step": "回到 ② export 產 CSV",
+            },
+        ],
+        "category": "Phase A5 — 拒答校準",
+        "supports_vendors": False,
+        "costs_money": True,
+        "depends_on": [
+            {"kind": "step", "what": "calibration/fetch",
+             "note": "必須先跑過 fetch 產 JSONL；此步從檔案讀出 error 筆"},
+        ],
+        "unblocks": [
+            {"group": "calibration", "subcommand": "export",
+             "note": "重抓完回到正常 export 流程"},
+        ],
+        "fields": [
+            {"name": "input", "flag": "--input", "type": "path",
+             "default": "experiments/refusal_calibration/responses_n200.jsonl",
+             "required": True,
+             "help": "原 fetch 產的 JSONL 路徑"},
+            {"name": "output", "flag": "--output", "type": "path",
+             "default": "",
+             "help": "輸出 JSONL 路徑。留空 = 就地覆寫 --input（推薦）"},
+            {"name": "seed", "flag": "--seed", "type": "int",
+             "default": 20240113,
+             "help": "per-call seed（跟 fetch 對齊）"},
         ],
     },
     {
@@ -623,7 +681,9 @@ COMMANDS: list[dict[str, Any]] = [
              "required": True, "help": "responses JSONL 路徑"},
             {"name": "output", "flag": "--output", "type": "path",
              "default": "experiments/refusal_calibration/responses_n20.csv",
-             "required": True, "help": "CSV 輸出路徑"},
+             "default_template": "{input|jsonl→csv}",
+             "required": True,
+             "help": "CSV 輸出路徑。🔗 未手動改過時會跟 input 同步（.jsonl → .csv）"},
         ],
     },
     {
@@ -668,7 +728,9 @@ COMMANDS: list[dict[str, Any]] = [
              "required": True, "help": "已填 label 的 CSV 路徑"},
             {"name": "output", "flag": "--output", "type": "path",
              "default": "experiments/refusal_calibration/labeled_n20.jsonl",
-             "required": True, "help": "labeled JSONL 輸出路徑"},
+             "default_template": "{csv|responses→labeled|csv→jsonl}",
+             "required": True,
+             "help": "labeled JSONL 輸出路徑。🔗 未手動改過時會跟 csv 同步（responses_n*.csv → labeled_n*.jsonl）"},
         ],
     },
     {

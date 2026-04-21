@@ -28,6 +28,21 @@ def fetch_cmd(n, vendors, output, seed):
     fetcher.fetch(n=n, vendors=vendors_list, output_path=output, seed=seed)
 
 
+@calibration.command("retry-errors")
+@click.option("--input", "input_path", type=click.Path(exists=True), required=True,
+              help="Responses JSONL containing status=error rows to re-fetch")
+@click.option("--output", type=click.Path(), default=None,
+              help="Output JSONL path. Default: rewrite --input in place.")
+@click.option("--seed", type=int, default=20240113, show_default=True,
+              help="Per-call seed (match original fetch for reproducibility)")
+def retry_errors_cmd(input_path, output, seed):
+    """Re-fetch only rows where status=='error' — recovers transient network
+    failures cheaply without re-running the full 1000-call sweep. Rows that
+    were already ok stay untouched; permanent errors (content filter, auth)
+    will stay error after retry."""
+    fetcher.retry_errors(input_path=input_path, output_path=output, seed=seed)
+
+
 @calibration.command("export")
 @click.option("--input", "input_path", type=click.Path(exists=True), required=True,
               help="Responses JSONL produced by `calibration fetch`")

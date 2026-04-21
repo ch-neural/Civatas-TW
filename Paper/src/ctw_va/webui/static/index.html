@@ -945,17 +945,19 @@
               <template x-if="f.promote"><span class="promote-pill">N</span></template>
             </label>
             <template x-if="f.type === 'int'">
-              <input type="number" x-model.number="f.value" :placeholder="f.default">
+              <input type="number" x-model.number="f.value" :placeholder="f.default"
+                     @input.debounce.150="_syncDependentDefaults(false)">
             </template>
             <template x-if="f.type === 'bool'">
-              <select x-model="f.value">
+              <select x-model="f.value" @change="_syncDependentDefaults(false)">
                 <option value="">（留空：CLI 預設）</option>
                 <option value="true">true</option>
                 <option value="false">false</option>
               </select>
             </template>
             <template x-if="f.type !== 'int' && f.type !== 'bool'">
-              <input type="text" x-model="f.value" :placeholder="f.default">
+              <input type="text" x-model="f.value" :placeholder="f.default"
+                     @input.debounce.150="_syncDependentDefaults(false)">
             </template>
             <div class="help" x-text="f.help"></div>
           </div>
@@ -1422,10 +1424,62 @@ function app() {
       this.activeFields = (c.fields || []).map(f => ({
         ...f,
         value: f.default === undefined || f.default === null ? '' : String(f.default),
+        _autoValue: null,     // last value we auto-synced to; null until template resolves
       }));
+      // Resolve any default_template fields using initial values — gives live
+      // synced starting state (not the stale hardcoded default).
+      this._syncDependentDefaults(/*force=*/true);
       // Reset preview cache when switching command; auto-probe existing outputs.
       this.previewedFor = c.group + '/' + c.subcommand;
       this.probePreviews();
+    },
+
+    // Evaluate a field's `default_template` against current field values.
+    // Supported placeholders:
+    //   {N}                          → field named "n" (upper alias for int)
+    //   {input|jsonl→csv}            → field "input" with extension swap
+    //   {csv|responses→labeled|csv→jsonl}  → chained substitutions
+    // Unresolved placeholders render as "" (caller decides whether to skip sync).
+    _resolveFieldTemplate(template) {
+      if (!template) return '';
+      return template.replace(
+        /\{([A-Za-z_][A-Za-z0-9_]*)((?:\|[^|}]+)*)\}/g,
+        (_, name, mods) => {
+          const key = name.toLowerCase();
+          const f = (this.activeFields || []).find(
+            x => (x.name || '').toLowerCase() === key
+          );
+          if (!f || f.value === '' || f.value === null || f.value === undefined) {
+            return '';
+          }
+          let v = String(f.value);
+          // Apply each `|from→to` modifier in order (simple substring replace).
+          const parts = mods.split('|').filter(Boolean);
+          for (const p of parts) {
+            const [from, to] = p.split('→');
+            if (from !== undefined && to !== undefined) {
+              v = v.split(from).join(to);
+            }
+          }
+          return v;
+        }
+      );
+    },
+
+    // For every field with a default_template, if user hasn't edited it
+    // away from its last auto-synced value, refresh it. First call (force)
+    // seeds _autoValue so the very first user edit is respected.
+    _syncDependentDefaults(force) {
+      for (const f of (this.activeFields || [])) {
+        if (!f.default_template) continue;
+        const resolved = this._resolveFieldTemplate(f.default_template);
+        if (!resolved) continue;              // upstream field not filled yet
+        if (force || f._autoValue === null || f.value === f._autoValue) {
+          f.value = resolved;
+          f._autoValue = resolved;
+        }
+        // else: user typed something custom → leave alone
+      }
     },
 
     get previewableOutputs() {
