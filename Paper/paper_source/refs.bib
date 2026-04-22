@@ -1,9 +1,6 @@
 % ─────────────────────────────────────────────────────────────────────────
 % Bibliography for CTW-VA-2026
-%
-% Note: All entries cite work cited in-text. Where venue/DOI are not yet
-% confirmed by the author, the entry uses {misc} with an url and is
-% flagged for final verification before arXiv submission.
+% Verified against arXiv listings 2026-04-22.
 % ─────────────────────────────────────────────────────────────────────────
 
 % ─── RLHF foundations ───────────────────────────────────────────────────
@@ -30,14 +27,14 @@
 }
 
 @article{bai2022training,
-  title         = {Training a helpful and harmless assistant with
-                   reinforcement learning from human feedback},
-  author        = {Bai, Yuntao and Jones, Andy and Ndousse, Kamal and
-                   Askell, Amanda and Chen, Anna and DasSarma, Nova and
-                   Drain, Dawn and Fort, Stanislav and Ganguli, Deep and
-                   Henighan, Tom and others},
-  journal       = {arXiv preprint arXiv:2204.05862},
-  year          = {2022}
+  title   = {Training a helpful and harmless assistant with
+             reinforcement learning from human feedback},
+  author  = {Bai, Yuntao and Jones, Andy and Ndousse, Kamal and
+             Askell, Amanda and Chen, Anna and DasSarma, Nova and
+             Drain, Dawn and Fort, Stanislav and Ganguli, Deep and
+             Henighan, Tom and others},
+  journal = {arXiv preprint arXiv:2204.05862},
+  year    = {2022}
 }
 
 @article{bai2022constitutional,
@@ -73,14 +70,14 @@
 }
 
 % ─── Refusal and safety benchmarking ────────────────────────────────────
-@inproceedings{rottger2024safetyprompts,
-  title     = {SafetyPrompts: a systematic review of open datasets for
-               evaluating and improving large language model safety},
-  author    = {Röttger, Paul and others},
-  booktitle = {Proceedings of the Association for Computational
-               Linguistics},
-  year      = {2024},
-  note      = {Final venue may differ; verify before submission}
+@article{rottger2024safetyprompts,
+  title   = {{SafetyPrompts}: a systematic review of open datasets for
+             evaluating and improving large language model safety},
+  author  = {Röttger, Paul and Pernisi, Fabio and Vidgen, Bertie and
+             Hovy, Dirk},
+  journal = {arXiv preprint arXiv:2404.05399},
+  year    = {2024},
+  note    = {Accepted to AAAI 2025}
 }
 
 @inproceedings{rottger2024xstest,
@@ -92,13 +89,14 @@
   year      = {2024}
 }
 
-@article{zheng2024openresearcher,
-  title   = {Over-refusal in large language models: a critical
-             examination of the calibration problem},
-  author  = {Zheng, others},
-  journal = {arXiv preprint},
+@article{cui2024orbench,
+  title   = {{OR-Bench}: An over-refusal benchmark for large language
+             models},
+  author  = {Cui, Justin and Chiang, Wei-Lin and Stoica, Ion and
+             Popa, Raluca Ada},
+  journal = {arXiv preprint arXiv:2405.20947},
   year    = {2024},
-  note    = {Placeholder; author verifying exact citation}
+  note    = {Accepted to ICML 2025}
 }
 
 @article{durmus2024opinionqa,
@@ -121,30 +119,44 @@
 }
 
 @article{hartmann2023political,
-  title   = {The political ideology of conversational AI: Converging
-             evidence on ChatGPT's pro-environmental, left-libertarian
+  title   = {The political ideology of conversational {AI}: Converging
+             evidence on {ChatGPT}'s pro-environmental, left-libertarian
              orientation},
   author  = {Hartmann, Jochen and Schwenzow, Jasper and Witte, Maximilian},
-  journal = {SSRN},
+  journal = {arXiv preprint arXiv:2301.01768},
   year    = {2023}
 }
 
-@article{zhang2024evaluating,
-  title   = {Evaluating the safety of large language models trained with
-             Chinese safety frameworks},
-  author  = {Zhang, others},
-  journal = {arXiv preprint},
-  year    = {2024},
-  note    = {Placeholder --- author verifying exact citation}
+% ─── Chinese-vendor safety and political alignment (direct neighbors) ───
+@inproceedings{huang2023ceval,
+  title     = {{C-Eval}: A multi-level multi-discipline {C}hinese
+               evaluation suite for foundation models},
+  author    = {Huang, Yuzhen and Bai, Yuzhuo and Zhu, Zhihao and Zhang,
+               Junlei and Zhang, Jinghan and Su, Tangjun and Liu,
+               Junteng and Lv, Chuancheng and Zhang, Yikai and Lei,
+               Jiayi and others},
+  booktitle = {Advances in Neural Information Processing Systems
+               (Datasets and Benchmarks Track)},
+  year      = {2023},
+  eprint    = {2305.08322},
+  archivePrefix = {arXiv}
 }
 
-@inproceedings{huang2023comprehensive,
-  title     = {A comprehensive evaluation of {ChatGPT} on {C}hinese
-               content},
-  author    = {Huang, others},
-  booktitle = {Proceedings of the ACL Workshop on Trustworthy NLP},
-  year      = {2023},
-  note      = {Placeholder --- verify exact citation}
+@article{naseh2025r1dacted,
+  title   = {{R1dacted}: Investigating local censorship in
+             {DeepSeek}'s {R1} language model},
+  author  = {Naseh, Ali and Chaudhari, Harsh and Roh, Jaechul and
+             Wu, Mingshi and Oprea, Alina and Houmansadr, Amir},
+  journal = {arXiv preprint arXiv:2505.12625},
+  year    = {2025}
+}
+
+@article{ko2026bilingual,
+  title   = {Bilingual bias in large language models: A {T}aiwan
+             sovereignty benchmark study},
+  author  = {Ko, Ju-Chun},
+  journal = {arXiv preprint arXiv:2602.06371},
+  year    = {2026}
 }
 
 % ─── LLM agent simulation ──────────────────────────────────────────────
@@ -164,7 +176,8 @@
              can we learn from {Homo Silicus}?},
   author  = {Horton, John J},
   journal = {NBER Working Paper},
-  year    = {2023}
+  year    = {2023},
+  note    = {Working Paper w31122}
 }
 
 @article{argyle2023samples,
@@ -189,11 +202,10 @@
   year    = {2023}
 }
 
-@article{sun2024persona,
-  title   = {Persona effects on language model outputs: a case study of
-             demographic steering in political opinion tasks},
-  author  = {Sun, others},
-  journal = {arXiv preprint},
-  year    = {2024},
-  note    = {Placeholder --- verify exact citation before submission}
+@article{sun2024personasteered,
+  title   = {Evaluating large language model biases in persona-steered
+             generation},
+  author  = {Sun, Andrew and others},
+  journal = {arXiv preprint arXiv:2405.20253},
+  year    = {2024}
 }

@@ -44,6 +44,16 @@ and a permissive underlying model (§\ref{sec:discussion-two-layer}).
 What Findings 1 and 5 jointly refute is the framing itself, not a claim
 about any particular vendor's alignment politics.
 
+The closest comparable audit we are aware of,
+\citet{ko2026bilingual}, probes 17 LLMs on Taiwan sovereignty questions
+in Chinese vs.\ English parallel queries and reports significant
+language-dependent bias in 15 of 17. That study's finding --- that the
+same vendor can behave materially differently on sovereignty-adjacent
+content depending on query language --- is orthogonal to but compatible
+with our per-topic and per-layer findings. Both studies suggest that
+sovereignty-topic LLM behavior is richer than aggregate vendor
+characterizations allow.
+
 \subsection{Topic \texorpdfstring{$\times$}{x} Vendor \texorpdfstring{$\times$}{x} Layer: A Three-Way Interaction}\label{sec:discussion-three-way}
 
 The cleaner organizing principle that emerges from our data is a
@@ -177,6 +187,13 @@ as explicit API errors, DeepSeek's surfaces as RLHF-shaped hedged
 output. This would predict that on sovereignty-adjacent prompts,
 DeepSeek's non-response content exhibits statistical regularities
 suggestive of a deterministic filter gate upstream of the generation.
+\citet{naseh2025r1dacted} report evidence consistent with this
+hypothesis for \vendor{DeepSeek}'s R1 reasoning model (which we do not
+audit here), characterizing it as the first instance of local censorship
+alignment at the model layer that persists under private deployment.
+Whether the same mechanism is operative in the non-reasoning
+\texttt{deepseek-chat V3.2} endpoint we audit is an open question
+that our instrumentation cannot answer.
 
 We lack instrumentation to discriminate between these hypotheses from
 the present dataset. All three would predict a meaningful

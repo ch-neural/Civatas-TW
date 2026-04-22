@@ -22,7 +22,7 @@ generally frames refusal as the intended output on a recognizable class
 of unsafe prompts, but recent work has begun to characterize the
 \emph{over-refusal} phenomenon --- models refusing benign prompts
 superficially resembling unsafe ones --- as an empirical concern
-\citep{rottger2024xstest,zheng2024openresearcher}.
+\citep{rottger2024xstest,cui2024orbench}.
 
 Our work contributes to this strand by exposing a richer taxonomy than
 the binary \emph{refuse/comply} distinction typically used. We
@@ -44,11 +44,24 @@ questions. \citet{rottger2024safetyprompts} benchmarks refusal on a
 multilingual safety prompt set, with coverage across English-speaking
 LLM vendors. \citet{hartmann2023political} documents ideological
 leaning differences in ChatGPT's responses, finding consistent
-left-leaning bias under their prompt regime. Chinese-vendor safety and
-political behavior has been studied by \citet{zhang2024evaluating} and
-\citet{huang2023comprehensive}, though most existing public work focuses
-on compliance with Chinese regulatory requirements rather than on
-contrast with Western-vendor behavior on a shared prompt distribution.
+left-leaning bias under their prompt regime.
+
+Chinese-vendor safety and political behavior has been studied more
+recently. \citet{huang2023ceval} established general Chinese-language
+capability benchmarks; more directly relevant,
+\citet{naseh2025r1dacted} investigate local censorship in
+\vendor{DeepSeek}'s R1 model, finding that R1 systematically refuses
+politically sensitive prompts in ways not observed in Western models,
+and characterize this as the first instance of local censorship
+alignment at the model layer. Most closely related to the present paper,
+\citet{ko2026bilingual} benchmarks 17 LLMs on Taiwan sovereignty
+questions in parallel Chinese/English query pairs and finds significant
+language-dependent bias in 15 of 17 models, with models behaving
+differently on the same sovereignty question depending on query language.
+These neighboring works establish Chinese-vendor and Taiwan-political
+LLM behavior as a live empirical concern but do not report the layered
+architectural decomposition or the topic-stratified vendor taxonomy that
+this paper develops.
 
 Our paper contributes to this strand a specifically Taiwan-political
 audit, with explicit paired-prompt design (the same 200 prompts put
@@ -70,7 +83,7 @@ political preferences, of deliberative stances --- that is faithful to
 the target human population modulo appropriate prompt engineering.
 Several authors have raised concern that this assumption is not robust
 to vendor-level alignment shaping \citep{santurkar2023whose,
-sun2024persona}: different vendors may produce systematically different
+sun2024personasteered}: different vendors may produce systematically different
 simulated populations from identical prompts.
 
 Our paper provides direct empirical support for this concern in a
