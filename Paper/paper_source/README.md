@@ -17,30 +17,41 @@ make clean     # remove auxiliary files
 Or upload `paper_source/` and `../paper_figures/` to Overleaf and set the
 compiler to XeLaTeX.
 
-## Drafting status (2026-04-22, batch 2 complete)
+## Drafting status (2026-04-22, **batch 3 complete — full first draft**)
 
 | Section | Status |
 |---|---|
-| Abstract | placeholder |
-| §1 Introduction | placeholder |
-| §2 Related Work | placeholder |
+| Abstract | **drafted** |
+| §1 Introduction | **drafted** |
+| §2 Related Work | **drafted** |
 | §3 Methodology | **drafted** |
-| §4.1 Per-vendor landscape | **drafted** |
-| §4.2 Finding 1 JSD clustering | **drafted** |
-| §4.3 Finding 2 Taiwan-statehood blocking | **drafted** |
-| §4.4 Finding 3 Grok/Kimi low-refusal | **drafted** |
-| §4.5 Finding 4 2-layer architecture | **drafted** |
-| §4.6 Finding 5 4-profile taxonomy | **drafted** |
-| §4.7 Finding 6 prompt bank validity | **drafted** |
-| §4.8 Finding 7 elasticity | **drafted** |
+| §4 Results (7 findings) | **drafted** |
 | §5 Discussion | **drafted** (5 subsections) |
-| §6 Limitations | placeholder (batch 3) |
-| §7 Conclusion | placeholder (batch 3) |
-| Appendix A: 14 blocked prompts | placeholder (batch 3) |
-| References | stub (batch 3) |
+| §6 Limitations | **drafted** (5 items) |
+| §7 Conclusion + Future Work | **drafted** |
+| Appendix A: 14 blocked prompts | **drafted** (original Chinese + English gloss) |
+| References (`refs.bib`) | **drafted** (19 entries; some placeholders to verify) |
 
-Current line count: ~1,100 lines of TeX (est. 8-10 compiled pages before
-Introduction, Related Work, Limitations, Conclusion, Appendix).
+Current line count: 1,486 lines of TeX (~12-15 compiled pages, 6 figures
++ 2 tables + appendix). Static sanity check on all .tex files: all braces
+balanced, all `\begin{}`/`\end{}` paired, zero remaining `\todo{}` uses.
+
+## Pre-submission TODOs
+
+Before submitting to arXiv:
+
+1. **Compile locally** with `make` and verify figure rendering (especially
+   xeCJK Chinese glyphs in Appendix A and figure labels).
+2. **Verify bibliography entries** marked `note = {Placeholder ...}` in
+   `refs.bib` — resolve to the exact paper/venue the citation refers to.
+   Current placeholders: Röttger 2024 SafetyPrompts, Zheng 2024, Zhang 2024,
+   Huang 2023, Sun 2024.
+3. **Optionally run flagship-tier sensitivity subset** (n=50 × 5 vendor,
+   ~USD 20) to strengthen §6 model-tier-asymmetry disclosure.
+4. **Final read-through** for tone, terminology consistency (e.g., always
+   ``RoC state institutions'' not ``Taiwan government institutions''), and
+   any figure-caption vs body-text number mismatches.
+5. **Add ORCID + affiliation** on the title page if desired.
 
 ## Figures / tables
 

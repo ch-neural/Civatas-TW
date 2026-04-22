@@ -1,0 +1,116 @@
+% ─────────────────────────────────────────────────────────────────────────
+% §1 Introduction
+% ─────────────────────────────────────────────────────────────────────────
+\section{Introduction}\label{sec:intro}
+
+Large language models are increasingly deployed as the substrate for
+simulated populations in computational social science, behavioral
+economics, and deliberation research
+\citep{park2023generative,horton2023llm,argyle2023samples}. In a growing
+number of such studies the choice of underlying LLM vendor is treated as
+an implementation detail --- a single commercial API is selected,
+often on the basis of cost or familiarity, and the resulting simulated
+population is analyzed as though its outputs were vendor-invariant. A
+parallel literature on LLM alignment has separately documented that
+different vendors' models exhibit systematically different refusal
+behavior on politically sensitive content \citep{rottger2024safetyprompts,
+durmus2024opinionqa}. What has been less systematically explored is the
+\emph{joint} distribution of these two phenomena: when a simulation
+study uses an LLM to generate populations engaging with a concrete
+political domain, how vendor-dependent are the resulting refusal
+patterns, and what does that vendor dependency look like when examined
+at the appropriate resolution?
+
+This paper audits five commercial large language models ---
+\vendor{OpenAI gpt-4o-mini}, \vendor{Google gemini-2.5-flash-lite},
+\vendor{xAI grok-4-fast}, \vendor{DeepSeek deepseek-chat}, and
+\vendor{Moonshot kimi-k2} --- on a bank of 200 Traditional Chinese
+prompts constructed to probe Taiwan political sensitivity. Each vendor
+responds to each prompt under a fixed generation configuration, yielding
+1{,}000 prompt--vendor observations. We hand-label each response into a
+four-category refusal taxonomy (\emph{hard refusal, soft refusal,
+on-task, API-blocked}), with a documented decision-tree protocol
+developed and refined during labeling and released as a supplementary
+artifact. Statistical analysis uses prompt-level paired bootstrap (5{,}000
+resamples, BCa confidence intervals) to report uncertainty on all
+primary quantities.
+
+Four observations frame the paper's contribution. First, the intuitive
+\emph{monolithic East--West alignment dichotomy} --- the framing under
+which U.S.\ vendors form one behavioral cluster and Chinese-owned
+vendors form another --- is empirically refuted by our data. The two
+Chinese-owned vendors produce the most distant pair of refusal
+distributions in the matrix (Jensen--Shannon divergence 0.200, 95\% CI
+\ci{0.149}{0.256}), while \vendor{DeepSeek}'s aggregate distribution is
+statistically indistinguishable from \vendor{Gemini}'s (JSD CI includes 0).
+National origin does not explain the observed clustering structure.
+
+Second, the alignment strategies we observe span two architecturally
+distinct layers: a deterministic infrastructure filter operating
+pre-generation, and a probabilistic RLHF-shaped model-level response
+layer. Only \vendor{Kimi} operates a significant Layer 1 filter in our
+dataset (rejecting 7\% of prompts with explicit filter-reason errors);
+all five vendors exhibit Layer 2 refusal behavior visible in response
+text. Aggregating the two layers into a single ``refusal rate''
+misrepresents mechanism and flattens an important contrast among vendor
+strategies.
+
+Third, a topic-stratified analysis reveals a four-profile vendor
+taxonomy that the aggregate distribution obscures. \vendor{DeepSeek} ---
+aggregately similar to the Western cluster --- exhibits a
+\emph{sovereignty-specific} on-task rate of 10.3\% (CI \ci{2.6}{23.3})
+versus 54.0\% on non-sovereignty content, a disjoint-CI collapse unique
+in our panel. \vendor{Grok} is topic-agnostic permissive (82--83\%
+across topics). \vendor{Kimi}, post Layer 1 filter, is similarly
+topic-agnostic permissive. The Western pair (\vendor{OpenAI},
+\vendor{Gemini}) exhibits moderate uniform sovereign dampening.
+These four profiles --- moderate sovereign dampening / topic-specific
+RLHF collapse / topic-agnostic permissive / infra-filter-plus-permissive-model
+--- organize the empirically observed vendor behavior more cleanly than
+any single-axis framing we have encountered in the literature.
+
+Fourth, \vendor{Kimi}'s pre-generation filter is best characterized
+as \emph{Taiwan-statehood blocking} rather than as
+\emph{sovereignty-opinion blocking}: 4 of 50 OT-expected neutral
+factual prompts about specific RoC state institutions (legislature
+seat counts, constitutional amendment counts, presidential term lengths,
+and flag design provenance) are rejected by the filter, alongside the 9
+rejected HR-expected sovereignty-opinion prompts. The filter appears to
+trigger on institutional-recognition content regardless of whether the
+prompt requests any opinion, a finding we believe has not been
+previously documented in the vendor-audit literature.
+
+\paragraph{Contributions.}
+The paper contributes: (i) a first public audit of refusal behavior
+across five major LLM vendors on a common Taiwan-political prompt bank
+(§\ref{sec:method}); (ii) statistical evidence against a monolithic
+East--West alignment dichotomy via pairwise JSD on refusal distributions
+with disjoint 95\% CIs (§\ref{sec:results-finding1});
+(iii) characterization of \vendor{Kimi}'s pre-generation filter as
+Taiwan-statehood-triggered, with enumeration of all 14 blocked prompts
+(§\ref{sec:results-finding2}, Appendix~\ref{app:blocked});
+(iv) a two-layer architecture decomposition of vendor refusal behavior
+(§\ref{sec:results-finding4}); (v) a four-profile vendor taxonomy
+derived from topic-stratified on-task rates, with CI-disjoint evidence
+for the \vendor{DeepSeek}--sovereignty profile
+(§\ref{sec:results-finding5}); (vi) a two-tier HR$\to$SR elasticity
+finding distinguishing responsive-RLHF, ceiling-bound, and
+stiff-RLHF vendor regimes (§\ref{sec:results-finding7}); and (vii)
+explicit recommendations for vendor-aware refusal auditing and for
+multi-vendor replication in LLM agent simulation studies
+(§\ref{sec:discussion}). All code, prompts, per-response logs,
+hand-labels, and the auxiliary judge audit trail are released with
+the paper.
+
+\paragraph{Scope.}
+We audit a five-vendor panel on a single time-slice (April 2026 model
+identifiers, explicitly frozen) and a single political domain (Taiwan).
+Our findings characterize those specific vendors in that specific
+window; generalization across vendors outside the panel, across
+political domains other than Taiwan, or across model revisions in
+future time-slices is not directly supported by this audit and
+requires its own replication. The paper's methodological
+contribution --- the decomposition of refusal behavior into
+topic~$\times$~vendor~$\times$~layer with paired bootstrap confidence
+intervals --- is designed to be directly reusable for such
+replications.

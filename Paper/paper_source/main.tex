@@ -70,28 +70,42 @@
 \maketitle
 
 \begin{abstract}
-\todo{Write last. Key points:
-(i) audit of 5 LLM vendors on 200 Taiwan-political prompts × 5 = 1{,}000 calls;
-(ii) 3-class refusal labeling with AI-assisted decision-tree protocol;
-(iii) Finding 1: DeepSeek's refusal distribution is statistically
-indistinguishable from OpenAI/Gemini (JSD CI overlaps 0), yet maximally
-distant from Kimi (JSD 0.200 CI \ci{0.149}{0.256}), refuting any simple
-East--West vendor dichotomy; (iv) Finding 2: Kimi's 7\% API-level content
-filter is best characterized as ``Taiwan-statehood blocking'' — 4/50
-OT-expected neutral factual questions about RoC institutions are blocked;
-(v) Finding 5 (core contribution): per-topic cross-tabulation reveals a
-4-profile vendor taxonomy, with DeepSeek sovereignty on-task collapsing to
-10.3\,\% \ci{2.6}{23.3} while its non-sovereignty behavior matches Western
-vendors.}
+We audit the refusal behavior of five commercial large language models
+--- \vendor{OpenAI gpt-4o-mini}, \vendor{Google gemini-2.5-flash-lite},
+\vendor{xAI grok-4-fast}, \vendor{DeepSeek V3.2}, and
+\vendor{Moonshot Kimi k2} --- on a bank of 200 Traditional Chinese
+prompts engineered to probe Taiwan political sensitivity, yielding
+1{,}000 prompt--vendor observations. Hand-labeled responses are
+classified along a four-category taxonomy (hard refusal, soft refusal,
+on-task, API-blocked), with all statistics reported under prompt-level
+paired bootstrap 95\% BCa confidence intervals. Four findings are
+robust at the CI level. First, the intuitive East--West alignment
+dichotomy is empirically refuted: the two Chinese-owned vendors produce
+the most divergent refusal distributions in the panel (JSD 0.200, CI
+\ci{0.149}{0.256}), while \vendor{DeepSeek}'s aggregate distribution is
+statistically indistinguishable from the U.S.\ vendors. Second,
+\vendor{Kimi}'s 7\% API-level content filter blocks 4 of 50 neutral
+factual prompts about Republic of China state institutions, supporting a
+\emph{Taiwan-statehood blocking} rather than
+\emph{sovereignty-opinion blocking} characterization. Third, a
+topic-stratified view reveals a four-profile vendor taxonomy, with
+\vendor{DeepSeek}'s sovereignty on-task rate collapsing to 10.3\%
+(\ci{2.6}{23.3}) while its non-sovereignty behavior matches Western
+vendors --- a disjoint-CI collapse unique in our panel. Fourth, a
+HR$\to$SR elasticity analysis distinguishes responsive-RLHF vendors
+from ceiling-bound and stiff-RLHF vendors. All code, prompts,
+per-response logs, hand-labels, and the auxiliary AI-judge audit trail
+are released. For LLM agent simulation studies in
+politically-sensitive domains, we recommend treating vendor as a
+first-class experimental variable and reporting layer-stratified
+refusal metrics.
 \end{abstract}
 
 
 % ── Section stubs ────────────────────────────────────────────────────────
-\section{Introduction}\label{sec:intro}
-\todo{Write in Batch 3.}
+\input{sections/introduction.tex}
 
-\section{Related Work}\label{sec:related}
-\todo{Write in Batch 3.}
+\input{sections/related.tex}
 
 \input{sections/methodology.tex}
 
@@ -99,18 +113,7 @@ vendors.}
 
 \input{sections/discussion.tex}
 
-\section{Limitations}\label{sec:limitations}
-\todo{Write in Batch 3. Key items:
-(a) single-rater annotation with 24.5\% AI-advised (§3.5 discloses κ
-infeasible, released audit trail);
-(b) model-tier asymmetry (OpenAI/Gemini mini-class vs DeepSeek/Kimi flagship);
-(c) single time-slice (April 2026 model IDs frozen);
-(d) Taiwan-political domain only, findings may not generalize to other
-politically-sensitive domains;
-(e) N=200 prompts is modest for sub-topic claims (topic-level CIs wide).}
-
-\section{Conclusion and Future Work}\label{sec:conclusion}
-\todo{Write in Batch 3.}
+\input{sections/limitations.tex}
 
 
 % ── Bibliography ─────────────────────────────────────────────────────────
@@ -119,8 +122,6 @@ politically-sensitive domains;
 % ── Appendix ─────────────────────────────────────────────────────────────
 \appendix
 
-\section{All Kimi API-Blocked Prompts ($N=14$)}\label{app:blocked}
-\todo{Write in Batch 3. Include 14 prompts in original Chinese with English
-glosses, grouped by expected category.}
+\input{sections/appendix_blocked.tex}
 
 \end{document}

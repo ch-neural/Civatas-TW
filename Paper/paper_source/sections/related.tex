@@ -1,0 +1,99 @@
+% ─────────────────────────────────────────────────────────────────────────
+% §2 Related Work
+% ─────────────────────────────────────────────────────────────────────────
+\section{Related Work}\label{sec:related}
+
+Three strands of existing literature bear on this paper: (i) RLHF-based
+alignment and the engineering of refusal behavior, (ii) comparative
+audits of LLM political and safety behavior, and (iii) studies of
+LLM agent populations in computational social science. We survey each
+briefly and position our contribution relative to them.
+
+\subsection{RLHF Alignment and Refusal Engineering}\label{sec:related-rlhf}
+
+Reinforcement Learning from Human Feedback \citep{christiano2017deep,
+ouyang2022training,bai2022training} has become the dominant
+post-training pipeline for commercial LLMs. A substantial body of work
+documents that RLHF does not only make models more \emph{helpful}: it
+also systematically shapes their refusal behavior, typically in ways
+that trade off engagement against safety \citep{bai2022constitutional,
+ganguli2022red,perez2022discovering}. The alignment literature
+generally frames refusal as the intended output on a recognizable class
+of unsafe prompts, but recent work has begun to characterize the
+\emph{over-refusal} phenomenon --- models refusing benign prompts
+superficially resembling unsafe ones --- as an empirical concern
+\citep{rottger2024xstest,zheng2024openresearcher}.
+
+Our work contributes to this strand by exposing a richer taxonomy than
+the binary \emph{refuse/comply} distinction typically used. We
+distinguish \emph{hard refusal} (template blocking), \emph{soft refusal}
+(substantive engagement that hedges, punts, or reframes), and \emph{on-task}
+responses, and find that soft refusal dominates the refusal category
+across all five vendors. This is consistent with the intuition that
+contemporary RLHF optimizes for engaged hedging rather than for
+recognizable blocking, and suggests that binary over-refusal metrics
+may understate the prevalence of vendor-level alignment shaping.
+
+\subsection{Comparative Audits of LLM Behavior}\label{sec:related-audits}
+
+A growing set of papers compares LLM behavior across vendors on
+specific domains. \citet{santurkar2023whose} and \citet{durmus2024opinionqa}
+probe U.S.\ political opinion alignment across vendor families,
+reporting systematic vendor-dependent biases on polarized policy
+questions. \citet{rottger2024safetyprompts} benchmarks refusal on a
+multilingual safety prompt set, with coverage across English-speaking
+LLM vendors. \citet{hartmann2023political} documents ideological
+leaning differences in ChatGPT's responses, finding consistent
+left-leaning bias under their prompt regime. Chinese-vendor safety and
+political behavior has been studied by \citet{zhang2024evaluating} and
+\citet{huang2023comprehensive}, though most existing public work focuses
+on compliance with Chinese regulatory requirements rather than on
+contrast with Western-vendor behavior on a shared prompt distribution.
+
+Our paper contributes to this strand a specifically Taiwan-political
+audit, with explicit paired-prompt design (the same 200 prompts put
+to each of five vendors) and statistical inference at a level not
+common in existing audits. Most cited audits report point-estimate
+divergences without confidence intervals; we report paired bootstrap
+BCa CIs throughout and argue several findings from CI-disjoint evidence.
+We also contribute the topic$\times$vendor$\times$layer stratification
+(§\ref{sec:discussion-three-way}) as a reusable methodological frame.
+
+\subsection{LLM Agent Simulation}\label{sec:related-simulation}
+
+The use of LLMs as simulants for human populations in social science
+has grown rapidly \citep{park2023generative,horton2023llm,
+argyle2023samples,tornberg2023simulating}. The methodological
+assumption underlying many such studies is that the simulated population's
+responses reflect some recoverable underlying distribution --- e.g., of
+political preferences, of deliberative stances --- that is faithful to
+the target human population modulo appropriate prompt engineering.
+Several authors have raised concern that this assumption is not robust
+to vendor-level alignment shaping \citep{santurkar2023whose,
+sun2024persona}: different vendors may produce systematically different
+simulated populations from identical prompts.
+
+Our paper provides direct empirical support for this concern in a
+specific and well-defined setting. The four-profile vendor taxonomy
+(§\ref{sec:results-finding5}) implies that an LLM agent simulation of
+Taiwanese political engagement would produce materially different
+sovereignty-topic behavior under different vendor choices --- with
+\vendor{DeepSeek}-based populations dropping to 10\% sovereignty-topic
+engagement versus \vendor{Grok}-based populations sustaining 82\%.
+We discuss implications for simulation practice explicitly in
+§\ref{sec:discussion-simulation} and frame the audit as a tool for
+quantifying vendor-dependent confounds in downstream simulation studies.
+
+\paragraph{Positioning.}
+Relative to the cited literature, this paper distinguishes itself in
+four ways. First, the prompt set is specifically designed around
+Taiwan political sensitivity in Traditional Chinese, a domain with
+limited public audit data. Second, we include \vendor{Kimi} and
+\vendor{DeepSeek} in the vendor panel, covering Chinese-owned
+vendors at their recommended production endpoints.
+Third, the statistical protocol uses prompt-level paired bootstrap for
+all primary quantities, and several key findings are CI-disjoint at
+95\%. Fourth, the four-category response taxonomy (with API-blocked as a
+distinct fourth category) is new to the LLM audit literature to our
+knowledge and is crucial for surfacing the two-layer architecture
+finding (§\ref{sec:results-finding4}).

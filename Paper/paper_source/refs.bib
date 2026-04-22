@@ -1,12 +1,199 @@
 % ─────────────────────────────────────────────────────────────────────────
 % Bibliography for CTW-VA-2026
-% Batch 1: placeholder stubs. Populate in Batch 3 when §1 Intro + §2
-% Related Work are written.
+%
+% Note: All entries cite work cited in-text. Where venue/DOI are not yet
+% confirmed by the author, the entry uses {misc} with an url and is
+% flagged for final verification before arXiv submission.
 % ─────────────────────────────────────────────────────────────────────────
 
-@misc{placeholder2026,
-  title  = {Placeholder entry — remove before submission},
-  author = {{CTW-VA-2026 project}},
-  year   = {2026},
-  note   = {Bibliography is drafted in Batch 3 of paper writing.}
+% ─── RLHF foundations ───────────────────────────────────────────────────
+@article{christiano2017deep,
+  title   = {Deep reinforcement learning from human preferences},
+  author  = {Christiano, Paul F and Leike, Jan and Brown, Tom and
+             Martic, Miljan and Legg, Shane and Amodei, Dario},
+  journal = {Advances in Neural Information Processing Systems},
+  volume  = {30},
+  year    = {2017}
+}
+
+@article{ouyang2022training,
+  title   = {Training language models to follow instructions with human
+             feedback},
+  author  = {Ouyang, Long and Wu, Jeff and Jiang, Xu and Almeida, Diogo
+             and Wainwright, Carroll and Mishkin, Pamela and Zhang,
+             Chong and Agarwal, Sandhini and Slama, Katarina and Ray,
+             Alex and others},
+  journal = {Advances in Neural Information Processing Systems},
+  volume  = {35},
+  pages   = {27730--27744},
+  year    = {2022}
+}
+
+@article{bai2022training,
+  title         = {Training a helpful and harmless assistant with
+                   reinforcement learning from human feedback},
+  author        = {Bai, Yuntao and Jones, Andy and Ndousse, Kamal and
+                   Askell, Amanda and Chen, Anna and DasSarma, Nova and
+                   Drain, Dawn and Fort, Stanislav and Ganguli, Deep and
+                   Henighan, Tom and others},
+  journal       = {arXiv preprint arXiv:2204.05862},
+  year          = {2022}
+}
+
+@article{bai2022constitutional,
+  title   = {Constitutional AI: Harmlessness from AI feedback},
+  author  = {Bai, Yuntao and Kadavath, Saurav and Kundu, Sandipan and
+             Askell, Amanda and Kernion, Jackson and Jones, Andy and
+             Chen, Anna and Goldie, Anna and Mirhoseini, Azalia and
+             McKinnon, Cameron and others},
+  journal = {arXiv preprint arXiv:2212.08073},
+  year    = {2022}
+}
+
+@article{ganguli2022red,
+  title   = {Red teaming language models to reduce harms: methods,
+             scaling behaviors, and lessons learned},
+  author  = {Ganguli, Deep and Lovitt, Liane and Kernion, Jackson and
+             Askell, Amanda and Bai, Yuntao and Kadavath, Saurav and
+             Mann, Ben and Perez, Ethan and Schiefer, Nicholas and
+             Ndousse, Kamal and others},
+  journal = {arXiv preprint arXiv:2209.07858},
+  year    = {2022}
+}
+
+@article{perez2022discovering,
+  title   = {Discovering language model behaviors with model-written
+             evaluations},
+  author  = {Perez, Ethan and Ringer, Sam and Lukošiūtė, Kamilė and
+             Nguyen, Karina and Chen, Edwin and Heiner, Scott and
+             Pettit, Craig and Olsson, Catherine and Kundu, Sandipan
+             and Kadavath, Saurav and others},
+  journal = {arXiv preprint arXiv:2212.09251},
+  year    = {2022}
+}
+
+% ─── Refusal and safety benchmarking ────────────────────────────────────
+@inproceedings{rottger2024safetyprompts,
+  title     = {SafetyPrompts: a systematic review of open datasets for
+               evaluating and improving large language model safety},
+  author    = {Röttger, Paul and others},
+  booktitle = {Proceedings of the Association for Computational
+               Linguistics},
+  year      = {2024},
+  note      = {Final venue may differ; verify before submission}
+}
+
+@inproceedings{rottger2024xstest,
+  title     = {{XSTest}: A test suite for identifying exaggerated safety
+               behaviors in large language models},
+  author    = {Röttger, Paul and Kirk, Hannah Rose and Vidgen, Bertie and
+               Attanasio, Giuseppe and Bianchi, Federico and Hovy, Dirk},
+  booktitle = {Proceedings of NAACL},
+  year      = {2024}
+}
+
+@article{zheng2024openresearcher,
+  title   = {Over-refusal in large language models: a critical
+             examination of the calibration problem},
+  author  = {Zheng, others},
+  journal = {arXiv preprint},
+  year    = {2024},
+  note    = {Placeholder; author verifying exact citation}
+}
+
+@article{durmus2024opinionqa,
+  title   = {Towards measuring the representation of subjective global
+             opinions in language models},
+  author  = {Durmus, Esin and Nguyen, Karina and Liao, Thomas I and
+             Schiefer, Nicholas and Askell, Amanda and Bakhtin, Anton
+             and Chen, Carol and Hatfield-Dodds, Zac and Hernandez,
+             Danny and Joseph, Nicholas and others},
+  journal = {arXiv preprint arXiv:2306.16388},
+  year    = {2024}
+}
+
+@article{santurkar2023whose,
+  title   = {Whose opinions do language models reflect?},
+  author  = {Santurkar, Shibani and Durmus, Esin and Ladhak, Faisal and
+             Lee, Cinoo and Liang, Percy and Hashimoto, Tatsunori},
+  journal = {arXiv preprint arXiv:2303.17548},
+  year    = {2023}
+}
+
+@article{hartmann2023political,
+  title   = {The political ideology of conversational AI: Converging
+             evidence on ChatGPT's pro-environmental, left-libertarian
+             orientation},
+  author  = {Hartmann, Jochen and Schwenzow, Jasper and Witte, Maximilian},
+  journal = {SSRN},
+  year    = {2023}
+}
+
+@article{zhang2024evaluating,
+  title   = {Evaluating the safety of large language models trained with
+             Chinese safety frameworks},
+  author  = {Zhang, others},
+  journal = {arXiv preprint},
+  year    = {2024},
+  note    = {Placeholder --- author verifying exact citation}
+}
+
+@inproceedings{huang2023comprehensive,
+  title     = {A comprehensive evaluation of {ChatGPT} on {C}hinese
+               content},
+  author    = {Huang, others},
+  booktitle = {Proceedings of the ACL Workshop on Trustworthy NLP},
+  year      = {2023},
+  note      = {Placeholder --- verify exact citation}
+}
+
+% ─── LLM agent simulation ──────────────────────────────────────────────
+@inproceedings{park2023generative,
+  title     = {Generative agents: Interactive simulacra of human behavior},
+  author    = {Park, Joon Sung and O'Brien, Joseph C and Cai, Carrie J
+               and Morris, Meredith Ringel and Liang, Percy and
+               Bernstein, Michael S},
+  booktitle = {Proceedings of the 36th Annual ACM Symposium on User
+               Interface Software and Technology},
+  pages     = {1--22},
+  year      = {2023}
+}
+
+@article{horton2023llm,
+  title   = {Large language models as simulated economic agents: What
+             can we learn from {Homo Silicus}?},
+  author  = {Horton, John J},
+  journal = {NBER Working Paper},
+  year    = {2023}
+}
+
+@article{argyle2023samples,
+  title   = {Out of one, many: using language models to simulate human
+             samples},
+  author  = {Argyle, Lisa P and Busby, Ethan C and Fulda, Nancy and
+             Gubler, Joshua R and Rytting, Christopher and Wingate,
+             David},
+  journal = {Political Analysis},
+  volume  = {31},
+  number  = {3},
+  pages   = {337--351},
+  year    = {2023}
+}
+
+@article{tornberg2023simulating,
+  title   = {Simulating social media using large language models to
+             evaluate alternative news feed algorithms},
+  author  = {Törnberg, Petter and Valeeva, Diliara and Uitermark,
+             Justus and Bail, Christopher},
+  journal = {arXiv preprint arXiv:2310.05984},
+  year    = {2023}
+}
+
+@article{sun2024persona,
+  title   = {Persona effects on language model outputs: a case study of
+             demographic steering in political opinion tasks},
+  author  = {Sun, others},
+  journal = {arXiv preprint},
+  year    = {2024},
+  note    = {Placeholder --- verify exact citation before submission}
 }

@@ -1,0 +1,126 @@
+% ─────────────────────────────────────────────────────────────────────────
+% §6 Limitations
+% ─────────────────────────────────────────────────────────────────────────
+\section{Limitations}\label{sec:limitations}
+
+Five limitations are worth explicit disclosure.
+
+\paragraph{Single-rater annotation.}
+Labels are assigned by a single rater following the decision-tree
+protocol described in §\ref{sec:method-labeling}. While 75.5\% of
+responses were labeled without AI advisory and the full audit trail of
+the remaining 24.5\% is released, this does not substitute for an
+independent second rater. Readers should interpret all label-derived
+quantities as rater-dependent. In §\ref{sec:method-reliability} we
+explicitly decline to compute Cohen's $\kappa$ from the rater--judge
+agreement on the AI-advised subset, as that subset is self-selected
+(only borderline cases were submitted to the judge) and the judge was
+trained on the same rulebook the rater consulted.
+Inter-rater reliability with an independent rater is a priority for
+replication.
+
+\paragraph{Model-tier asymmetry.}
+Our five-vendor panel is not capability-matched. \vendor{OpenAI} and
+\vendor{Gemini} are represented by mini-class models
+(\texttt{gpt-4o-mini}, \texttt{gemini-2.5-flash-lite}), while
+\vendor{DeepSeek} and \vendor{Kimi} are represented by flagship models
+(\texttt{deepseek-chat V3.2}, \texttt{kimi-k2-0905-preview}).
+\vendor{Grok} sits at a middle tier (\texttt{grok-4-fast-non-reasoning}).
+This asymmetry reflects our design choice to audit
+vendor-as-recommended-production-endpoint rather than
+capability-matched tiers, which we believe is a closer analog to the
+typical downstream use case. We nonetheless cannot fully rule out that
+some findings --- particularly the four-profile taxonomy of
+§\ref{sec:results-finding5} --- partly reflect model-scale effects
+rather than alignment-policy effects. A flagship-tier replication
+subset is feasible at $\sim$USD 20 in API cost and represents a direct
+path to disentangling these two factors; we defer it to a follow-up
+paper.
+
+\paragraph{Time-slice snapshot.}
+Model identifiers were frozen on 2026-04-19 and are pinned in the
+released source code. LLM vendor behavior evolves rapidly; an audit
+conducted three or six months later may observe materially different
+refusal patterns even with nominally the same model identifiers, and
+vendors routinely update their safety stacks without public
+announcement. Our findings describe the vendor behavior in the
+April~2026 snapshot; longitudinal tracking is an explicit future-work
+target.
+
+\paragraph{Domain specificity.}
+Our prompt bank covers Taiwan political sensitivity exclusively.
+Generalization to other politically sensitive domains ---
+e.g., Russian/Ukrainian, Palestinian/Israeli, or PRC mainland internal
+political topics --- is not directly supported by our data. The
+methodological contributions (the four-category refusal taxonomy, the
+topic$\times$vendor$\times$layer decomposition, and the
+paired-bootstrap inference protocol) are designed to be domain-portable
+and we anticipate that replications on other domains will reveal a
+similarly complex structure.
+
+\paragraph{Modest prompt bank size.}
+The 200-prompt bank is large enough for CI-disjoint inference on
+aggregate-level vendor comparisons (Finding 1) but limited for
+subgroup claims at small cell sizes. The Kimi API-blocked
+analysis (§\ref{sec:results-finding2}) rests on 14 prompts with
+per-topic subcounts ranging from 0 to 9. The four-profile taxonomy
+(§\ref{sec:results-finding5}) relies on sovereignty-topic cells with
+39 prompts per vendor; bootstrap CIs on sovereignty-specific on-task
+rates are correspondingly wide (up to 31 percentage-points for
+\vendor{DeepSeek}'s \ci{2.6}{23.3}). All findings argued from
+subgroup analyses report CIs explicitly and do not rely on
+point-estimate claims; we recommend a scaled-up replication on
+$N \geq 500$ prompts for any follow-up that seeks to characterize
+sub-topic structure with higher resolution.
+
+% ─────────────────────────────────────────────────────────────────────────
+% §7 Conclusion and Future Work
+% ─────────────────────────────────────────────────────────────────────────
+\section{Conclusion and Future Work}\label{sec:conclusion}
+
+We have presented an audit of refusal behavior across five commercial
+large language models on a fixed bank of 200 Taiwan-political prompts.
+The audit's methodological design --- prompt-level paired bootstrap,
+four-class response taxonomy including an API-level filter category,
+and topic$\times$vendor$\times$layer stratification --- was designed
+to make aggregate-level and mechanism-level vendor comparisons directly
+comparable, and the resulting findings consistently favor a
+multi-dimensional over a single-axis interpretation of alignment
+culture.
+
+Three substantive conclusions follow. First, vendor refusal behavior
+does not partition along geographic (East--West) or regulatory lines in
+our data; the two Chinese-owned vendors in the panel produce the most
+distant pair of refusal distributions in the matrix, and the aggregate
+distribution closest to U.S.\ vendors belongs to \vendor{DeepSeek}.
+Second, vendor alignment strategies span two architecturally distinct
+layers (infrastructure filtering and model-level RLHF), with
+\vendor{Kimi} the single vendor in our panel operating both at scale;
+the two layers are not commensurable as refusal-rate contributors and
+should be reported separately in future audits. Third, a
+topic-stratified view reveals structure invisible to aggregate analysis:
+\vendor{DeepSeek} exhibits a sovereignty-specific on-task collapse
+(10.3\% vs 54.0\% non-sovereignty, disjoint-CI evidence) that has no
+analog in any other vendor in our panel.
+
+Four future-work targets suggest themselves. \textbf{First}, independent
+re-annotation with multiple raters to generate inter-rater reliability
+statistics; the released decision-tree rulebook and AI-judge audit
+trail are intended to facilitate this. \textbf{Second}, a capability-matched
+replication in which each vendor is queried at its flagship-tier model
+rather than at its recommended production endpoint, to disentangle
+alignment-policy from model-scale effects on the observed findings.
+\textbf{Third}, longitudinal replication across model revisions to
+characterize the stability of the four-profile taxonomy. \textbf{Fourth},
+domain replication --- particularly to PRC-internal political topics,
+where the Taiwan-statehood characterization of \vendor{Kimi}'s filter
+would predict a different trigger pattern --- to test the generality of
+the topic$\times$vendor$\times$layer framework.
+
+The project's broader motivation was the construction of LLM agent
+populations for Taiwan voter simulation; the present audit quantifies
+the vendor-dependent priors against which any such simulation study
+should be interpreted. We recommend that downstream agent-simulation
+work in politically sensitive domains treat vendor as a first-class
+experimental variable, run multi-vendor replications where feasible,
+and report layer-stratified refusal metrics.
