@@ -20,8 +20,16 @@
 \usepackage{xeCJK}
 % Fall back to system fonts if these aren't present (user can override)
 \IfFontExistsTF{Helvetica Neue}{\setmainfont{Helvetica Neue}}{}
-\IfFontExistsTF{PingFang TC}{\setCJKmainfont{PingFang TC}}{%
-  \IfFontExistsTF{Noto Sans CJK TC}{\setCJKmainfont{Noto Sans CJK TC}}{}}
+\IfFontExistsTF{PingFang TC}{%
+  \setCJKmainfont{PingFang TC}%
+  \setCJKsansfont{PingFang TC}%
+  \setCJKmonofont{PingFang TC}%
+}{%
+  \IfFontExistsTF{Noto Sans CJK TC}{%
+    \setCJKmainfont{Noto Sans CJK TC}%
+    \setCJKsansfont{Noto Sans CJK TC}%
+    \setCJKmonofont{Noto Sans CJK TC}%
+  }{}}
 
 % ── Math / tables / figures ──────────────────────────────────────────────
 \usepackage{amsmath,amssymb}
