@@ -1,0 +1,232 @@
+% ─────────────────────────────────────────────────────────────────────────
+% §3 Methodology
+% ─────────────────────────────────────────────────────────────────────────
+\section{Methodology}\label{sec:method}
+
+We audit five commercial large language models by sampling their responses
+to a fixed bank of 200 Taiwan-political prompts and hand-labeling each
+response along a four-category refusal taxonomy. This section documents
+(i)~vendor and model selection,
+(ii)~prompt bank construction,
+(iii)~the API-level sampling harness,
+(iv)~the labeling protocol,
+(v)~rater reliability disclosure, and
+(vi)~the statistical procedures used throughout the paper. All code,
+labels, prompts, and per-response cost and latency logs are released
+alongside this paper.
+
+\subsection{Vendor and Model Selection}\label{sec:method-vendors}
+
+We select five vendors spanning three alignment-training lineages: two
+U.S.\ vendors with Reinforcement Learning from Human Feedback (RLHF)
+pipelines documented in-lineage (\vendor{OpenAI}, \vendor{Google Gemini}),
+two Chinese-owned vendors with partially-documented RLHF pipelines
+(\vendor{DeepSeek}, \vendor{Moonshot Kimi}), and one vendor that has
+explicitly positioned itself as a low-refusal alternative
+(\vendor{xAI Grok}). For each vendor we query the \emph{recommended
+production chat endpoint} as of 2026-04-19, not a capability-matched or
+price-matched tier. Specifically:
+
+\begin{itemize}
+  \item \vendor{OpenAI}: \texttt{gpt-4o-mini}
+  \item \vendor{Gemini}: \texttt{gemini-2.5-flash-lite}
+  \item \vendor{Grok}: \texttt{grok-4-fast-non-reasoning}
+  \item \vendor{DeepSeek}: \texttt{deepseek-chat} (V3.2)
+  \item \vendor{Kimi}: \texttt{kimi-k2-0905-preview}
+\end{itemize}
+
+All five endpoints operate in non-reasoning mode (inference paths
+without extended chain-of-thought compute). Reasoning modes are explicitly
+disabled where the vendor exposes a toggle: Gemini's
+\texttt{thinking\_budget} is set to 0 and Kimi's \texttt{thinking.type}
+is set to \texttt{disabled}; xAI's \texttt{-non-reasoning} variant is
+selected by model identifier. Model scale is deliberately not matched:
+OpenAI and Gemini representatives are mini/lite-class models, whereas
+DeepSeek-chat ($\sim\!671$B MoE) and Kimi-k2 ($\sim\!1$T MoE) are flagship
+serving endpoints. We adopt this asymmetry because it reflects the
+realistic deployment economics of an agent simulation study operating at
+thousands-of-calls scale: researchers encounter \emph{vendor-as-offered},
+not vendor-at-equal-capability. This audit therefore characterizes refusal
+behavior as experienced by downstream developers rather than normalizing
+for capability. See §\ref{sec:limitations}~Limitations for the treatment
+of model-scale asymmetry as a potential confound.
+
+All calls share a canonical generation configuration:
+\texttt{temperature} = 0.0, \texttt{top\_p} = 1.0, \texttt{max\_tokens}
+= 512, both frequency and presence penalties set to 0.0, and a fixed
+random \texttt{seed} of 20240113 (retained on the four vendors that
+expose it; Gemini's OpenAI-compatible endpoint rejects seeds). With
+\texttt{temperature} = 0 and max-tokens clipped at 512, observed
+inter-vendor differences cannot be attributed to sampling stochasticity
+or response-length variation. Model identifiers were frozen prior to
+data collection and are pinned in the released source code; the audit
+captures vendor behavior at a single time slice, which we denote the
+\emph{April 2026 snapshot}.
+
+\subsection{Prompt Bank Design}\label{sec:method-prompts}
+
+The prompt bank consists of 200 Traditional Chinese prompts, each
+written by the authors with an explicit \emph{design intent} falling into
+one of three categories:
+\begin{description}
+  \item[Hard-refusal-expected (HR)] 80 prompts engineered to provoke
+    outright refusal under typical RLHF alignment --- e.g., requests for
+    the model's own stance on Taiwanese independence versus cross-strait
+    unification, or character judgments of named political candidates.
+  \item[Soft-refusal-expected (SR)] 70 prompts that probe political
+    sensitivity but admit substantive analytical engagement --- e.g.,
+    policy-effect debates or cross-party comparative questions.
+  \item[On-task-expected (OT)] 50 neutral factual prompts serving as a
+    compliance baseline --- e.g., ``What is the presidential term length
+    in Taiwan?''
+\end{description}
+
+Each prompt is further tagged with one of six topic labels:
+\texttt{sovereignty} (statehood, cross-strait, unification/independence),
+\texttt{candidate} (named politicians), \texttt{history} (228 incident,
+martial law, KMT-era trauma), \texttt{ethnic} (Hoklo, Hakka, 外省, 原住民,
+新住民 relations), \texttt{policy} (energy, conscription, constitutional
+reform), and \texttt{factual} (institutional facts about the RoC
+government, elections, and legal system). Topic labels are used only in
+analysis and are not exposed to models. The full prompt list is released
+as a CSV alongside this paper.
+
+\subsection{Sampling Harness and Response Logging}\label{sec:method-harness}
+
+We query each of the 5 vendors with all 200 prompts, yielding 1{,}000
+prompt--vendor observations in total. Each query is issued through a
+unified \texttt{VendorClient} abstraction that enforces the canonical
+generation configuration above and preserves vendor-native
+authentication. A common retry schedule (exponential backoff with jitter,
+up to 4 attempts) is applied to rate-limit and transient-server errors;
+content-filter refusals and authentication failures are logged as
+terminal errors without retry. For each call we record the model
+identifier, request and response token counts, estimated USD cost,
+latency, HTTP status, and the raw response text. The resulting dataset
+(\texttt{responses\_n200.csv}) is the primary analytic substrate of the
+paper.
+
+Thirteen of the fourteen Kimi \texttt{status=error} entries in the
+dataset are pre-generation content-filter refusals returned by the
+Moonshot API with explicit filter-reason messages; these represent a
+qualitatively different phenomenon from model-level refusal (which is
+observable in the response text). We preserve the API-level error
+category as a fourth response class, \emph{api\_blocked}, disjoint from
+the three text-level labels described below. No other vendor emits
+API-level filter errors in this dataset.
+
+\subsection{Labeling Protocol}\label{sec:method-labeling}
+
+Each non-\texttt{api\_blocked} response is hand-labeled into one of three
+categories:
+\begin{description}
+  \item[\texttt{hard\_refusal}] The response is holistically devoid of
+    substantive engagement. Explicit refusal boilerplate (``As an AI, I
+    cannot take sides...'') with no analysis, or pure template responses
+    that make no reference to the prompt's specific content.
+  \item[\texttt{soft\_refusal}] The response contains substantive content
+    but exhibits at least one of: (a) punt to a third party (Case H
+    family — ``this should be decided by the people / legislature /
+    market''); (b) PRC-aligned entity framing (Case I/J — ``Taiwan
+    region'', ``One-China principle'', active topic hijacking); (c)
+    explicit refusal to commit (``I cannot provide a definite position'')
+    regardless of surrounding analysis.
+  \item[\texttt{on\_task}] The response directly answers the prompt's
+    core ask with substantive content, uses neutral terminology, and
+    makes a directional commitment where the prompt requests one (even
+    if the commitment is multi-causal, e.g., ``both structural and
+    behavioral factors contribute'').
+\end{description}
+
+Labels are assigned by a single rater following a documented
+decision-tree protocol with 10 named Cases (A--J) and 11 Traps,
+iteratively refined during early labeling. The rulebook, including
+specific trigger phrases for each Case (e.g., ``視觀點而定'',
+``由人民決定'' for Case H punts; simplified-Chinese output and
+PRC-institutional framing for Case J), is released as a
+supplementary document.
+
+To reduce judgment drift on borderline responses, the rater consulted
+an auxiliary \texttt{gpt-5.4} judge on demand. The judge was prompted
+with the same decision-tree rulebook and issued structured JSON outputs
+containing a label recommendation, a 5-step decision trace, a
+\texttt{matched\_case}, and \texttt{matched\_traps}. All judge outputs
+are persisted in a sidecar JSONL file
+(\texttt{responses\_n200.ai\_suggest.jsonl}) alongside the primary CSV
+to provide a full audit trail. The rater retained final authority over
+every label and exercised it by explicitly overriding the judge when
+warranted.
+
+\subsection{Rater Reliability and Methodological Disclosure}\label{sec:method-reliability}
+
+Single-rater annotation is a recognized threat to construct validity.
+We mitigate this threat through disclosure rather than post-hoc blind
+re-annotation, for reasons described below.
+
+Of the 986 labelable responses (1{,}000 total minus 14 \emph{api\_blocked}),
+744 (75.5\%) were labeled by the human rater without consulting the AI
+judge. The remaining 241 (24.5\%) were labeled with AI advisory — typically
+borderline Case~H (institutional punt) or Case~J (PRC-framed) responses
+where rulebook application was non-obvious. On the AI-advised subset,
+rater--judge agreement was 99.6\% (240/241), reflecting the iterative
+refinement of the decision-tree protocol during early labeling. Because
+rater and judge each influenced the other during the labeling sprint
+(rater incorporated judge reasoning into the rulebook; judge read the
+current rulebook as context), this agreement statistic is not a clean
+inter-rater reliability measure. We report it in the interest of
+transparency and explicitly decline to compute Cohen's $\kappa$ from it:
+a $\kappa$ of $0.99$ on a self-selected subset would overstate
+reliability.
+
+We considered but opted against a post-hoc blind re-annotation
+subset. Such a subset would have measured rater \emph{test--retest}
+stability, not inter-rater reliability; for the arXiv-first
+dissemination setting, we judged the marginal gain in methodological
+confidence insufficient to justify the additional labeling effort and
+unavoidable recency bias. Instead, we release the full AI-judge audit
+trail and the labeling rulebook so that independent investigators can
+reproduce, audit, or dispute individual labels. A replication study with
+multiple independent raters (inter-rater $\kappa$) is an explicit future
+work target.
+
+\paragraph{Conflict-of-interest disclosure.} The auxiliary judge
+(\texttt{gpt-5.4}) is produced by \vendor{OpenAI}, one of the five
+audited vendors. In §\ref{sec:results} we report per-vendor labeling
+statistics and do not observe rater--judge disagreements concentrated
+on \vendor{OpenAI} responses; readers should nonetheless interpret
+\vendor{OpenAI}-specific findings with this caveat in mind.
+
+\subsection{Statistical Procedures}\label{sec:method-stats}
+
+Throughout §\ref{sec:results} we report 95\% bias-corrected and
+accelerated (BCa) bootstrap confidence intervals for all primary
+quantities. Resampling is performed at the \emph{prompt} level: each of
+the 200 prompts contributes one observation to each of the 5 vendors,
+and a bootstrap resample draws 200 prompt-indices with replacement. This
+preserves the paired structure of the design, in which the same prompt
+elicits jointly-distributed responses across vendors. We use 5{,}000
+bootstrap resamples (fixed seed 20260422) and estimate BCa acceleration
+via leave-one-prompt-out jackknife.
+
+Inter-vendor refusal-distribution similarity is measured by the
+Jensen--Shannon divergence (JSD) between 4-class probability vectors
+(\texttt{hard\_refusal}, \texttt{soft\_refusal}, \texttt{on\_task},
+\texttt{api\_blocked}), computed with base-2 logarithms so that
+JSD $\in [0, 1]$. Two vendors with statistically indistinguishable
+refusal distributions would have a JSD whose 95\% CI includes 0; we
+observe this for the \vendor{OpenAI}--\vendor{Gemini} pair
+(§\ref{sec:results-finding1}).
+
+For per-topic and per-expected-category subgroup analyses, CIs widen
+materially because the relevant subsample sizes range from 19 (factual
+prompts for Kimi) to 100 (HR-expected prompts per vendor). Subgroup
+claims are flagged explicitly wherever the corresponding CI exceeds
+20~percentage-points in width.
+
+All statistics are computed from a single frozen dataset; no
+multiple-hypothesis correction is applied to the main findings because
+all five are a priori reasoned from the audit design rather than
+discovered through undirected mining. For the 10 pairwise-JSD
+comparisons (§\ref{sec:results-finding1}) we note that even with a
+Bonferroni correction ($\alpha/10 = 0.005$), the headline contrasts
+remain significant given the non-overlapping CIs reported.

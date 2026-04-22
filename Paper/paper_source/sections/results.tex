@@ -1,0 +1,155 @@
+% ─────────────────────────────────────────────────────────────────────────
+% §4 Results
+% ─────────────────────────────────────────────────────────────────────────
+\section{Results}\label{sec:results}
+
+We present seven findings in a fixed sequence. Section~\ref{sec:results-overview}
+establishes the per-vendor refusal landscape on the full 1{,}000-call dataset.
+Section~\ref{sec:results-finding1} presents the paper's headline statistical
+contribution: the pairwise JSD clustering structure, which directly refutes the
+hypothesis that vendor refusal behavior partitions by national origin.
+Section~\ref{sec:results-finding2} characterizes Kimi's unique
+API-level content filter. Sections~\ref{sec:results-finding3}--\ref{sec:results-finding7}
+present the remaining findings.
+
+\subsection{Per-Vendor Refusal Landscape}\label{sec:results-overview}
+
+\todo{Write in Batch 2. Summarize Table 1 + Fig 1 data with CIs. ~0.5 page.}
+
+\subsection{Finding 1: DeepSeek's Refusal Distribution Does Not Cluster with Kimi's}\label{sec:results-finding1}
+
+The central empirical question of this audit is whether vendors partition
+into meaningful refusal-behavior clusters, and if so, along what axis. An
+\emph{a priori} plausible hypothesis --- call it the \textbf{monolithic
+East--West dichotomy} --- would predict that the two Chinese-owned vendors
+(\vendor{DeepSeek}, \vendor{Kimi}) cluster together on account of shared
+regulatory and training-data environment, while the U.S.\ vendors
+(\vendor{OpenAI}, \vendor{Gemini}) cluster together on account of shared
+RLHF lineage. The pairwise Jensen--Shannon divergences in Figure~\ref{fig:jsd-heatmap}
+decisively reject this hypothesis.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{fig2_pairwise_jsd_heatmap.pdf}
+  \caption{Pairwise Jensen--Shannon divergence between vendors' 4-class
+  refusal distributions (hard refusal, soft refusal, on-task, API-blocked).
+  Values are base-2 bounded in $[0, 1]$. Diagonal is trivially zero.
+  \vendor{DeepSeek} is near-minimal distance from both Western vendors
+  (JSD $0.017$ from \vendor{OpenAI}, $0.010$ from \vendor{Gemini}) and
+  maximally distant from \vendor{Kimi} (JSD $0.200$, the global maximum
+  of the off-diagonal entries). \vendor{Kimi} is closest to \vendor{Grok}
+  ($0.043$), not to its putative ``Chinese-vendor'' peer.}
+  \label{fig:jsd-heatmap}
+\end{figure}
+
+Three features of this matrix together constitute the Finding~1 evidence.
+
+\paragraph{(i) The Western baseline is statistically indistinguishable from zero.}
+The \vendor{OpenAI}--\vendor{Gemini} JSD is $0.0019$ with 95\% bootstrap CI
+\ci{0.0000}{0.0068}. Because this CI includes 0, the two distributions are
+statistically indistinguishable at this sample size --- consistent with the
+expectation that two U.S.\ RLHF pipelines trained with qualitatively
+similar safety objectives produce qualitatively similar refusal patterns.
+
+\paragraph{(ii) \vendor{DeepSeek} is close to the Western pair, not to \vendor{Kimi}.}
+\vendor{DeepSeek}'s JSD to \vendor{OpenAI} is $0.017$ \ci{0.004}{0.034} and to
+\vendor{Gemini} is $0.010$ \ci{0.001}{0.021}. Both intervals exclude zero
+but only narrowly. In contrast, the \vendor{DeepSeek}--\vendor{Kimi} JSD
+is $0.200$ \ci{0.149}{0.256} --- the largest value in the matrix and an
+order of magnitude larger than either DeepSeek--Western comparison.
+
+\paragraph{(iii) The CIs are mutually disjoint.}
+The \vendor{DeepSeek}--\vendor{Kimi} 95\% CI (lower bound $0.149$) does not
+overlap with \emph{any} CI involving \vendor{DeepSeek} and a Western vendor
+(upper bound at most $0.034$). This non-overlap rules out the null
+hypothesis that \vendor{DeepSeek} is equidistant from \vendor{Kimi} and
+from the Western cluster at the 95\% confidence level.
+
+\paragraph{Implication.}
+These observations are inconsistent with a vendor-clustering axis organized
+by national origin. The empirically supported partition is
+$\{\vendor{OpenAI},\vendor{Gemini},\vendor{DeepSeek}\}$ against
+$\{\vendor{Kimi}\}$, with $\vendor{Grok}$ occupying an intermediate position
+(its closest neighbor is $\vendor{Kimi}$ at JSD $0.043$, driven by both
+vendors' common pattern of high on-task rate; see §\ref{sec:results-finding3}).
+We interpret this clustering structure as evidence that refusal-distribution
+\emph{shape} (the relative mix of hard, soft, on-task, and API-blocked
+categories) is dominated by RLHF training conventions rather than by
+regulatory geography. DeepSeek, despite its Chinese corporate origin,
+produces a refusal distribution whose shape closely tracks
+contemporary U.S.\ RLHF practice. Kimi's distribution, by contrast, is
+dominated by two vendor-specific departures: a non-zero API-level
+content filter (7.0\% of calls; §\ref{sec:results-finding2}) and an
+unusually high on-task rate (83.0\%) on the responses that pass the
+filter. These two features together place Kimi far from every other
+vendor in 4-class distribution space.
+
+Section~\ref{sec:results-finding5} will further complicate this picture:
+although DeepSeek's \emph{distribution shape} matches the Western cluster,
+its \emph{topic-level behavior} diverges dramatically from both Western
+vendors and from Kimi on sovereignty-adjacent prompts. The shape-level
+similarity in Figure~\ref{fig:jsd-heatmap} thus masks a layer-specific
+divergence that becomes visible only under per-topic stratification.
+
+\subsection{Finding 2: Kimi's API Filter Is Taiwan-Statehood Blocking, Not Opinion Blocking}\label{sec:results-finding2}
+
+\todo{Write in Batch 2. Lead with Fig 3 2-panel. Key evidence:
+- 7.0\% of Kimi calls are API-level refusals, vs 0\% for all other vendors.
+- By topic: sovereignty 23.1\%, factual 12.5\%, other topics 0\%.
+- By expected: HR 11.2\%, OT 8.0\%, SR 1.4\%.
+- All 14 blocked prompts in Appendix A. Critical subset: 4 OT-expected
+  factual questions about RoC state institutions (legislature seats,
+  constitutional amendments, presidential term, flag design) are blocked.
+- Implication: filter triggers on institutional-recognition content,
+  not on opinion elicitation. $\sim$0.8 page.}
+
+\subsection{Finding 3: \vendor{Grok} and \vendor{Kimi} Share a Low-Refusal Regime via Different Mechanisms}\label{sec:results-finding3}
+
+\todo{Write in Batch 2. Lead with Fig 4. Both 17\% refusal rate (CIs
+\ci{12}{22}), 22.5pp below median. But Grok has 0\% api_blocked and
+model-level permissive RLHF; Kimi has 7\% api_blocked with near-
+100\% model-level on-task once past the filter. Different architectures,
+similar aggregate. $\sim$0.5 page.}
+
+\subsection{Finding 4: A Two-Layer Refusal Architecture}\label{sec:results-finding4}
+
+\todo{Write in Batch 2. No standalone figure --- references Fig 3, Fig 4,
+Fig 6. Frame as a conceptual summary: pre-generation infra filter (Layer 1,
+only Kimi) + model-level RLHF (Layer 2, all vendors). Total observed
+restrictiveness is a product, not sum. $\sim$0.5 page.}
+
+\subsection{Finding 5: A 4-Profile Vendor Taxonomy via Topic-Stratified On-Task Rate}\label{sec:results-finding5}
+
+\todo{Write in Batch 2. Lead with Fig 6 heatmap. This is the single
+strongest signal in the dataset and the core §5 Discussion hook.
+
+Key claim: DeepSeek sovereignty on-task = 10.3\% \ci{2.6}{23.3}, vs non-sov
+54.0\%, gap -43.8pp. This CI is disjoint from every other vendor's
+sovereignty CI. Contrast with Kimi sovereignty 83.3\% \ci{64.5}{93.8}
+(topic-agnostic post-filter) and Grok 82.1\% \ci{65.9}{92.1}
+(topic-agnostic no-filter).
+
+Taxonomy (4 profiles):
+  Profile A (Western: OpenAI, Gemini): moderate sovereign dampening
+  Profile B (DeepSeek): topic-specific RLHF collapse
+  Profile C (Grok): topic-agnostic permissive
+  Profile D (Kimi): infra-filter + post-filter permissive
+
+Paper's conceptual contribution: alignment culture is NOT a single axis.
+Vendor behavior is a topic × vendor × layer 3-way interaction.
+
+$\sim$1.0 page.}
+
+\subsection{Finding 6: Prompt Bank Validity}\label{sec:results-finding6}
+
+\todo{Write in Batch 2. Short section: OT baseline 96.4\% on-task validates
+the prompt bank as producing the expected compliance distribution on
+neutral factual questions. HR-expected producing 3\% hard / 55.8\% soft /
+39.0\% on-task confirms RLHF engage-with-hedge over block. $\sim$0.3 page.}
+
+\subsection{Finding 7: Two-Tier HR→SR Refusal Elasticity}\label{sec:results-finding7}
+
+\todo{Write in Batch 2. Lead with Fig 5. OpenAI/Gemini +46pp Δ (responsive
+RLHF) vs Grok/DeepSeek/Kimi +25--27pp Δ (clustered but for two reasons).
+Clarify ceiling-effect (Grok/Kimi start high) vs stiff RLHF (DeepSeek
+starts low, stays low). $\sim$0.5 page.}

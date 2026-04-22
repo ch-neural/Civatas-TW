@@ -1,0 +1,127 @@
+% ============================================================================
+% CTW-VA-2026: Vendor-Specific Refusal Patterns in LLM Responses to
+% Taiwan-Political Prompts
+%
+% Compile with XeLaTeX (for xeCJK Chinese support):
+%   xelatex main && biber main && xelatex main && xelatex main
+%
+% Or use `make` (see Makefile).
+% ============================================================================
+\documentclass[11pt,letterpaper]{article}
+
+% ── Layout ───────────────────────────────────────────────────────────────
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}           % blank line between paragraphs, no indent
+\usepackage{microtype}
+\setlength{\emergencystretch}{3em}
+
+% ── Fonts + CJK ──────────────────────────────────────────────────────────
+\usepackage{fontspec}
+\usepackage{xeCJK}
+% Fall back to system fonts if these aren't present (user can override)
+\IfFontExistsTF{Helvetica Neue}{\setmainfont{Helvetica Neue}}{}
+\IfFontExistsTF{PingFang TC}{\setCJKmainfont{PingFang TC}}{%
+  \IfFontExistsTF{Noto Sans CJK TC}{\setCJKmainfont{Noto Sans CJK TC}}{}}
+
+% ── Math / tables / figures ──────────────────────────────────────────────
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\graphicspath{{../paper_figures/}}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,skip=6pt}
+\usepackage{subcaption}
+
+% ── Colors + links ───────────────────────────────────────────────────────
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks=true,
+            linkcolor=black,
+            citecolor=Sepia,
+            urlcolor=NavyBlue]{hyperref}
+
+% ── Bibliography ─────────────────────────────────────────────────────────
+\usepackage[backend=biber,style=authoryear,natbib=true,maxcitenames=2,
+            sorting=nyt]{biblatex}
+\addbibresource{refs.bib}
+
+% ── Code / verbatim ──────────────────────────────────────────────────────
+\usepackage{xurl}
+
+% ── Custom macros ────────────────────────────────────────────────────────
+\newcommand{\vendor}[1]{\textsf{#1}}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+\newcommand{\ci}[2]{[#1,\,#2]}
+\newcommand{\pp}{\,\text{pp}}
+
+% ── Title ────────────────────────────────────────────────────────────────
+\title{Vendor-Specific Refusal Patterns in LLM Responses to\\
+       Taiwan-Political Prompts: Evidence Against a Monolithic\\
+       East--West Alignment Dichotomy}
+\author{Ch Tseng\thanks{Independent researcher. Correspondence:
+        \href{mailto:chtseng.neural@gmail.com}{chtseng.neural@gmail.com}.
+        Code, data, and labeling protocol available at
+        \url{https://github.com/chtseng-neural/Civatas-TW}.}}
+\date{\today}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\todo{Write last. Key points:
+(i) audit of 5 LLM vendors on 200 Taiwan-political prompts × 5 = 1{,}000 calls;
+(ii) 3-class refusal labeling with AI-assisted decision-tree protocol;
+(iii) Finding 1: DeepSeek's refusal distribution is statistically
+indistinguishable from OpenAI/Gemini (JSD CI overlaps 0), yet maximally
+distant from Kimi (JSD 0.200 CI \ci{0.149}{0.256}), refuting any simple
+East--West vendor dichotomy; (iv) Finding 2: Kimi's 7\% API-level content
+filter is best characterized as ``Taiwan-statehood blocking'' — 4/50
+OT-expected neutral factual questions about RoC institutions are blocked;
+(v) Finding 5 (core contribution): per-topic cross-tabulation reveals a
+4-profile vendor taxonomy, with DeepSeek sovereignty on-task collapsing to
+10.3\,\% \ci{2.6}{23.3} while its non-sovereignty behavior matches Western
+vendors.}
+\end{abstract}
+
+
+% ── Section stubs ────────────────────────────────────────────────────────
+\section{Introduction}\label{sec:intro}
+\todo{Write in Batch 3.}
+
+\section{Related Work}\label{sec:related}
+\todo{Write in Batch 3.}
+
+\input{sections/methodology.tex}
+
+\input{sections/results.tex}
+
+\section{Discussion}\label{sec:discussion}
+\todo{Write in Batch 2 after all §4 results are drafted.}
+
+\section{Limitations}\label{sec:limitations}
+\todo{Write in Batch 3. Key items:
+(a) single-rater annotation with 24.5\% AI-advised (§3.5 discloses κ
+infeasible, released audit trail);
+(b) model-tier asymmetry (OpenAI/Gemini mini-class vs DeepSeek/Kimi flagship);
+(c) single time-slice (April 2026 model IDs frozen);
+(d) Taiwan-political domain only, findings may not generalize to other
+politically-sensitive domains;
+(e) N=200 prompts is modest for sub-topic claims (topic-level CIs wide).}
+
+\section{Conclusion and Future Work}\label{sec:conclusion}
+\todo{Write in Batch 3.}
+
+
+% ── Bibliography ─────────────────────────────────────────────────────────
+\printbibliography
+
+% ── Appendix ─────────────────────────────────────────────────────────────
+\appendix
+
+\section{All Kimi API-Blocked Prompts ($N=14$)}\label{app:blocked}
+\todo{Write in Batch 3. Include 14 prompts in original Chinese with English
+glosses, grouped by expected category.}
+
+\end{document}
