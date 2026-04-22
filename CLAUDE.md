@@ -2292,3 +2292,119 @@ philosophy：
    支撐（如 supply/demand/policy）才算 on_task 的 substance。
 6. **Grok/Kimi 在 SR 上的 on_task 率（82%/90%）比 Western vendor 在 OT 上可能還高**：
    這是最強的 2-layer architecture 證據。paper §5 要突顯。
+
+---
+
+## Stage 17 — 標註 100% 完成 + blind validation 工具建置 + §3.5 揭露策略定案（2026-04-22）
+
+### 17.1 標註收尾
+
+986/986 labelable row 全標完（OT47/deepseek 為最後一筆）。`calibration stats` 最終輸出：
+
+| 類別 | n | % |
+|---|---|---|
+| hard_refusal | 12 | 1.2% |
+| soft_refusal | 316 | 32.0% |
+| on_task | 658 | 66.7% |
+
+Per-vendor refusal rate：deepseek 54.0% / gemini 43.0% / openai 39.5% /
+grok 17.0% / kimi 17.0% in-text + 7.0% infra（api_blocked 14/200）。
+
+Stage 16.4 的 3 個 primary finding + Stage 16.5 的 4 個 bonus finding 在
+full dataset 全部 survive。**Paper 資料面已完備**。
+
+### 17.2 Blind validation 放棄 — 但工具仍建置（可選 pipeline）
+
+**初始決定做盲標**（抽 n=30-50 重標、關 AI、算 Cohen's κ）後，使用者反駁
+「我沒有每次都使用 AI 建議」，核對 `calibration stats` 確認：
+
+```
+AI suggestions (sidecar):
+  Total entries:    241
+  Overlap w/ human: 241  (agree=240, disagree=1)
+  Human-only:       744  (labeled by human, no AI entry)
+```
+
+**744 / 985 = 75.5% 純人工獨立判斷**，只 24.5% 有 AI 輔助。原本擔憂「99.6%
+agreement = rater 過度信任 AI」因此**無效**：99.6% 只來自主動求助 AI 的 241 筆
+（self-selected 困難樣本），sampling bias 明顯，不是全樣本 rater-AI 污染指標。
+
+**結論**：單人標註的 paper 本來就不寫 κ（κ 是兩人 rater 才有意義）。
+arXiv 定位下，**誠實揭露方法學限制**比硬做一個測不到重點的 κ 更合理。
+
+### 17.3 §3.5 揭露模板（直接套用）
+
+```
+Refusal labels were produced by a single rater using a decision-tree
+protocol (Paper/docs/04_REFUSAL_LABELING_RULES.md). Of the 986 labelable
+responses, 744 (75.5%) were labeled independently without AI assistance.
+For the remaining 241 (24.5%), the rater consulted a gpt-5.4 advisory
+judge on demand — typically for borderline Case H (institutional punt) or
+Case J (PRC-framed) instances. Rater-AI agreement on this subset was
+99.6% (240/241), reflecting iteratively-refined decision rules
+(Cases H1-H4, Traps 9-11 added during calibration).
+
+Limitations (§6): Single-rater annotation is a known threat. We mitigate
+via (a) documented decision tree, (b) AI judge audit trail released on
+GitHub (responses_n200.ai_suggest.jsonl), and (c) rater-AI agreement
+reported above. Second-rater replication reserved for future work.
+
+Conflict-of-interest: The advisory judge (gpt-5.4) is an OpenAI product,
+and OpenAI is one of the audited vendors. We verified no systematic
+rater-AI disagreement concentrated on OpenAI responses (Appendix A).
+```
+
+### 17.4 Blind validation 工具鏈（保留作可選 pipeline）
+
+即使這次 v1 paper 不跑盲標，建置的工具鏈 v2 paper 或後續 second-rater
+情境可直接用：
+
+- **`refusal/blind.py`** — `sample_blind_subset()` stratified by
+  (vendor × expected)，largest-remainder 配額、seed deterministic、
+  label column 清空、輸出 `*_blind.csv` 符合 webui whitelist
+- **`refusal/agreement.py`** — `compute()` 讀 primary + blind CSV、
+  sklearn Cohen's κ（處理 NaN degenerate case）、per-vendor 拆分、
+  3×3 confusion matrix、coverage gap 報告
+- **CLI** — `calibration blind-sample` + `calibration agreement`，後者
+  支援 `--json` + `--output-json` 寫 JSON 給 figure script
+- **Webui 盲標模式** — filename 尾綴 `_blind.csv` 自動觸發
+  `labeler.blindMode=true`：
+  - 藍色 "🙈 盲標模式" banner 顯示於 header 下
+  - AI 按鈕 row（`lf-ai-row`）x-show 隱藏
+  - AI error panel + result panel 條件 hide
+  - 鍵盤 `a` shortcut 在 blind mode 被無視
+- **spec.py** — 兩個新 step entry（blind-sample / agreement），
+  `③ bis` / `③ ter` 編號，放在 import-labels 與 train 中間
+- **Tests** — 15 個 test 覆蓋 stratification 形狀、determinism、
+  label 清空、api_blocked 排除、κ perfect/partial/degenerate/coverage-gap
+  邊界（全綠、全 suite 106 passed）
+
+### 17.5 關鍵教訓（Stage 17 新增）
+
+1. **先看數據再下判斷**：我原本主張做盲標是基於「99.6% 太高，rater 可能
+   被 AI 污染」，但 `calibration stats` 早就顯示 75.5% 是 human-only。
+   使用者反駁後才回頭看才發現。**任何 methodology 爭議前要先 grep 手上
+   的事實**，不能只靠直覺推。
+2. **工具 vs 實驗是兩回事**：即使決定不做實驗（blind validation run），
+   工具仍有保留價值（v2 paper / second-rater / future κ audit）。不要
+   因為「不用」就 revert，但要在設計時想清楚「工具 generic 到跨情境」。
+3. **Single-rater paper 不寫 κ**：inter-rater κ 需要獨立兩 rater，
+   單 rater test-retest κ 是測 rater 穩定性而非 bias，arXiv 讀者通常
+   不要求。走**清晰的 §3.5 揭露 + audit trail 釋出**比硬湊數字更好。
+
+### 17.6 未 commit 變更狀態（Stage 17 收尾）
+
+```
+新增：
+  Paper/src/ctw_va/refusal/blind.py          ~110 行
+  Paper/src/ctw_va/refusal/agreement.py      ~140 行
+  Paper/tests/test_blind_validation.py       ~240 行 (15 test)
+
+修改：
+  Paper/src/ctw_va/cli/calibration.py        +69 行 (blind-sample + agreement CLI)
+  Paper/src/ctw_va/webui/spec.py             +100 行 (2 new step entry)
+  Paper/src/ctw_va/webui/static/index.html   +30 行 (blindMode detection + UI hiding)
+  CLAUDE.md                                  +當前這段
+```
+
+Full test suite：**106 passed**（91 + 15 new）

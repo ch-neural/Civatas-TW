@@ -634,6 +634,19 @@
     font-size: 12.5px;
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
   }
+  .labeler-blind-banner {
+    padding: 10px 18px;
+    background: rgba(147, 197, 253, 0.08);
+    border-bottom: 1px solid rgba(147, 197, 253, 0.35);
+    color: #93c5fd;
+    font-size: 12.5px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .labeler-blind-banner code {
+    background: rgba(255,255,255,0.06); padding: 1px 6px;
+    border-radius: 3px; font-family: ui-monospace, monospace; font-size: 11px;
+    color: #cbd5e1;
+  }
   .labeler-review-banner kbd {
     background: rgba(255,255,255,0.08); padding: 1px 5px;
     border-radius: 3px; font-family: ui-monospace, monospace; font-size: 11px;
@@ -2018,6 +2031,7 @@ function app() {
       onlyInconsistent: false,
       reviewing: false,          // true while user re-checks inconsistent rows
       revealFor: null,
+      blindMode: false,          // true when filename ends with _blind.csv — hides AI + primary label cues
       aiSuggest: {
         loading: false,
         error: null,
@@ -2084,6 +2098,10 @@ function app() {
       this.labelerOpen = true;
       this.labeler.reviewing = false;
       this.labeler.onlyInconsistent = false;
+      // Blind mode: filename ending in _blind.csv hides AI suggestions
+      // so the rater re-labels without assistance → κ vs primary is meaningful.
+      const name = (path || '').split('/').pop() || '';
+      this.labeler.blindMode = /_blind\.csv$/i.test(name);
       await this.labelerLoad();
     },
 
@@ -2351,6 +2369,7 @@ function app() {
       }
       if (k === 'a' || k === 'A') {
         ev.preventDefault();
+        if (this.labeler.blindMode) return;   // blind mode: no AI assistance
         // If a cached suggestion already exists, 'a' re-runs (force=true).
         // Otherwise it runs fresh.
         this.aiSuggestRun(!!this.aiSuggestCurrent);
@@ -2415,6 +2434,12 @@ function app() {
       <button class="labeler-review-exit" @click="exitReviewing()">✕ 結束檢視 · 回總結</button>
     </div>
   </template>
+  <template x-if="labeler.blindMode">
+    <div class="labeler-blind-banner">
+      🙈 <b>盲標模式</b> · AI 建議已隱藏 · 請憑自身判斷重新標註 ·
+      完成後執行 <code>civatas-exp calibration agreement</code> 計算 Cohen's κ
+    </div>
+  </template>
   <div class="labeler-body">
     <div class="labeler-focus">
       <template x-if="labeler.loading"><div>讀取中…</div></template>
@@ -2468,8 +2493,8 @@ function app() {
               <span class="lf-k">3</span> 正常 <small>on_task</small>
             </button>
           </div>
-          <!-- AI 決策樹分析 -->
-          <div class="lf-ai-row">
+          <!-- AI 決策樹分析 (hidden in blind mode) -->
+          <div class="lf-ai-row" x-show="!labeler.blindMode">
             <button class="lf-ai-btn"
                     @click="aiSuggestRun(false)"
                     :disabled="aiLoadingHere || currentRow.status === 'error' || !!aiSuggestCurrent">
@@ -2490,13 +2515,13 @@ function app() {
                    placeholder="gpt-5.4"
                    title="OpenAI model id">
           </div>
-          <template x-if="aiErrorHere">
+          <template x-if="aiErrorHere && !labeler.blindMode">
             <div class="lf-ai-error">
               <b>⚠ AI 呼叫失敗：</b>
               <span x-text="aiErrorHere"></span>
             </div>
           </template>
-          <template x-if="aiSuggestVisible">
+          <template x-if="aiSuggestVisible && !labeler.blindMode">
             <div class="lf-ai-result">
               <div class="lf-ai-head">
                 <span class="lf-ai-label" :class="'lbl-' + aiSuggestCurrent.label">

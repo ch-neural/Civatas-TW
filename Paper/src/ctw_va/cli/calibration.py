@@ -5,7 +5,7 @@ import json as _json
 
 import click
 
-from ..refusal import fetcher, csv_io, classifier, stats as stats_mod
+from ..refusal import fetcher, csv_io, classifier, stats as stats_mod, blind as blind_mod
 from ..refusal.prompts import VALID_LABELS
 
 
@@ -93,6 +93,71 @@ def stats_cmd(csv_path, sidecar, as_json):
         click.echo(_json.dumps(s, ensure_ascii=False, indent=2))
     else:
         click.echo(stats_mod.format_text(s, csv_path=csv_path))
+
+
+@calibration.command("blind-sample")
+@click.option("--csv", "csv_path", type=click.Path(exists=True), required=True,
+              help="Primary labeled CSV (e.g. responses_n200.csv)")
+@click.option("--n", type=int, default=50, show_default=True,
+              help="Blind subset size (stratified across vendor × expected)")
+@click.option("--seed", type=int, default=20260422, show_default=True,
+              help="Deterministic seed — same seed produces the same subset")
+@click.option("--output", type=click.Path(), default=None,
+              help="Output CSV (default: <input_stem>_blind.csv; filename must match "
+                   "responses_n*_*.csv so the webui labeler accepts it)")
+def blind_sample_cmd(csv_path, n, seed, output):
+    """Sample a blind-validation subset for rater reliability (Cohen's κ).
+
+    Output CSV has the label column cleared. Open in webui under blind mode
+    (AI suggestions hidden) and re-label from scratch. Then run
+    `calibration agreement` to compute κ.
+    """
+    from pathlib import Path
+    if output is None:
+        p = Path(csv_path)
+        output = str(p.with_name(p.stem + "_blind" + p.suffix))
+    result = blind_mod.sample_blind_subset(
+        input_csv=csv_path, output_csv=output, n=n, seed=seed,
+    )
+    click.echo(f"✓ Sampled {result['sampled']} rows from "
+               f"{result['eligible']} eligible → {result['output']}")
+    click.echo(f"  seed={result['seed']}")
+    click.echo(f"  stratum breakdown (vendor|expected):")
+    for k in sorted(result["by_stratum"]):
+        click.echo(f"    {k}: {result['by_stratum'][k]}")
+    click.echo()
+    click.echo("  Next: open the output CSV in the webui labeler. Blind mode "
+               "auto-activates (AI suggestions hidden) when filename ends with _blind.csv.")
+
+
+@calibration.command("agreement")
+@click.option("--primary", "primary_csv", type=click.Path(exists=True), required=True,
+              help="Primary labeled CSV (original human labels)")
+@click.option("--blind", "blind_csv", type=click.Path(exists=True), required=True,
+              help="Blind re-labeled CSV (same rows, re-labeled without AI assist)")
+@click.option("--json", "as_json", type=bool, default=False, is_flag=True,
+              help="Emit JSON instead of text report")
+@click.option("--output-json", type=click.Path(), default=None,
+              help="Optional: write JSON report to this path (for paper §3.5 citation)")
+def agreement_cmd(primary_csv, blind_csv, as_json, output_json):
+    """Compute Cohen's κ between primary and blind labels on the blind subset.
+
+    Reports overall κ + per-vendor κ + 3×3 confusion matrix. Writes optional
+    JSON for downstream paper figures.
+    """
+    from ..refusal import agreement as agreement_mod
+    result = agreement_mod.compute(primary_csv=primary_csv, blind_csv=blind_csv)
+    if output_json:
+        import json as _j
+        from pathlib import Path
+        Path(output_json).parent.mkdir(parents=True, exist_ok=True)
+        Path(output_json).write_text(
+            _j.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+    if as_json:
+        click.echo(_json.dumps(result, ensure_ascii=False, indent=2))
+    else:
+        click.echo(agreement_mod.format_text(result))
 
 
 @calibration.command("train")

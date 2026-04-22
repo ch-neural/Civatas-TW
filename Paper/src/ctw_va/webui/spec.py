@@ -771,6 +771,7 @@ COMMANDS: list[dict[str, Any]] = [
         ],
         "unblocks": [
             {"group": "calibration", "subcommand": "train"},
+            {"group": "calibration", "subcommand": "blind-sample"},
         ],
         "fields": [
             {"name": "csv", "flag": "--csv", "type": "path",
@@ -783,6 +784,122 @@ COMMANDS: list[dict[str, Any]] = [
              "default_template": "{csv|responses→labeled|csv→jsonl}",
              "required": True,
              "help": "labeled JSONL 輸出路徑。🔗 未手動改過時會跟 csv 同步（responses_n*.csv → labeled_n*.jsonl）"},
+        ],
+    },
+    {
+        "group": "calibration",
+        "subcommand": "blind-sample",
+        "title": "③ bis · 抽盲標子集（rater reliability）",
+        "summary": (
+            "從已標註的 CSV 隨機抽 N 筆（stratified by vendor × expected），"
+            "label 欄清空輸出到 *_blind.csv。之後在 webui 開該檔進入盲標模式，"
+            "AI 建議自動隱藏，重標後跑 agreement 算 Cohen's κ。"
+        ),
+        "why": (
+            "paper §3.5 必須回報 rater reliability — 現在 985 筆中有 241 筆曾看過 AI 建議，"
+            "agreement 只能算 99.6%（太高可能被審稿人質疑）。盲標 30–50 筆獨立子集 "
+            "→ 算 κ vs primary label → 得到真正的 inter-rater reliability 數字。"
+            "不做這個，paper §3.5 的 self-audit disclosure 會很弱。"
+        ),
+        "details": [
+            "Stratified sampling 確保每個 (vendor × expected) cell 都被抽到",
+            "--seed 讓抽樣 deterministic，跨機器可重現",
+            "輸出檔名尾綴 _blind.csv → 符合 webui labeler filename whitelist",
+            "api_blocked（status=error）row 不進候選池",
+            "開啟盲標 CSV 時，labeler modal 自動進入 blind mode（AI 按鈕隱藏、banner 顯示）",
+        ],
+        "outputs": [
+            {
+                "path": "experiments/refusal_calibration/responses_n{N}_blind.csv",
+                "kind": "CSV — 同原 schema，label 欄清空",
+                "expected": "通常 30–50 筆",
+                "next_step": "在 webui labeler 盲標 → 跑 agreement",
+                "schema": "同 export CSV；label 欄等你重新填",
+            },
+        ],
+        "category": "Phase A5 — 拒答校準",
+        "depends_on": [
+            {"kind": "step", "what": "calibration/import-labels",
+             "note": "需要至少一批 primary labels 才抽得出來"},
+        ],
+        "unblocks": [
+            {"group": "calibration", "subcommand": "agreement"},
+        ],
+        "fields": [
+            {"name": "csv", "flag": "--csv", "type": "path",
+             "default": "experiments/refusal_calibration/responses_n200.csv",
+             "required": True,
+             "help": "已標註的 primary CSV 路徑"},
+            {"name": "n", "flag": "--n", "type": "int",
+             "default": 50,
+             "help": "盲標子集大小（常見 30–50；n ≥ 15 才能每 stratum 至少 1 筆）"},
+            {"name": "seed", "flag": "--seed", "type": "int",
+             "default": 20260422,
+             "help": "抽樣 seed（跨機器同 seed 產生同樣子集）"},
+            {"name": "output", "flag": "--output", "type": "path",
+             "default": "",
+             "required": False,
+             "help": "（選用）輸出 CSV 路徑。留空 = 自動以 _blind 尾綴產生"},
+        ],
+    },
+    {
+        "group": "calibration",
+        "subcommand": "agreement",
+        "title": "③ ter · Cohen's κ (primary vs blind)",
+        "summary": (
+            "比對 primary CSV 與 blind CSV 的 label（依 prompt_id × vendor 配對），"
+            "輸出整體 κ、per-vendor κ、3×3 confusion matrix。"
+        ),
+        "why": (
+            "paper §3.5 引用用的核心數字。κ ≥ 0.8 = excellent、0.6–0.8 = substantial、"
+            "< 0.6 需在 limitations 揭露。per-vendor κ 可偵測「某家 vendor 的回應比其它家"
+            "更難判」的 bias。"
+        ),
+        "details": [
+            "用 sklearn.metrics.cohen_kappa_score 計算（3 類 categorical）",
+            "degenerate case（某 vendor 全同 label）全 agree → 1.0；否則 → 0.0（conservative）",
+            "confusion matrix rows=primary, cols=blind，對應正式 paper table",
+            "可以 --output-json 寫 JSON 給後續 figure script 消費",
+        ],
+        "outputs": [
+            {
+                "path": "(stdout)",
+                "kind": "文字報告或 JSON",
+                "schema": "overall{kappa, observed_agreement, n}, per_vendor{vendor:{n,kappa,agreement_rate}}, confusion_matrix",
+                "next_step": "paper §3.5 / methodology 引用此數字",
+            },
+            {
+                "path": "metrics/calibration/agreement.json",
+                "kind": "（選用）JSON 報告（--output-json 指定時產生）",
+            },
+        ],
+        "category": "Phase A5 — 拒答校準",
+        "depends_on": [
+            {"kind": "step", "what": "calibration/blind-sample"},
+            {"kind": "gate", "what": "盲標 blind CSV 完成",
+             "note": "blind CSV 的 label 欄需填完（可用 webui labeler 盲標模式）",
+             "action": {"kind": "open_labeler"},
+             "target_step": {"group": "calibration", "subcommand": "blind-sample"}},
+        ],
+        "unblocks": [],
+        "fields": [
+            {"name": "primary", "flag": "--primary", "type": "path",
+             "default": "experiments/refusal_calibration/responses_n200.csv",
+             "required": True,
+             "help": "Primary labeled CSV（原始標註，含 AI 建議輔助）"},
+            {"name": "blind", "flag": "--blind", "type": "path",
+             "default": "experiments/refusal_calibration/responses_n200_blind.csv",
+             "default_from_job": {"group": "calibration", "subcommand": "blind-sample", "field": "output"},
+             "required": True,
+             "help": "盲標 CSV（rater 重新標註，無 AI 輔助）"},
+            {"name": "output_json", "flag": "--output-json", "type": "path",
+             "default": "",
+             "required": False,
+             "help": "（選用）JSON 報告輸出路徑，給 paper figure script 消費"},
+            {"name": "as_json", "flag": "--json", "type": "bool",
+             "default": False,
+             "required": False,
+             "help": "stdout 輸出 JSON 取代文字報告"},
         ],
     },
     {
