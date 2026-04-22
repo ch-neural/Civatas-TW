@@ -14,9 +14,9 @@ Dichotomy"** 的全部材料。該研究審計 OpenAI / Gemini / Grok / DeepSeek
 五家商業 LLM 在 200 題繁中台灣政治議題上的拒答行為，帶 paired-bootstrap 95%
 BCa 置信區間、4-class refusal taxonomy、topic × vendor × layer 三維分解。
 
-- 📂 [`Paper/`](Paper/) — 完整子目錄（論文 LaTeX 源碼、實驗資料、分析腳本）
-- 📂 [`Paper/paper_source/`](Paper/paper_source/) — LaTeX 源碼（`make` 即可編譯）
-- 📄 [`Paper/paper_source/PAPER_ZH.md`](Paper/paper_source/PAPER_ZH.md) — 中文解讀版（10 分鐘讀完 28 頁 paper 精華）
+- 📄 [`Paper/paper_source/main.pdf`](Paper/paper_source/main.pdf) — 論文 PDF（27 頁）
+- 📂 [`Paper/paper_source/`](Paper/paper_source/) — LaTeX 源碼（`make` 可重新編譯）
+- 📂 [`Paper/`](Paper/) — 完整子目錄（實驗資料、分析腳本、文件）
 - 📊 [`Paper/experiments/refusal_calibration/`](Paper/experiments/refusal_calibration/)
   — 1,000 筆 vendor call log + 986 筆人工標註 + AI-judge audit trail
 - 📘 [`Paper/docs/04_REFUSAL_LABELING_RULES.md`](Paper/docs/04_REFUSAL_LABELING_RULES.md)
@@ -31,7 +31,7 @@ BCa 置信區間、4-class refusal taxonomy、topic × vendor × layer 三維分
 3. **Finding 5**（核心）：DeepSeek 在 sovereignty 題上 on-task rate 崩到 **10.3%**
    （CI `[2.6, 23.3]`），非 sovereignty 題卻是 54%（Western 水準）——
    整個資料集最強的單一 signal。
-4. 其餘 4 個 findings 見 [`Paper/paper_source/PAPER_ZH.md`](Paper/paper_source/PAPER_ZH.md)。
+4. 其餘 4 個 findings（api_blocked/on_task/elasticity 等）見 [論文 PDF](Paper/paper_source/main.pdf) §4 Results。
 
 ### 本 repo 的雙重定位
 
