@@ -63,9 +63,10 @@ words, whichever is shorter. We are within both limits.)
 ## 4. Comments field
 
 ```
-25 pages, 6 figures, 2 tables, appendix with full 14-prompt
-API-blocked enumeration. Code, prompts, per-response logs, hand-labels,
-and AI-judge audit trail released at
+27 pages, 7 figures, 2 tables, appendix with full 14-prompt
+API-blocked enumeration. Also archived at Zenodo
+(DOI: 10.5281/zenodo.19691574). Code, prompts, per-response logs,
+hand-labels, and AI-judge audit trail released at
 https://github.com/ch-neural/Civatas-TW
 ```
 

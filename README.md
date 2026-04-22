@@ -8,11 +8,21 @@
 
 ## 📄 Paper: CTW-VA-2026
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19691574.svg)](https://doi.org/10.5281/zenodo.19691574)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+
 本 repo 同時包含研究論文 **"Vendor-Specific Refusal Patterns in LLM Responses
 to Taiwan-Political Prompts: Evidence Against a Monolithic East-West Alignment
 Dichotomy"** 的全部材料。該研究審計 OpenAI / Gemini / Grok / DeepSeek / Kimi
 五家商業 LLM 在 200 題繁中台灣政治議題上的拒答行為，帶 paired-bootstrap 95%
 BCa 置信區間、4-class refusal taxonomy、topic × vendor × layer 三維分解。
+
+**正式引用**：
+```
+Tseng, C.-H. (2026). Vendor-Specific Refusal Patterns in LLM Responses to
+Taiwan-Political Prompts: Evidence Against a Monolithic East-West Alignment
+Dichotomy. Zenodo. https://doi.org/10.5281/zenodo.19691574
+```
 
 - 📄 [`Paper/paper_source/main.pdf`](Paper/paper_source/main.pdf) — 論文 PDF（27 頁）
 - 📂 [`Paper/paper_source/`](Paper/paper_source/) — LaTeX 源碼（`make` 可重新編譯）
