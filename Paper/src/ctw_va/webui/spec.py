@@ -730,7 +730,7 @@ COMMANDS: list[dict[str, Any]] = [
              "default": "",
              "required": False,
              "help": "（選用）AI 建議 JSONL。留空 = 自動找 <stem>.ai_suggest.jsonl"},
-            {"name": "as_json", "flag": "--json", "type": "flag",
+            {"name": "as_json", "flag": "--json", "type": "bool",
              "default": False,
              "required": False,
              "help": "輸出 JSON 取代文字報告"},
