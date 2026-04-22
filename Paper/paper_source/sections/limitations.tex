@@ -29,13 +29,15 @@ Our five-vendor panel is not capability-matched. \vendor{OpenAI} and
 This asymmetry reflects our design choice to audit
 vendor-as-recommended-production-endpoint rather than
 capability-matched tiers, which we believe is a closer analog to the
-typical downstream use case. We nonetheless cannot fully rule out that
-some findings --- particularly the four-profile taxonomy of
-§\ref{sec:results-finding5} --- partly reflect model-scale effects
-rather than alignment-policy effects. A flagship-tier replication
-subset is feasible at $\sim$USD 20 in API cost and represents a direct
-path to disentangling these two factors; we defer it to a follow-up
-paper.
+typical downstream use case. To test whether observed findings reflect
+alignment policy rather than model-scale differences, we conducted a
+40-prompt flagship-tier sensitivity subset
+(§\ref{sec:discussion-robustness}); Findings 1, 3, 5, and 7 retain
+their qualitative character when \vendor{OpenAI}, \vendor{Gemini}, and
+\vendor{Grok} are queried at flagship-tier models. The sensitivity
+subset is itself limited in sample size (n=40 prompts,
+wide single-vendor CIs), and a $N \geq 200$-prompt flagship replication
+would provide tighter confidence bands on each finding.
 
 \paragraph{Time-slice snapshot.}
 Model identifiers were frozen on 2026-04-19 and are pinned in the
@@ -106,16 +108,17 @@ analog in any other vendor in our panel.
 Four future-work targets suggest themselves. \textbf{First}, independent
 re-annotation with multiple raters to generate inter-rater reliability
 statistics; the released decision-tree rulebook and AI-judge audit
-trail are intended to facilitate this. \textbf{Second}, a capability-matched
-replication in which each vendor is queried at its flagship-tier model
-rather than at its recommended production endpoint, to disentangle
-alignment-policy from model-scale effects on the observed findings.
-\textbf{Third}, longitudinal replication across model revisions to
-characterize the stability of the four-profile taxonomy. \textbf{Fourth},
-domain replication --- particularly to PRC-internal political topics,
-where the Taiwan-statehood characterization of \vendor{Kimi}'s filter
-would predict a different trigger pattern --- to test the generality of
-the topic$\times$vendor$\times$layer framework.
+trail are intended to facilitate this. \textbf{Second}, a scaled-up
+capability-matched replication at $N \geq 200$ prompts; the present
+paper's 40-prompt flagship subset (§\ref{sec:discussion-robustness})
+establishes qualitative robustness but leaves CIs wide on
+subgroup-level statistics. \textbf{Third}, longitudinal replication
+across model revisions to characterize the stability of the
+four-profile taxonomy. \textbf{Fourth}, domain replication ---
+particularly to PRC-internal political topics, where the
+Taiwan-statehood characterization of \vendor{Kimi}'s filter would
+predict a different trigger pattern --- to test the generality of the
+topic$\times$vendor$\times$layer framework.
 
 The project's broader motivation was the construction of LLM agent
 populations for Taiwan voter simulation; the present audit quantifies

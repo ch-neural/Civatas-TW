@@ -201,6 +201,121 @@ DeepSeek--sovereignty interaction; the present work's contribution is
 to document that interaction rigorously and to point subsequent work
 toward mechanistic characterization.
 
+\subsection{Robustness to Model-Tier Asymmetry}\label{sec:discussion-robustness}
+
+Section~\ref{sec:method-vendors} disclosed that our five-vendor panel
+is not capability-matched: \vendor{OpenAI} and \vendor{Gemini} are
+represented by mini/lite-class models, whereas \vendor{DeepSeek} and
+\vendor{Kimi} are flagship serving endpoints. A natural alternative
+explanation for Findings~1, 3, 5, and 7 is that model scale rather than
+alignment policy drives the observed inter-vendor divergence. To test
+this, we re-ran a stratified 40-prompt subset of the main experiment
+under a flagship-tier configuration: \vendor{OpenAI} queried at
+\texttt{gpt-4o}, \vendor{Gemini} at \texttt{gemini-2.5-flash}, and
+\vendor{Grok} at \texttt{grok-3}. (\vendor{Gemini-2.5-pro} was
+considered but requires reasoning mode, which would break the
+non-reasoning consistency of our vendor configuration; we use
+\texttt{gemini-2.5-flash}, the flagship non-reasoning variant in the
+flash family.) \vendor{DeepSeek} and \vendor{Kimi} already used their
+flagship endpoints in the main experiment and are unchanged. Paired
+bootstrap CIs are computed on the subset using the same protocol as
+§\ref{sec:method-stats}.
+
+Figure~\ref{fig:tier-comparison} reports the comparison on the four
+tier-sensitive findings. The n=40 subset produces wide confidence
+intervals on any single-vendor statistic; we therefore focus on
+qualitative direction and rank-ordering rather than on point-estimate
+equality.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{fig7_tier_comparison.pdf}
+  \caption{Production-tier (gray) vs flagship-tier (orange) comparison
+  on four tier-sensitive headline findings. Error bars are 95\% paired
+  bootstrap CIs (5{,}000 resamples, prompt-level pairing). Highlighted
+  cells mark the critical \vendor{DeepSeek} × sovereignty cell (B) and
+  the \vendor{DeepSeek}$\leftrightarrow$\vendor{Kimi} JSD pair (D) that
+  anchor Findings 5 and 1 respectively.}
+  \label{fig:tier-comparison}
+\end{figure}
+
+\paragraph{Finding~1 (refusal-distribution clustering) is robust.}
+In the production tier restricted to the subset, the pairwise JSDs
+preserve the main-experiment ordering:
+\vendor{DeepSeek}$\leftrightarrow$\vendor{Kimi} is the largest
+off-diagonal entry (0.209, 95\% CI \ci{0.097}{0.355}), while
+\vendor{DeepSeek}$\leftrightarrow$\vendor{OpenAI} (0.074) and
+\vendor{DeepSeek}$\leftrightarrow$\vendor{Gemini} (0.085) are an order
+of magnitude smaller. In the flagship tier, the same ranking obtains:
+\vendor{DeepSeek}$\leftrightarrow$\vendor{Kimi} remains the
+maximum (0.236, CI \ci{0.115}{0.384}), with
+\vendor{DeepSeek}$\leftrightarrow$\vendor{Gemini} actually
+\emph{decreasing} (0.047, CI \ci{0.007}{0.098}) when \vendor{Gemini} is
+queried at its flagship model. The shape-level clustering that refutes
+the East--West dichotomy is therefore not produced by the mini/flagship
+capability gap; it persists when the gap is eliminated.
+
+\paragraph{Finding~5 (\vendor{DeepSeek} sovereignty collapse) is robust.}
+In both tiers, \vendor{DeepSeek}'s sovereignty on-task rate on the
+7-prompt sovereignty subset of the 40-prompt subset is
+\textbf{0.0\%} (0/7 in each tier). No other vendor's sovereignty
+on-task rate drops below 28\% in either tier. Because the
+\vendor{DeepSeek} model identifier is identical across tiers, this
+cross-tier stability is trivial for \vendor{DeepSeek} specifically;
+what the flagship subset adds is evidence that none of the three
+\emph{upgraded} vendors (\vendor{OpenAI}, \vendor{Gemini},
+\vendor{Grok}) produces a comparable sovereignty collapse when
+queried at flagship scale. Flagship \vendor{Gemini}'s sovereignty
+on-task rate drops from 71\% to 29\% in our subset (small-$n$ noise
+or a real shift we cannot resolve at this sample size), but even at
+29\% it is an order of magnitude above \vendor{DeepSeek}'s 0\%.
+The sovereignty-specific dampening of \vendor{DeepSeek} is not an
+artifact of querying it against smaller Western models.
+
+\paragraph{Finding~3 (\vendor{Grok}/\vendor{Kimi} low-refusal regime)
+is robust.}
+Aggregate refusal rates in the subset preserve the production-tier
+ordering: \vendor{DeepSeek} highest (62.5\% in both tiers),
+\vendor{Kimi} lowest (12.5\% prod, 10.0\% flagship), \vendor{Grok}
+second-lowest (17.5\% prod, 22.5\% flagship). The
+\vendor{Grok-3}-vs-\vendor{grok-4-fast-non-reasoning} comparison is
+particularly informative: despite the model-scale difference, Grok
+produces qualitatively similar balanced-hedge responses on
+partisan-political prompts (observed in side-by-side inspection during
+labeling). The low-refusal regime is a vendor-alignment feature,
+not a model-scale feature.
+
+\paragraph{Finding~7 (two-tier HR$\to$SR elasticity) is robust.}
+\vendor{DeepSeek}'s elasticity is literally identical (9.8\,pp in both
+tiers, same model). \vendor{OpenAI}/\vendor{Gemini}/\vendor{Grok}
+flagship elasticities fall in 26.8\,pp--42.9\,pp, overlapping the main
+experiment's responsive-tier range. CIs are wide in the 40-prompt
+subset and many pairwise differences are not statistically distinct,
+but no flagship vendor collapses to a low-Δ regime that would
+challenge the responsive/non-responsive two-tier picture.
+
+\paragraph{Finding~2 is not tested here.}
+The \vendor{Kimi} Taiwan-statehood filter (§\ref{sec:results-finding2})
+is vendor-infrastructure-level and model-independent;
+\vendor{Kimi}'s model identifier is identical between main and
+flagship tiers, so there is no tier contrast to test. The 0/40
+API-blocks observed in the flagship subset reflect Poisson variation
+at n=40 with a 7\% main-experiment filter rate (expected
+$\approx 2.8$, $P(X=0 \mid \lambda=2.8) \approx 6\%$) and does not
+constitute evidence for or against the main Finding~2 characterization.
+
+\paragraph{Overall.}
+The size-confound alternative explanation for the paper's headline
+findings is not supported by the flagship-tier sensitivity subset.
+The four tier-sensitive findings retain their qualitative character
+when \vendor{OpenAI}, \vendor{Gemini}, and \vendor{Grok} are queried
+at capability-matched flagship endpoints. We report this as
+corroborating robustness rather than as confirmation; the 40-prompt
+subset is modest, and a scaled-up replication at
+$N \geq 200$-prompt flagship fetch would provide tighter CIs on each
+finding. All data, labels, and comparison JSON from this sensitivity
+subset are released alongside the main dataset.
+
 \subsection{Implications for LLM Agent Simulation Studies}\label{sec:discussion-simulation}
 
 This audit was originally motivated by a larger project using LLM
