@@ -81,40 +81,40 @@
 \maketitle
 
 \begin{abstract}
-We audit the refusal behavior of five commercial large language models
---- \vendor{OpenAI gpt-4o-mini}, \vendor{Google gemini-2.5-flash-lite},
+We audit five commercial large language models
+(\vendor{OpenAI gpt-4o-mini}, \vendor{Google gemini-2.5-flash-lite},
 \vendor{xAI grok-4-fast}, \vendor{DeepSeek V3.2}, and
-\vendor{Moonshot Kimi k2} --- on a bank of 200 Traditional Chinese
-prompts engineered to probe Taiwan political sensitivity, yielding
-1{,}000 prompt--vendor observations. Hand-labeled responses are
-classified along a four-category taxonomy (hard refusal, soft refusal,
-on-task, API-blocked), with all statistics reported under prompt-level
-paired bootstrap 95\% BCa confidence intervals. Four findings are
-robust at the CI level. First, the intuitive East--West alignment
-dichotomy is empirically refuted: the two Chinese-owned vendors produce
-the most divergent refusal distributions in the panel (JSD 0.200, CI
-\ci{0.149}{0.256}), while \vendor{DeepSeek}'s aggregate distribution is
-statistically indistinguishable from the U.S.\ vendors. Second,
-\vendor{Kimi}'s 7\% API-level content filter blocks 4 of 50 neutral
-factual prompts about Republic of China state institutions, supporting a
-\emph{Taiwan-statehood blocking} rather than
-\emph{sovereignty-opinion blocking} characterization. Third, a
-topic-stratified view reveals a four-profile vendor taxonomy, with
-\vendor{DeepSeek}'s sovereignty on-task rate collapsing to 10.3\%
+\vendor{Moonshot Kimi k2}) on 200 Traditional Chinese prompts designed
+to probe Taiwan political sensitivity. Each vendor responds to each
+prompt under a fixed generation configuration, yielding 1{,}000
+observations. Hand-labeled responses are classified along a
+four-category taxonomy (hard refusal, soft refusal, on-task,
+API-blocked), with all statistics reported under prompt-level
+paired-bootstrap 95\% BCa confidence intervals.
+Four findings emerge. The intuitive East-West alignment dichotomy is
+refuted: the two Chinese-owned vendors produce the most divergent
+refusal distributions in the panel (JSD 0.200, CI \ci{0.149}{0.256}),
+while \vendor{DeepSeek}'s aggregate distribution is statistically
+indistinguishable from the U.S.\ vendors.
+\vendor{Kimi}'s 7\% API-level content filter rejects 4 of 50
+OT-expected neutral factual prompts about Republic of China state
+institutions, supporting a \emph{Taiwan-statehood blocking} rather
+than \emph{sovereignty-opinion blocking} reading.
+A topic-stratified view reveals a four-profile vendor taxonomy.
+\vendor{DeepSeek}'s sovereignty on-task rate collapses to 10.3\%
 (\ci{2.6}{23.3}) while its non-sovereignty behavior matches Western
-vendors --- a disjoint-CI collapse unique in our panel. Fourth, a
-HR$\to$SR elasticity analysis distinguishes responsive-RLHF vendors
-from ceiling-bound and stiff-RLHF vendors. A 40-prompt flagship-tier
-sensitivity subset shows these four findings retain their qualitative
-character when \vendor{OpenAI}, \vendor{Gemini}, and \vendor{Grok} are
-queried at capability-matched flagship endpoints, indicating that the
-observed inter-vendor divergence is not an artifact of
-model-scale asymmetry. All code, prompts,
-per-response logs, hand-labels, and the auxiliary AI-judge audit trail
-are released. For LLM agent simulation studies in
-politically-sensitive domains, we recommend treating vendor as a
-first-class experimental variable and reporting layer-stratified
-refusal metrics.
+vendors, a disjoint-CI collapse unique in the panel. An HR$\to$SR
+elasticity analysis separates responsive-RLHF vendors from
+ceiling-bound and stiff-RLHF vendors.
+A 40-prompt flagship-tier sensitivity subset shows these four findings
+retain their qualitative character when \vendor{OpenAI},
+\vendor{Gemini}, and \vendor{Grok} are queried at capability-matched
+flagship endpoints, so the observed inter-vendor divergence is not a
+model-scale artifact. Code, prompts, per-response logs, hand-labels,
+and the auxiliary AI-judge audit trail are released. For LLM agent
+simulation in politically sensitive domains, we recommend treating
+vendor as a first-class experimental variable and reporting
+layer-stratified refusal metrics.
 \end{abstract}
 
 

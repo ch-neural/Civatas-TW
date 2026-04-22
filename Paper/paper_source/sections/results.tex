@@ -57,14 +57,14 @@ numbers.
 \subsection{Finding 1: DeepSeek's Refusal Distribution Does Not Cluster with Kimi's}\label{sec:results-finding1}
 
 The central empirical question of this audit is whether vendors partition
-into meaningful refusal-behavior clusters, and if so, along what axis. An
-\emph{a priori} plausible hypothesis --- call it the \textbf{monolithic
-East--West dichotomy} --- would predict that the two Chinese-owned vendors
+into meaningful refusal-behavior clusters, and if so along what axis. An
+\emph{a priori} plausible hypothesis, the \textbf{monolithic East-West
+dichotomy}, would predict that the two Chinese-owned vendors
 (\vendor{DeepSeek}, \vendor{Kimi}) cluster together on account of shared
-regulatory and training-data environment, while the U.S.\ vendors
+regulatory and training-data environment, and the U.S.\ vendors
 (\vendor{OpenAI}, \vendor{Gemini}) cluster together on account of shared
-RLHF lineage. The pairwise Jensen--Shannon divergences in Figure~\ref{fig:jsd-heatmap}
-decisively reject this hypothesis.
+RLHF lineage. The pairwise Jensen-Shannon divergences in
+Figure~\ref{fig:jsd-heatmap} reject this hypothesis.
 
 \begin{figure}[htbp]
   \centering
@@ -83,18 +83,19 @@ decisively reject this hypothesis.
 Three features of this matrix together constitute the Finding~1 evidence.
 
 \paragraph{(i) The Western baseline is statistically indistinguishable from zero.}
-The \vendor{OpenAI}--\vendor{Gemini} JSD is $0.0019$ with 95\% bootstrap CI
-\ci{0.0000}{0.0068}. Because this CI includes 0, the two distributions are
-statistically indistinguishable at this sample size --- consistent with the
-expectation that two U.S.\ RLHF pipelines trained with qualitatively
+The \vendor{OpenAI}-\vendor{Gemini} JSD is $0.0019$ with 95\% bootstrap CI
+\ci{0.0000}{0.0068}. Because this CI includes 0, the two distributions
+are statistically indistinguishable at this sample size, consistent with
+the expectation that two U.S.\ RLHF pipelines trained with qualitatively
 similar safety objectives produce qualitatively similar refusal patterns.
 
 \paragraph{(ii) \vendor{DeepSeek} is close to the Western pair, not to \vendor{Kimi}.}
-\vendor{DeepSeek}'s JSD to \vendor{OpenAI} is $0.017$ \ci{0.004}{0.034} and to
-\vendor{Gemini} is $0.010$ \ci{0.001}{0.021}. Both intervals exclude zero
-but only narrowly. In contrast, the \vendor{DeepSeek}--\vendor{Kimi} JSD
-is $0.200$ \ci{0.149}{0.256} --- the largest value in the matrix and an
-order of magnitude larger than either DeepSeek--Western comparison.
+\vendor{DeepSeek}'s JSD to \vendor{OpenAI} is $0.017$ \ci{0.004}{0.034}
+and to \vendor{Gemini} is $0.010$ \ci{0.001}{0.021}. Both intervals
+exclude zero but only narrowly. In contrast, the
+\vendor{DeepSeek}-\vendor{Kimi} JSD is $0.200$ \ci{0.149}{0.256}, the
+largest value in the matrix and an order of magnitude larger than
+either DeepSeek-Western comparison.
 
 \paragraph{(iii) The CIs are mutually disjoint.}
 The \vendor{DeepSeek}--\vendor{Kimi} 95\% CI (lower bound $0.149$) does not
@@ -131,12 +132,12 @@ divergence that becomes visible only under per-topic stratification.
 
 \subsection{Finding 2: Kimi's API Filter Is Taiwan-Statehood Blocking, Not Opinion Blocking}\label{sec:results-finding2}
 
-\vendor{Kimi} is the only vendor in our five-vendor panel that emits
-API-level content-filter errors. Of 200 calls, 14 (7.0\%) return a
-pre-generation refusal with an explicit filter-reason message rather
-than any response text. We analyze this subset along two axes --- prompt
-topic and prompt design intent --- in Figure~\ref{fig:kimi-blocked},
-and interpret the resulting pattern in the remainder of this subsection.
+\vendor{Kimi} is the only vendor in our panel that emits API-level
+content-filter errors. Of 200 calls, 14 (7.0\%) return a pre-generation
+refusal with an explicit filter-reason message rather than any response
+text. Figure~\ref{fig:kimi-blocked} analyzes this subset along two
+axes, prompt topic and prompt design intent; the remainder of this
+subsection interprets the resulting pattern.
 
 \begin{figure}[htbp]
   \centering
@@ -163,9 +164,9 @@ where users are most likely to elicit politically sensitive opinions.
 Partitioning the same 14 blocks by design intent
 (Figure~\ref{fig:kimi-blocked}(b)) rules out that reading. 11.2\% of
 HR-expected prompts are blocked, consistent with the filter targeting
-provocative content. But \textbf{8.0\% of OT-expected prompts
-(4/50) are also blocked} --- a rate within a factor of 1.4 of the HR-expected
-rate. The OT-expected prompts are by construction neutral factual
+provocative content. But \textbf{8.0\% of OT-expected prompts (4/50) are also blocked},
+a rate within a factor of 1.4 of the HR-expected rate. The OT-expected
+prompts are by construction neutral factual
 questions with no opinion content; their 96.4\% cross-vendor on-task rate
 (§\ref{sec:results-finding6}) confirms the prompt-bank design.
 
@@ -187,14 +188,14 @@ institution (\emph{legislature}, \emph{constitution}, \emph{president},
 \emph{national flag}) by its Traditional-Chinese institutional name.
 Three of four use ``台灣'' (Taiwan) as the modifier; the fourth uses
 ``中華民國'' (Republic of China). None poses a question whose answer
-requires any political judgment --- seat counts, amendment counts,
-term lengths, and flag color meanings are documentary facts.
+requires any political judgment: seat counts, amendment counts, term
+lengths, and flag color meanings are documentary facts.
 
 The set of topics on which the filter \emph{does not} fire reinforces
 the institutional-recognition reading. History prompts in our bank
 include requests for evaluation of martial-law-era atrocities and the
-228 Incident --- plainly political, plainly politically sensitive ---
-and none triggered the filter. Ethnic prompts probe Hoklo / Hakka /
+228 Incident, which are plainly political and plainly politically
+sensitive, and none triggered the filter. Ethnic prompts probe Hoklo / Hakka /
 外省 / 原住民 / 新住民 relations, a domain with visible political
 charge in Taiwan, and none triggered the filter. Policy prompts include
 conscription reform, nuclear energy, and redistribution of fiscal
@@ -208,9 +209,9 @@ We therefore characterize \vendor{Kimi}'s pre-generation filter as
 \textbf{Taiwan-statehood blocking} rather than
 \textbf{sovereignty-opinion blocking}: the filter appears to trigger
 on prompt-level recognition of the Republic of China as a sovereign
-polity --- including its deliberative, constitutional, executive, and
-symbolic institutions --- independently of whether the prompt requests
-any opinion. This pattern is consistent with a keyword- or
+polity (including its deliberative, constitutional, executive, and
+symbolic institutions) regardless of whether the prompt requests any
+opinion. This pattern is consistent with a keyword- or
 entity-recognition-level filter operating on the prompt before the
 language model is invoked, and inconsistent with a content-reasoning
 filter that evaluates the prompt's argumentative structure or the
@@ -239,18 +240,17 @@ becomes visible once the 4-class distribution is decomposed.
   \label{fig:on-task-bar}
 \end{figure}
 
-\vendor{Grok}'s 17.0\% refusal is entirely text-level --- the model
-returns 33 soft refusals (16.5\%) and 1 hard refusal (0.5\%) out of 200
-calls, with zero API-level filter errors. Its low-refusal regime is
-best understood as a model-level RLHF choice that admits substantive
+\vendor{Grok}'s 17.0\% refusal is entirely text-level. The model returns
+33 soft refusals (16.5\%) and 1 hard refusal (0.5\%) out of 200 calls,
+with zero API-level filter errors. Its low-refusal regime is best
+understood as a model-level RLHF choice that admits substantive
 engagement on topics where other vendors' text-level alignment prompts
-soft refusal. \vendor{Kimi}'s identical 17.0\% is dominated by a
-different composition: 14 API-blocked responses (7.0\%) with zero
-response text, plus 20 soft refusals (10.0\%) and 0 hard refusals.
-Conditional on the response passing the pre-generation filter,
-\vendor{Kimi}'s model-level behavior is the most permissive observed
-in our dataset --- 166 of 186 labelable responses (89.2\%) are on-task
---- exceeding even \vendor{Grok}'s conditional rate.
+soft refusal. \vendor{Kimi}'s identical 17.0\% has a different
+composition: 14 API-blocked responses (7.0\%) with zero response text,
+plus 20 soft refusals (10.0\%) and 0 hard refusals. Conditional on
+passing the pre-generation filter, \vendor{Kimi}'s model-level behavior
+is the most permissive in our dataset: 166 of 186 labelable responses
+(89.2\%) are on-task, exceeding even \vendor{Grok}'s conditional rate.
 
 Mechanistically, these represent two non-equivalent routes to the same
 aggregate:
