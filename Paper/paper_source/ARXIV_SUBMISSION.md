@@ -66,7 +66,7 @@ words, whichever is shorter. We are within both limits.)
 25 pages, 6 figures, 2 tables, appendix with full 14-prompt
 API-blocked enumeration. Code, prompts, per-response logs, hand-labels,
 and AI-judge audit trail released at
-https://github.com/chtseng-neural/Civatas-TW
+https://github.com/ch-neural/Civatas-TW
 ```
 
 ## 5. Subject categories
