@@ -6,6 +6,50 @@
 
 ---
 
+## 📄 Paper: CTW-VA-2026
+
+本 repo 同時包含研究論文 **"Vendor-Specific Refusal Patterns in LLM Responses
+to Taiwan-Political Prompts: Evidence Against a Monolithic East-West Alignment
+Dichotomy"** 的全部材料。該研究審計 OpenAI / Gemini / Grok / DeepSeek / Kimi
+五家商業 LLM 在 200 題繁中台灣政治議題上的拒答行為，帶 paired-bootstrap 95%
+BCa 置信區間、4-class refusal taxonomy、topic × vendor × layer 三維分解。
+
+- 📂 [`Paper/`](Paper/) — 完整子目錄（論文 LaTeX 源碼、實驗資料、分析腳本）
+- 📂 [`Paper/paper_source/`](Paper/paper_source/) — LaTeX 源碼（`make` 即可編譯）
+- 📄 [`Paper/paper_source/PAPER_ZH.md`](Paper/paper_source/PAPER_ZH.md) — 中文解讀版（10 分鐘讀完 28 頁 paper 精華）
+- 📊 [`Paper/experiments/refusal_calibration/`](Paper/experiments/refusal_calibration/)
+  — 1,000 筆 vendor call log + 986 筆人工標註 + AI-judge audit trail
+- 📘 [`Paper/docs/04_REFUSAL_LABELING_RULES.md`](Paper/docs/04_REFUSAL_LABELING_RULES.md)
+  — 標註 decision tree（Cases A-J + Traps 1-11）
+
+### 主要發現（見 paper §4）
+
+1. **Finding 1**：DeepSeek 的 refusal 分佈跟 Western 幾乎一樣（JSD 0.010-0.017），
+   跟 Kimi 差最遠（JSD 0.200）。「中 vs 西」二分法被資料打臉。
+2. **Finding 2**：Kimi 的 API filter 不只擋敏感意見，連「立法院席次」「總統任期」
+   等 RoC 制度事實題也擋 → **Taiwan-statehood blocking** 而非 opinion blocking。
+3. **Finding 5**（核心）：DeepSeek 在 sovereignty 題上 on-task rate 崩到 **10.3%**
+   （CI `[2.6, 23.3]`），非 sovereignty 題卻是 54%（Western 水準）——
+   整個資料集最強的單一 signal。
+4. 其餘 4 個 findings 見 [`Paper/paper_source/PAPER_ZH.md`](Paper/paper_source/PAPER_ZH.md)。
+
+### 本 repo 的雙重定位
+
+```
+github.com/ch-neural/Civatas-TW
+├── ap/                    ← Civatas 模擬平台（9-service Dockerized, 下半部介紹）
+├── data/                  ← 台灣地理 / 人口普查 / 選舉 / PVI 資料
+├── scripts/               ← 頂層資料抓取 + 建 templates 腳本
+└── Paper/                 ← CTW-VA-2026 論文（獨立子專案）
+    ├── paper_source/      ← LaTeX 源碼 + 中文版
+    ├── experiments/       ← 實驗資料 + 標註
+    ├── docs/              ← 標註 rulebook + 研究計劃
+    ├── src/               ← Python 套件（5-vendor client adapter、refusal classifier 等）
+    └── scripts/           ← 繪圖 + 分析 + bootstrap CI 腳本
+```
+
+---
+
 ## 特色
 
 - **9 個 Docker 服務**：Next.js 前端 + FastAPI 後端 + OASIS simulation 核心
