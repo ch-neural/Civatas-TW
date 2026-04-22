@@ -248,7 +248,13 @@ def _build_flags(params: dict) -> list[str]:
 
     Keys whose ``flag`` is empty are treated as positional. Empty strings
     and None are skipped (lets the CLI fall back to its own default).
-    Booleans render as bare ``--flag`` when True.
+    Booleans render as bare ``--flag`` when True, skip entirely when False.
+
+    Defensive: the frontend *should* coerce bool-typed fields via
+    ``_coerce`` before POSTing, but a stale browser spec cache can result
+    in string ``"true"`` / ``"false"`` slipping through. We treat those
+    case-insensitively as booleans here so the resulting argv is always
+    click-compatible regardless of frontend state.
 
     The webui posts a list of ``{flag, value, positional}`` so we can
     preserve positional ordering; we honour that shape here.
@@ -260,6 +266,11 @@ def _build_flags(params: dict) -> list[str]:
         val = item.get("value", "")
         if val in (None, ""):
             continue
+        # Defensive: stringly-typed "true"/"false" arrive when a stale
+        # browser cache renders an is_flag field as a text/select without
+        # coercion. Normalise before the bool branch below.
+        if isinstance(val, str) and val.strip().lower() in ("true", "false"):
+            val = (val.strip().lower() == "true")
         if flag == "":
             positionals.append(str(val))
         elif isinstance(val, bool):
