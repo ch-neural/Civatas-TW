@@ -1,0 +1,254 @@
+{
+  "n_prompts": 200,
+  "n_resamples": 5000,
+  "on_task_rate_pct": {
+    "openai": {
+      "estimate": 60.5,
+      "ci_low": 53.5,
+      "ci_high": 66.5,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "gemini": {
+      "estimate": 56.99999999999999,
+      "ci_low": 50.0,
+      "ci_high": 63.0,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "grok": {
+      "estimate": 83.0,
+      "ci_low": 76.5,
+      "ci_high": 87.0,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "deepseek": {
+      "estimate": 45.5,
+      "ci_low": 38.5,
+      "ci_high": 52.0,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "kimi": {
+      "estimate": 83.0,
+      "ci_low": 76.5,
+      "ci_high": 87.0,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    }
+  },
+  "refusal_rate_pct": {
+    "openai": {
+      "estimate": 39.5,
+      "ci_low": 32.5,
+      "ci_high": 46.0,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "gemini": {
+      "estimate": 43.0,
+      "ci_low": 36.0,
+      "ci_high": 49.0,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "grok": {
+      "estimate": 17.0,
+      "ci_low": 12.0,
+      "ci_high": 22.0,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "deepseek": {
+      "estimate": 54.5,
+      "ci_low": 47.0,
+      "ci_high": 61.0,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "kimi": {
+      "estimate": 17.0,
+      "ci_low": 12.0,
+      "ci_high": 22.0,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    }
+  },
+  "pairwise_jsd": {
+    "openai__gemini": {
+      "estimate": 0.0018852349997060828,
+      "ci_low": 0.0,
+      "ci_high": 0.006810842544746418,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "openai__grok": {
+      "estimate": 0.046034557350883354,
+      "ci_low": 0.023983966997845253,
+      "ci_high": 0.071662882787598,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "openai__deepseek": {
+      "estimate": 0.017367430947658656,
+      "ci_low": 0.004280517220888452,
+      "ci_high": 0.033868563396099644,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "openai__kimi": {
+      "estimate": 0.11725072299249072,
+      "ci_low": 0.081443019246906,
+      "ci_high": 0.1595820120796814,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "gemini__grok": {
+      "estimate": 0.05987509114562828,
+      "ci_low": 0.033393636807481836,
+      "ci_high": 0.08837572896656581,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "gemini__deepseek": {
+      "estimate": 0.009567812837410332,
+      "ci_low": 0.0012934633758019372,
+      "ci_high": 0.02085110269019138,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "gemini__kimi": {
+      "estimate": 0.1354430096727925,
+      "ci_low": 0.09562749756354441,
+      "ci_high": 0.18045501789538554,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "grok__deepseek": {
+      "estimate": 0.1150013886221612,
+      "ci_low": 0.07261787378625537,
+      "ci_high": 0.16060834817257982,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "grok__kimi": {
+      "estimate": 0.04330945936181664,
+      "ci_low": 0.02431335843726833,
+      "ci_high": 0.0669378499074206,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "deepseek__kimi": {
+      "estimate": 0.19996074703823138,
+      "ci_low": 0.14851063073144333,
+      "ci_high": 0.25594491084655396,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    }
+  },
+  "hr_to_sr_delta_pp": {
+    "openai": {
+      "estimate": 46.607142857142854,
+      "ci_low": 31.985868043414914,
+      "ci_high": 60.35928037937422,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "gemini": {
+      "estimate": 45.89285714285714,
+      "ci_low": 29.83255822475984,
+      "ci_high": 58.813551541550744,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "grok": {
+      "estimate": 26.428571428571423,
+      "ci_low": 13.614938718348197,
+      "ci_high": 39.16267628342246,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "deepseek": {
+      "estimate": 26.785714285714285,
+      "ci_low": 12.617491293036183,
+      "ci_high": 41.42857142857142,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "kimi": {
+      "estimate": 25.311288017962852,
+      "ci_low": 15.66586460774501,
+      "ci_high": 37.31343283582089,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    }
+  },
+  "sovereignty_on_task_pct": {
+    "openai": {
+      "estimate": 51.282051282051285,
+      "ci_low": 35.13513513513514,
+      "ci_high": 66.66666666666667,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "gemini": {
+      "estimate": 43.58974358974359,
+      "ci_low": 28.205128205128204,
+      "ci_high": 59.523809523809526,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "grok": {
+      "estimate": 82.05128205128206,
+      "ci_low": 65.85031524683058,
+      "ci_high": 92.10526315789474,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "deepseek": {
+      "estimate": 10.256410256410257,
+      "ci_low": 2.6315789473684212,
+      "ci_high": 23.279124965041166,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    },
+    "kimi": {
+      "estimate": 83.33333333333333,
+      "ci_low": 64.53148797473547,
+      "ci_high": 93.75,
+      "method": "bca",
+      "n_resamples": 5000,
+      "confidence": 0.95
+    }
+  }
+}
