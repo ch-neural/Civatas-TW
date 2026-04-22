@@ -708,6 +708,13 @@ COMMANDS: list[dict[str, Any]] = [
         ],
         "outputs": [
             {
+                "path": "{csv}",
+                "kind": "CSV — 輸入檔回顯（點 ✏️ 進入標註模式可直接在 webui 標註）",
+                "expected": "與 --csv 欄位同路徑，preview 顯示前 50 列",
+                "next_step": "✏️ 進入標註模式繼續標註，或 import-labels 匯回 JSONL",
+                "schema": "同 export CSV schema（14 欄）",
+            },
+            {
                 "path": "(stdout)",
                 "kind": "文字或 JSON",
                 "expected": "約 30 行 text 報告 / 完整 JSON tree",
@@ -725,7 +732,7 @@ COMMANDS: list[dict[str, Any]] = [
              "default": "experiments/refusal_calibration/responses_n200.csv",
              "default_from_job": {"group": "calibration", "subcommand": "export", "field": "output"},
              "required": True,
-             "help": "要統計的 CSV 路徑"},
+             "help": "要統計的 CSV 路徑。跑完 stats 後下方 preview 會顯示此 CSV + ✏️ 進入標註模式按鈕"},
             {"name": "sidecar", "flag": "--sidecar", "type": "path",
              "default": "",
              "required": False,
