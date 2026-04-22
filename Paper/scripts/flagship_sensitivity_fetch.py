@@ -281,8 +281,10 @@ def main():
                     help="Override flagship model ID: --model openai=gpt-4.1")
     ap.add_argument("--input", default=str(INPUT_CSV),
                     help=f"Source labeled CSV (default {INPUT_CSV})")
-    ap.add_argument("--output-stem", default="responses_sens_n40",
-                    help="Output filename stem (.jsonl + .csv)")
+    ap.add_argument("--output-stem", default="responses_n40_flagship",
+                    help="Output filename stem (.jsonl + .csv). Must match the "
+                         "labeler whitelist regex ^responses_n\\d+(_\\w+)?\\.csv$ "
+                         "so the webui labeler will accept it.")
     args = ap.parse_args()
 
     # Load .env so API keys are available
