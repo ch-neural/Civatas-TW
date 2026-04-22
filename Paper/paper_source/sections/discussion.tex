@@ -1,0 +1,219 @@
+% ─────────────────────────────────────────────────────────────────────────
+% §5 Discussion
+% ─────────────────────────────────────────────────────────────────────────
+\section{Discussion}\label{sec:discussion}
+
+The seven findings in §\ref{sec:results} resist summarization under a
+single-axis alignment-culture theory. This section develops three
+corresponding departures from standard framings in the public discourse
+on LLM refusal behavior.
+
+\subsection{Alignment Culture Is Not a One-Dimensional East--West Axis}\label{sec:discussion-axis}
+
+A frequent simplification in popular and industry commentary on LLM
+alignment treats national origin as the primary organizing axis:
+\emph{Western} vendors are imagined to share an RLHF-driven ``liberal
+democratic'' alignment posture, \emph{Chinese} vendors an ``authoritarian''
+one. Under that framing, the observable behaviors of \vendor{OpenAI},
+\vendor{Gemini}, \vendor{DeepSeek}, and \vendor{Kimi} should partition
+2--2 along corporate geography.
+
+Our Finding 1 refutes this prediction \emph{prima facie}. The two
+Chinese-owned vendors produce the single most distant pair of refusal
+distributions in the matrix (\vendor{DeepSeek}--\vendor{Kimi} JSD 0.200,
+CI \ci{0.149}{0.256}). The two putative Western-Chinese cross-pairs
+that the East--West framing predicts to be distant --- \vendor{OpenAI} vs
+\vendor{DeepSeek} and \vendor{Gemini} vs \vendor{DeepSeek} --- are in
+fact the closest non-Western pairings in the matrix, with JSDs an
+order of magnitude below the DeepSeek--Kimi gap. Neither a geographic
+East--West axis nor a regulatory regime axis explains the clustering
+structure that actually obtains.
+
+This is not a surprising result under a slightly more mechanistic view.
+DeepSeek's training recipe is publicly documented and explicitly
+acknowledges RLHF-style post-training on curated preference data
+\emph{in the tradition of InstructGPT and its successors}. In the
+distribution-shape view of refusal behavior --- the relative mix of
+hard/soft/on-task responses --- DeepSeek tracking OpenAI and Gemini is
+precisely what one would expect from a vendor that has adopted
+contemporary RLHF conventions regardless of regulatory geography. Kimi's
+departure, likewise, is not evidence of \emph{Chinese alignment} in some
+monolithic sense, but evidence of a vendor-specific architectural choice
+to split the refusal workload between an infrastructure-level filter
+and a permissive underlying model (§\ref{sec:discussion-two-layer}).
+What Findings 1 and 5 jointly refute is the framing itself, not a claim
+about any particular vendor's alignment politics.
+
+\subsection{Topic $\times$ Vendor $\times$ Layer: A Three-Way Interaction}\label{sec:discussion-three-way}
+
+The cleaner organizing principle that emerges from our data is a
+three-way interaction between prompt \emph{topic}, vendor \emph{identity},
+and the \emph{layer} at which refusal is expressed. The
+aggregate-distribution similarity of §\ref{sec:results-finding1} and the
+topic-stratified divergence of §\ref{sec:results-finding5} are not in
+tension: they describe the refusal surface from two different
+cross-sections. At the aggregate marginal of prompt topics, DeepSeek
+shapes up like OpenAI/Gemini; conditional on the sovereignty topic,
+DeepSeek is categorically more restrictive than any other vendor in
+our panel.
+
+This interactive structure implies that
+\emph{topic-aggregated refusal metrics materially misrepresent vendor
+behavior.} A downstream researcher using DeepSeek for non-sovereignty
+Taiwan content (e.g., ethnic relations, historical events, policy
+debates) would observe behavior essentially indistinguishable from
+Western vendors at refusal-rate metrics commonly reported in the
+alignment literature. The same researcher moving to sovereignty-adjacent
+content --- relevant for any simulation of Taiwanese political
+engagement with cross-strait questions --- would encounter a refusal
+regime that 10\,\% of the time permits on-task engagement. This is a
+40-percentage-point shift invisible to aggregate reporting.
+
+The layer dimension adds a second implication. \vendor{Kimi}'s aggregate
+on-task rate of 83\% on labeled responses is the highest in our panel.
+A researcher reading only the aggregate number and comparing it to the
+public characterization of Kimi as a Chinese-vendor aligned product
+might be surprised. The resolution is that the aggregate rate is
+computed over prompts that \emph{reached} the language model ---
+i.e., after the infrastructure filter removed 7\% of calls. The full
+denominator, including filter rejections, is different in kind:
+infrastructure rejections are visible to the caller as terminal errors
+with filter-reason messages, not as outputs requiring content analysis.
+Treating the two as commensurable categories within a single refusal
+metric is a conceptual error that inflates Kimi's apparent
+permissiveness.
+
+Concretely, for vendor audit practice, the implications are:
+\begin{itemize}
+  \item \textbf{Report Layer 1 and Layer 2 refusal separately.} For a
+    vendor with non-trivial Layer 1 filtering (only \vendor{Kimi} in our
+    dataset, but the set may grow), the aggregate refusal rate conflates
+    two phenomena with different auditability properties.
+  \item \textbf{Stratify by topic.} Aggregate refusal rates can be
+    near-identical for vendors whose topic-conditional behaviors differ
+    by factors of 4--5 (DeepSeek vs Western on sovereignty). For any
+    simulation study whose prompt distribution is not uniform over
+    topics, aggregate rates are inadequate.
+  \item \textbf{Stratify by prompt design intent}, not only by topic.
+    The 8.0\% OT-expected block rate for Kimi is invisible in
+    topic-level reporting (it contributes diffusely to the factual
+    topic's 12.5\% rate) but is the most interpretable evidence for the
+    \emph{Taiwan-statehood blocking} characterization of the filter.
+\end{itemize}
+
+\subsection{The Two-Layer Architecture as a Distinct Alignment Strategy}\label{sec:discussion-two-layer}
+
+The clearest architectural contrast in our dataset is between
+\vendor{DeepSeek}'s topic-specific RLHF strengthening on sovereignty
+(sovereignty on-task 10\%, non-sovereignty 54\%) and \vendor{Kimi}'s
+infrastructure-filter-plus-permissive-model combination
+(sovereignty 83\% of labeled responses on-task, but with 7\% of all
+sovereignty responses blocked upstream). We suggest these represent
+two distinct engineering solutions to the same alignment-policy
+objective --- suppressing responses to sovereignty-sensitive prompts
+that an alignment team would not endorse --- with meaningfully
+different properties for downstream auditability.
+
+The DeepSeek-style strategy concentrates the refusal workload in a
+single layer (the model's RLHF-shaped output distribution) and
+consequently produces refusals that are (i) probabilistic (the same
+prompt may on different samples yield a refusal or an engagement),
+(ii) content-sensitive (prompt rephrasing is effective at influencing
+the response), and (iii) often visually similar to engagement (soft
+refusal, not hard refusal, dominates). The resulting auditor
+must work at the content-analysis level, with all the rater-reliability
+challenges documented in §\ref{sec:method-reliability}.
+
+The Kimi-style strategy splits the refusal workload between a
+deterministic Layer 1 and a permissive Layer 2. Layer 1 refusals are
+visible to every API caller as explicit filter-reason errors; they
+require no content analysis to identify and no inter-rater protocol to
+measure. The trade-off is that Layer 1 filtering is maximally visible:
+a downstream user who prompts \vendor{Kimi} with ``How many seats are
+in Taiwan's legislature?'' (OT03) receives a filter error and can
+immediately recognize it as a policy decision by the vendor, rather
+than a hedged engagement that might be mistaken for a capability
+limit.
+
+Neither strategy is clearly preferable from a pure auditability
+standpoint --- the Kimi strategy is more transparent about its hard
+refusals but may create user-perceived gaps on factual content, while
+the DeepSeek strategy preserves user-perceived coverage at the cost of
+content-reasoning-hidden refusals. What our data supports is the
+\emph{empirical observation} that both strategies exist in production at
+commercial scale, and that they produce qualitatively different audit
+signals that should not be aggregated into a single ``refusal rate''.
+
+\subsection{The DeepSeek Paradox and Its Possible Origins}\label{sec:discussion-deepseek}
+
+The single strongest signal in our dataset is the conjunction of
+\vendor{DeepSeek}'s Western-shaped aggregate refusal distribution with
+its sovereignty-specific 10.3\% on-task rate. We are not positioned from
+this audit alone to adjudicate its mechanistic origin, but three
+hypotheses are worth registering for future investigation.
+
+First, DeepSeek's RLHF reward model may be directly shaped by a
+topic-specific penalty for sovereignty-engaging outputs that does not
+fire at comparable intensity on Western RLHF models. This would be
+consistent with a training-data curation decision taken at the DeepSeek
+organization and would predict that smaller or fine-tuning-modifiable
+versions of the model exhibit reduced topic specificity.
+
+Second, DeepSeek's pre-training data may under-represent a particular
+class of content (e.g., Traditional Chinese political writing authored
+from a Taiwan perspective) such that the model's sovereignty-topic
+responses are both more error-prone and more defensively hedged, not
+because the alignment layer targets the topic but because the base
+model has lower competence on it. This would predict that
+sovereignty-topic soft refusals exhibit semantic patterns consistent
+with uncertainty-driven hedging rather than policy-driven refusal.
+
+Third, the observation might be driven in part by a content-filter
+analog operating at the \vendor{DeepSeek} API layer that we do not
+detect because it manifests as soft-refusal output rather than
+terminal filter errors. That is: Kimi's filter and DeepSeek's filter
+may be functionally similar but surface differently --- Kimi's surfaces
+as explicit API errors, DeepSeek's surfaces as RLHF-shaped hedged
+output. This would predict that on sovereignty-adjacent prompts,
+DeepSeek's non-response content exhibits statistical regularities
+suggestive of a deterministic filter gate upstream of the generation.
+
+We lack instrumentation to discriminate between these hypotheses from
+the present dataset. All three would predict a meaningful
+DeepSeek--sovereignty interaction; the present work's contribution is
+to document that interaction rigorously and to point subsequent work
+toward mechanistic characterization.
+
+\subsection{Implications for LLM Agent Simulation Studies}\label{sec:discussion-simulation}
+
+This audit was originally motivated by a larger project using LLM
+agents to simulate Taiwan voter populations. The findings are
+directly consequential for that class of application. A
+simulation study using a single vendor for Taiwan-political agents
+will produce results that are vendor-specific in ways not always
+acknowledged in the computational social science literature. Two
+concrete risks deserve explicit highlighting:
+
+\begin{itemize}
+  \item A simulation restricted to \vendor{DeepSeek} would produce
+    populations whose sovereignty-topic discourse is dominated by
+    soft refusal or on-task engagement shaped by the model's
+    10\%-sovereignty-on-task regime. Results on cross-strait attitudes
+    would systematically under-represent engagement with the topic,
+    and soft refusal content may be misinterpreted as agent-level
+    indecision rather than vendor-level alignment shaping.
+  \item A simulation restricted to \vendor{Kimi} would silently drop
+    7\% of sovereignty-adjacent prompts (infrastructure-level), with
+    the remaining responses skewing sharply toward on-task engagement
+    at the post-filter language model. Aggregated across an agent
+    day, this could manifest as vendor-specific sparsity in
+    sovereignty discussion combined with (selectively) higher
+    compliance on what remains.
+\end{itemize}
+
+Our recommended mitigation is simple: report vendor as a first-class
+variable in any Taiwan-political agent simulation, and where feasible
+run the same simulation over multiple vendors to quantify
+vendor-dependent effects. The audit data in this paper provides the
+prior distribution under which such multi-vendor comparisons should
+be interpreted.

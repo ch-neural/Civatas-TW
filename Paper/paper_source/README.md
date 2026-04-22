@@ -17,27 +17,30 @@ make clean     # remove auxiliary files
 Or upload `paper_source/` and `../paper_figures/` to Overleaf and set the
 compiler to XeLaTeX.
 
-## Drafting status (2026-04-22)
+## Drafting status (2026-04-22, batch 2 complete)
 
 | Section | Status |
 |---|---|
 | Abstract | placeholder |
 | §1 Introduction | placeholder |
 | §2 Related Work | placeholder |
-| §3 Methodology | **drafted (batch 1)** |
-| §4.1 Per-vendor landscape | placeholder (batch 2) |
-| §4.2 Finding 1 JSD clustering | **drafted (batch 1)** |
-| §4.3 Finding 2 Taiwan-statehood blocking | placeholder (batch 2) |
-| §4.4 Finding 3 Grok/Kimi low-refusal | placeholder (batch 2) |
-| §4.5 Finding 4 2-layer architecture | placeholder (batch 2) |
-| §4.6 Finding 5 4-profile taxonomy | placeholder (batch 2) |
-| §4.7 Finding 6 prompt bank validity | placeholder (batch 2) |
-| §4.8 Finding 7 elasticity | placeholder (batch 2) |
-| §5 Discussion | placeholder (batch 2) |
+| §3 Methodology | **drafted** |
+| §4.1 Per-vendor landscape | **drafted** |
+| §4.2 Finding 1 JSD clustering | **drafted** |
+| §4.3 Finding 2 Taiwan-statehood blocking | **drafted** |
+| §4.4 Finding 3 Grok/Kimi low-refusal | **drafted** |
+| §4.5 Finding 4 2-layer architecture | **drafted** |
+| §4.6 Finding 5 4-profile taxonomy | **drafted** |
+| §4.7 Finding 6 prompt bank validity | **drafted** |
+| §4.8 Finding 7 elasticity | **drafted** |
+| §5 Discussion | **drafted** (5 subsections) |
 | §6 Limitations | placeholder (batch 3) |
 | §7 Conclusion | placeholder (batch 3) |
 | Appendix A: 14 blocked prompts | placeholder (batch 3) |
 | References | stub (batch 3) |
+
+Current line count: ~1,100 lines of TeX (est. 8-10 compiled pages before
+Introduction, Related Work, Limitations, Conclusion, Appendix).
 
 ## Figures / tables
 
