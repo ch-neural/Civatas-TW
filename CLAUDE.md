@@ -2662,4 +2662,232 @@ Cross-tab showing actual label distribution vs expected category:
    極端？（hypothesis：DeepSeek 的 RLHF 訓練資料在 sovereignty-related prompt
    上強力 reward refusal，但其它 topic 是標準 helpful-assistant training）
 
+---
+
+## Stage 20 — Paper 完工 + 跨 PC handoff（2026-04-22 晚）
+
+Stages 16-19 完整 paper 寫作結束，正式進入「等 arXiv endorsement → submit → 公告」
+階段。本 stage 記錄**跨 PC 切換時必知的所有現況**，讓你在新 PC 上拉 CLAUDE.md 就能
+無縫接續。
+
+### 20.1 當前狀態快照
+
+**Git repo**（https://github.com/ch-neural/Civatas-TW）：
+- `main` branch 已完全同步 `feat/ctw-va-2026-vendor-audit`（fast-forward merged 於 commit `5735e5d`）
+- 預設 branch 是 `main`、public
+- 讀者點 GitHub repo URL 首頁直接看到更新後的 README（有 CTW-VA-2026 section + Zenodo DOI badge）
+- Working tree clean
+
+**論文狀態**：
+- `Paper/paper_source/main.tex` + 7 個 sections + 2 個 appendices = **30 頁 PDF**（commit `7bfeb14` 之後）
+- PDF commit 進 git：`Paper/paper_source/main.pdf`（386 KB）
+- 所有 release 承諾的 artifact 都在 `Paper/`：1000 筆 vendor log、986 筆 label、AI judge sidecar、14-prompt blocked list、decision tree rulebook
+
+**Zenodo**：
+- **v1 已發布、有 DOI**：`10.5281/zenodo.19691574` (https://zenodo.org/records/19691574)
+  - 但 v1 的 PDF 是**舊版 27 頁**（commit `174db72` 時的版本，沒有 Appendix B）
+  - **v2 尚待使用者手動上傳**（含 Appendix B 的 30 頁新版 PDF）
+  - 手動流程見 §20.4 待辦 #1
+
+**arXiv**：**尚未投稿**，在等 endorsement。
+
+### 20.2 Paper 7 個 core findings 回顧（給你回新 PC 後快速 recall）
+
+| # | Finding | 數字 |
+|---|---|---|
+| 1 | DeepSeek ≈ Western cluster（JSD 0.01）vs ≠ Kimi（JSD 0.200） | 整個矩陣最大的是 DS↔Kimi |
+| 2 | Kimi Taiwan-statehood blocking | 7% api_blocked，含 4 個 OT 事實題（立法院 / 憲法 / 總統任期 / 國旗）|
+| 3 | Grok / Kimi 都 17% refusal | 兩家都低，但機制完全不同（text-level vs infra-level）|
+| 4 | 兩層拒答架構（L1 infra filter + L2 RLHF）| 只有 Kimi 有 L1 |
+| 5 | **4-profile taxonomy + DeepSeek sovereignty collapse** | **DS sov on_task = 10.3% CI [2.6, 23.3]**；全 panel 唯一 disjoint-CI 訊號 |
+| 6 | OT baseline 96.4% on_task | Prompt bank validity |
+| 7 | HR→SR elasticity 2-tier | OpenAI/Gemini +46pp vs 其他 +25-27pp |
+
+加上 **§5.5 Robustness**：flagship-tier sensitivity subset（n=40 × 5 vendors = 200 calls，USD 0.014）確認 findings 在 capability-matched 旗艦 model 下仍 robust。Appendix B 展示 4 個 sovereignty 題的 5-vendor 逐字回應對照（HR17 / HR01 / OT05 / SR03）。
+
+### 20.3 手上有的 assets（投稿 / 公告用）
+
+所有 handoff material 在 `Paper/paper_source/`：
+
+| 檔案 | 內容 |
+|---|---|
+| `main.pdf` | **正式 30 頁 paper PDF** |
+| `main.tex`, `sections/*.tex`, `refs.bib` | LaTeX source（要改內容從這改）|
+| `Makefile` | `make` 重編，`make clean` 清 .aux |
+| `README.md` | compile 說明、drafting status table |
+| **`ENDORSEMENT_EMAILS.md`** | **繁中給郭昱晨 + 英文給 Naseh，直接可寄** |
+| **`FB_ANNOUNCEMENT.md`** | **FB 公告文案，直接可貼** |
+| `ARXIV_SUBMISSION.md` | arXiv form 每欄該填什麼（title / abstract / comments / categories / license）|
+| `PAPER_ZH.md` | **中文個人速讀版**（gitignored、只本機有） |
+
+### 20.4 **待辦清單**（新 PC 接手後做這些就好）
+
+以優先順序排：
+
+#### ⭐ 待辦 #1：上傳 Zenodo v2（3 分鐘）
+
+Zenodo v1 的 PDF 還是舊版 27 頁（沒 Appendix B）。要換 PDF 必須發 new version
+（Zenodo 規定）。
+
+```
+1. 登入 https://zenodo.org/records/19691574
+2. 右側工具列找「New version」按鈕
+3. 刪掉舊的 main.pdf
+4. 上傳新的 Paper/paper_source/main.pdf（386 KB、30 頁）
+5. Description 加一句：
+   "v2 (April 22, 2026): Added Appendix B with worked examples showing
+   all five vendor responses to four sovereignty-adjacent prompts,
+   complementing the quantitative findings in Section 4. Paper grew
+   from 27 to 30 pages."
+6. Related identifiers：讓 Zenodo 自動加 IsNewVersionOf v1
+7. Publish → 拿到新的 version-specific DOI + Concept DOI
+```
+
+拿到 **Concept DOI** 後：
+- 更新 `README.md` 的 DOI badge 指向 Concept DOI（一律看最新版）
+- 更新 `ENDORSEMENT_EMAILS.md` 和 `FB_ANNOUNCEMENT.md` 的 DOI 連結
+
+#### ⭐ 待辦 #2：寄 endorsement email（10 分鐘）
+
+兩封**同一天寄**：
+- 繁中給 Ko（`juchunko@ntu.edu.tw`）
+- 英文給 Naseh（`anaseh@cs.umass.edu`）
+
+內容**已寫好**在 `Paper/paper_source/ENDORSEMENT_EMAILS.md`，直接複製貼上即可。
+
+**時機**：週一至週三台灣早上 9-11 AM（對方收到剛好他們工作時間）。
+
+若 7 天都無回覆，備用 endorser：Paul Röttger (Bocconi)、Esin Durmus (Anthropic)。
+
+#### ⭐ 待辦 #3：發 FB 公告（Zenodo v2 發完之後）
+
+內容**已寫好**在 `Paper/paper_source/FB_ANNOUNCEMENT.md`。
+
+**時機**：Zenodo v2 DOI 拿到之後。貼文中 DOI 連結改成 Concept DOI。
+
+發 FB 同時可以 cross-post 到 Threads（相同社群平台、相同內容）+ LinkedIn。
+
+#### 📋 待辦 #4：endorsement 通過後 → arXiv submission（20 分鐘）
+
+Ko 或 Naseh 回 yes 之後：
+
+```
+1. cd /path/to/Civatas-TW/Paper
+2. bash scripts/make_arxiv_bundle.sh  # 產 ctw_va_2026_arxiv.tar.gz
+3. 去 https://arxiv.org/submit
+4. 按 ARXIV_SUBMISSION.md 填欄位：
+   - Primary: cs.CL
+   - Cross-lists: cs.CY, cs.AI, stat.AP
+   - Title + Abstract 複製 ARXIV_SUBMISSION.md §1 + §3
+   - Comments 用 §4
+   - License: CC BY 4.0
+   - Upload ctw_va_2026_arxiv.tar.gz（LaTeX source）
+5. arXiv 會問 endorsement code → 寄給 endorser → 他 click https://arxiv.org/auth/endorse
+6. 等 1-2 天 moderation → 拿 arXiv ID（形如 2604.XXXXX）
+7. 更新 Zenodo record，Related identifiers 加 IsIdenticalTo: arXiv:2604.XXXXX
+8. HF Papers submission: hf.co/papers/submit 貼 arXiv ID
+```
+
+#### 📋 待辦 #5（可選）：備用 endorser email
+
+若 Ko + Naseh 7 天沒回，可以寄給：
+
+- **Paul Röttger** (Bocconi University)：`paul.rottger@unibocconi.it`（XSTest + SafetyPrompts 作者）
+- **Esin Durmus** (Anthropic)：透過 Anthropic 官方 contact 或她的 Google Scholar 上的 email（OpinionQA 作者）
+
+若需要寫，用 ENDORSEMENT_EMAILS.md 的 Naseh 英文版當 template，替換 cite 段落為 Röttger/Durmus 對應的工作即可。
+
+### 20.5 新 PC 第一次操作步驟
+
+```sh
+# 1. Clone repo
+git clone git@github.com:ch-neural/Civatas-TW.git
+cd Civatas-TW
+
+# 2. 確認本機資料完整
+ls Paper/paper_source/main.pdf         # 應該有 386 KB 30 頁 PDF
+ls Paper/paper_source/ENDORSEMENT_EMAILS.md
+ls Paper/paper_source/FB_ANNOUNCEMENT.md
+ls Paper/paper_source/ARXIV_SUBMISSION.md
+
+# 3. 若需要重編 paper（例如要改版本 2）：
+#    先裝 BasicTeX（如果 xelatex 沒裝）
+brew install --cask basictex
+eval "$(/usr/libexec/path_helper)"
+sudo tlmgr update --self
+sudo tlmgr install xecjk biber biblatex booktabs microtype \
+  fontspec caption subcaption xcolor hyperref geometry parskip \
+  xurl fontaxes etoolbox logreq collection-xetex
+
+cd Paper/paper_source
+make clean && make
+
+# 4. 若需要存取 webui / scripts：建 per-host venv
+cd Paper
+python3 -m venv .venv-$(hostname -s | sed 's/\..*//')
+.venv-<hostname>/bin/pip install -e .
+
+# 5. .env 需要手動 scp 過去（含 5 vendor API key + OPENAI_API_KEY + SERPER_API_KEY）
+#    git.ignore 擋住不會同步
+```
+
+### 20.6 不在 git 裡、手動 scp 過去的東西
+
+```
+Paper/.env              # 5 個 vendor API key + OpenAI（for AI judge）
+Paper/paper_source/PAPER_ZH.md  # 個人中文速讀版（已加 gitignore 不追蹤）
+```
+
+其他都在 git 裡（包含全部實驗資料）。
+
+### 20.7 最新 Git timeline（2026-04-22 17:00 後收尾）
+
+```
+7bfeb14 paper: add Appendix B — vendor behavioral styles with worked examples
+22a0aed paper: add Zenodo DOI 10.5281/zenodo.19691574
+174db72 paper: commit compiled PDF + privatize Chinese narrative
+5735e5d README: add CTW-VA-2026 paper section + repo layout  ← merge point feat→main
+d563fb4 add arXiv submission bundler + gitignore the tarball
+ee5957c fix GitHub repo URL: chtseng-neural → ch-neural
+5bc1828 add Chinese personal-reading narrative (PAPER_ZH.md)
+71e2182 Stage 19.6: voice pass — reduce AI-like patterns in English prose
+eb36d89 Stage 19.5: flagship-tier sensitivity subset + §5.5 Robustness
+e814ce6 webui: expose labeler entry button on stats step preview
+8b0235e webui: defensive bool coercion in _build_flags
+d140d63 rename flagship subset to match labeler whitelist regex
+7cfe298 Stage 19.5 Phase 1: flagship sensitivity subset fetched
+f206751 Stage 19: author block + arXiv submission metadata
+991495f Stage 19: resolve 5 refs.bib placeholders + add 2 neighboring citations
+34076a1 Stage 19: compile-cleanliness fixes (xeCJK fonts + hyperref escapes)
+55ab323 Stage 19 batch 3: full paper first draft complete
+172fa17 Stage 19 batch 2: §4 Results (7 findings) + §5 Discussion drafted
+38ff83b Stage 19 batch 1: paper scaffolding + §3 Methodology + §4.2 Finding 1
+f6be379 Stage 18: full-dataset finalization
+a6c4b0c Stage 17: blind validation pipeline
+4d20e20 Stage 16 follow-up: --json bool type fix + 100% labeled
+```
+
+### 20.8 Session 決策紀錄（新 PC 接手後若忘記決策理由可參考）
+
+| 決策 | 理由 | 來源 |
+|---|---|---|
+| 走 arXiv + Zenodo 並行（不只 arXiv） | Zenodo 不需 endorsement，5 分鐘拿 DOI，不被 endorsement 拖延 | §20.4 待辦 #1 |
+| 先 push 再 merge feat→main（fast-forward） | main 預設 branch 必須顯示 Paper/ 讓讀者看得到 | commit `5735e5d` |
+| 刪除 PAPER_ZH.md 從 git（保留本機）| 個人筆記不公開 | commit `174db72` |
+| 本機 compile PDF 後 commit 進 git | 讀者沒裝 XeLaTeX 也能看 | commit `174db72` |
+| 寫 Appendix B 加 worked examples | FB 公告的核心視覺素材需要 paper 裡有正式版 | commit `7bfeb14` |
+| 先 Ko 再 Naseh（不並列試 Röttger / Durmus） | Ko 是最直接 neighbor (Taiwan sov paper)，Naseh 是 DeepSeek R1 filter (§5.4 Hypothesis 3 最相關) | §20.4 待辦 #2 |
+| HF Papers 不能繞過 arXiv | HF Papers 需要 arXiv ID，所以先 Zenodo 再 arXiv 再 HF Papers | §20.4 待辦 #4 |
+| 不做 blind validation subset 跑 Cohen's κ | 單人標註 + AI-advisory 24.5% 的 setting 下，κ 不是合適指標；改用 §3.5 誠實揭露 | Stage 17 |
+
+### 20.9 可能的下游工作（非必做，但值得知道）
+
+- **v2 paper**：加第二位 native 繁中 rater 做 κ，加 longitudinal replication 測幾個月後 vendor 行為是否穩定
+- **domain extension**：把同樣方法套到 PRC 內部政治議題，測試 Taiwan-statehood blocking 的 pattern 是否 domain-specific
+- **Civatas 正式 full run**：本 audit 最初動機是 Civatas 選舉模擬（`ap/` 主系統）的 vendor confound 警報。真正 run full（300 persona × 13 day × 5 vendor × 3 rep）至今**還沒跑**，是 Civatas 專案下一大里程碑
+
+### 20.10 一句話版本（給你一週後忘了在幹嘛時）
+
+> **Paper 寫完了、30 頁、發上 Zenodo 有 DOI、GitHub repo public、審計五家 LLM 的台灣政治題拒答行為。接下來三件事：(1) Zenodo 換 v2 新 PDF、(2) 寄 endorsement email（草稿在 `ENDORSEMENT_EMAILS.md`）、(3) 通過後 arXiv submit。FB 公告文案在 `FB_ANNOUNCEMENT.md`，Zenodo v2 發完就可以貼。**
+
 
