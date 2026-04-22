@@ -2890,4 +2890,246 @@ a6c4b0c Stage 17: blind validation pipeline
 
 > **Paper 寫完了、30 頁、發上 Zenodo 有 DOI、GitHub repo public、審計五家 LLM 的台灣政治題拒答行為。接下來三件事：(1) Zenodo 換 v2 新 PDF、(2) 寄 endorsement email（草稿在 `ENDORSEMENT_EMAILS.md`）、(3) 通過後 arXiv submit。FB 公告文案在 `FB_ANNOUNCEMENT.md`，Zenodo v2 發完就可以貼。**
 
+---
+
+## Stage 21 — arXiv submission 啟動 + cs.CY primary pivot（2026-04-22 晚 ~ 04-23）
+
+Stage 20 寄出 endorsement email 給 Ko 後隔天就收到回覆。本 stage 記錄 arXiv
+投稿流程實際啟動、碰到 endorsement 權限限制、主類別從 cs.CL → cs.CY 的調整，
+以及當前卡在 Ko endorse click 等待中的狀態。
+
+### 21.1 Ko 回覆 + primary category pivot（cs.CL → cs.CY）
+
+Ko 回信摘要（繁中、用 AI agent 讀過 paper）：
+> 論文看過了，方法與 findings 都很紮實，DeepSeek/Kimi 的區分這件事值得公開討論。
+> 但我在 arXiv 的文章是 submit 到 **cs.CY**，不是 cs.CL。依 arXiv 規則我可能
+> 沒有 cs.CL 的 endorsement 權限。因此，我是否改為 submit 到 Computers and Society？
+
+**使用者決策：接受 Ko 建議，primary → cs.CY**。
+
+**為什麼 cs.CY 反而是更好的 primary**（事後分析）：
+
+| 論文核心貢獻 | 更貼近的 category |
+|---|---|
+| Vendor 拒答行為稽核、governance implication | cs.CY |
+| Taiwan-statehood blocking（AI filter audit）| cs.CY |
+| 東西方二分法反駁 | cs.CY |
+| 三層拒答架構 framework（L1 infra / L2 RLHF / L3 lineage）| cs.CY + cs.AI |
+| HR→SR elasticity methodology | cs.CL + stat.AP |
+
+這篇**本質是 audit / accountability / governance paper，不是 NLP 方法論 paper**
+（沒有新 NLP 技術、新 model、新 benchmark）。cs.CY 是正確分類，原本選 cs.CL
+是考量 LLM 論文慣性、但 Ko 的觀點反而矯正了分類判斷。
+
+### 21.2 文件更新
+
+**`Paper/paper_source/ARXIV_SUBMISSION.md` §5**（已改、未 commit）：
+- Primary: `cs.CL` → **`cs.CY`**
+- Cross-list: `cs.CY, cs.AI, stat.AP` → **`cs.CL, cs.AI, stat.AP`**
+- Rationale 重寫：明確寫「no new NLP methodology」，cs.CY 是實質對位、cs.CL 為 cross-list
+- 加 endorsement note 記錄與 Ko 確認
+
+**`Paper/paper_source/ENDORSEMENT_EMAILS.md`**（已改、未 commit）：
+- 檔案頭加「狀態摘要」section：記錄 Ko 已回覆、方案調整
+- **新增 §A.2**：回 Ko 確認改投 cs.CY 的繁中信草稿（可直接 copy-paste）
+- §A 原始 Ko 信標記「✅ 已寄、已回覆」
+- **§B Naseh 信重新定位為 paper-notification**（zero ask）—— endorsement 不
+  再需要（Ko 一人足以 endorse cs.CY primary），但 §5.4 Hypothesis 3 直接 cite
+  他 R1dacted 工作，寄 courtesy notification 仍有價值
+- 寄送 tips 重寫：A.2 立即寄、B 等 arXiv ID 拿到後再寄（一次給完整連結更漂亮）
+- 備用 endorser（Röttger / Durmus）備註從 cs.CL endorsement 改為 cs.CY 角度
+
+**`FB_ANNOUNCEMENT.md`**：原本就沒提 cs.CL，無需改。
+
+### 21.3 arXiv submission 啟動狀態
+
+**帳號資訊**：
+- arXiv username: `ch-tseng`
+- 帳號 email: `myvno@hotmail.com`（**注意**：與 paper 作者欄 `chtseng.neural@gmail.com` 不同，arXiv 所有 admin 信件寄到 hotmail）
+- Affiliation: `SunplusIT`（短稱、paper 作者欄是 "Sunplus Innovation Technology, Hsinchu, Taiwan"）
+- Career Status: Staff
+- Default Category: `cs.CY`
+- Groups registered: `cs, stat`
+
+**Submission**：
+- ID: **`submit/7508861`** (Type: New)
+- Status: **`incomplete`**
+- Expires: **`2026-05-06`**（14 天、每次編輯重置）
+- License 選: **CC BY**
+- Primary classification 選: **cs.CY (Computers and Society)**
+- Cross-list：submission 下一頁才選（Add Files 之後的 Metadata stage）
+
+**Endorsement code**：**`BQYN84`**（arXiv 為此 submission 產生、綁 submit/7508861）
+
+**已寄給 Ko 的 endorsement code email**（回覆 Ko 原信的同一 thread）：
+- 主旨: `Re: arXiv 論文 endorsement — 改投 cs.CY 確認`
+- 內容: code `BQYN84` + endorsement URL + 被 endorse 帳號 `ch-tseng` + 類別 cs.CY
+- **同時**隱含確認改投 cs.CY（不需再寄 §A.2 確認信、兩個訊息合併）
+
+**當前瓶頸**：Ko **還沒 click 那一下**。arXiv 在 user 未 endorsed 前**強制擋在
+Start 頁**—— 不讓使用者填 Submission Agreement / Authorship / License / Archive
+以外任何欄位、也不讓進 Add Files。頁面只顯示 `"You are not endorsed for this archive"`
+紅框 + Continue 按下去 silently 回到原頁。
+
+### 21.4 arXiv tarball 打包（ready to upload）
+
+**檔案**: `Paper/ctw_va_2026_arxiv.tar.gz`（151 KB，2026-04-22 22:22 產出）
+
+**內容結構**（19 個檔）:
+```
+arxiv_submission/
+├── main.tex + refs.bib
+├── sections/ (8 個 .tex)
+├── fig1–7.pdf (7 個圖)
+└── table1_per_vendor_breakdown.tex
+```
+
+**打包器做的 path rewrite**（`Paper/scripts/make_arxiv_bundle.sh`）：
+- `\graphicspath{{../paper_figures/}}` → `\graphicspath{{./}}`（扁平化）
+- `\input{../paper_figures/table1_...}` → `\input{table1_...}`
+
+**CJK 字體 fallback 驗證安全**（`main.tex` lines 22-32）：
+```latex
+\IfFontExistsTF{PingFang TC}{ ... }{
+  \IfFontExistsTF{Noto Sans CJK TC}{ ... }{ default }}
+```
+- macOS 本機：PingFang TC
+- arXiv Linux server：fall back to Noto Sans CJK TC（TeXLive `collection-langchinese`
+  標配）
+- arXiv 編出的 PDF glyph 會與本機版略不同，但版面 / 頁數 / 引用皆一致
+
+**本地 sanity compile 未執行**：本機 `xelatex` / `biber` / `tlmgr` 皆不在 PATH
+（Stage 20 時在另一台 PC 編的 main.pdf 已 commit 進 git）。**不需重編**理由：
+(a) paper_source/main.pdf 是 2026-04-22 17:34 編的、source 未變；(b) tarball
+只做 2 行 path rewrite、不動 content；(c) 字體 fallback defensive、arXiv 編一定過。
+
+若**真要**在新 PC 本機 test compile：
+```bash
+rm -rf /tmp/test_arxiv && mkdir /tmp/test_arxiv && \
+  tar xzf Paper/ctw_va_2026_arxiv.tar.gz -C /tmp/test_arxiv && \
+  cd /tmp/test_arxiv/arxiv_submission && \
+  xelatex -interaction=nonstopmode main && biber main && \
+  xelatex -interaction=nonstopmode main && xelatex -interaction=nonstopmode main
+```
+需 `brew install --cask basictex` + `sudo tlmgr install xecjk biber biblatex
+noto-cjk collection-langchinese fontspec caption subcaption xcolor hyperref
+geometry parskip xurl fontaxes etoolbox booktabs microtype logreq`。
+
+### 21.5 當前待辦清單
+
+**⚠️ BLOCKING: 等 Ko click endorsement**（唯一瓶頸）
+
+1. ⏳ **Ko click endorse**（code `BQYN84`, URL `https://arxiv.org/auth/endorse`）
+   - 無時間表（他立委辦公室忙、email 可能淹沒）
+   - 監控方式：收 `myvno@hotmail.com` 的 "You have been endorsed for cs.CY"
+     arXiv 通知信
+   - 建議：24-48 hr 仍無動靜 → LINE / FB messenger / 追信 email 主旨加 `[提醒]`
+   - **64 hr+** 完全無反應 → 啟動備用 endorser（Paul Röttger `paul.rottger@
+     unibocconi.it`，XSTest 作者、高機率有 cs.CY 權限）
+
+**Ko endorse 完成後**的流程（預估 20 分鐘）：
+1. 回 `submit/7508861` 頁、點 ✏️ Update 繼續
+2. 填 Start 頁下半部三個 radio/dropdown（Authorship / License CC BY / Primary cs.CY）→ Continue
+3. Add Files stage: 上傳 `Paper/ctw_va_2026_arxiv.tar.gz`
+4. Review Files：等 arXiv 自動 build、確認產出 PDF（應該 30 頁）
+5. Process：等 arXiv 處理完成
+6. Metadata stage：填
+   - Title + Abstract（從 `ARXIV_SUBMISSION.md` §1 + §3 copy）
+   - Comments field（§4）
+   - Cross-list: `cs.CL`, `cs.AI`, `stat.AP`（arXiv 可能 moderator 調整）
+7. Preview → 最後 Submit
+8. 等 moderation（1-2 天）→ 拿 arXiv ID（形如 2604.XXXXX）→ 上線
+9. 拿到 arXiv ID 後：
+   - 更新 Zenodo record，Related identifiers 加 `IsIdenticalTo: arXiv:2604.XXXXX`
+   - 寄 §B paper-notification email 給 Ali Naseh
+   - 考慮 HF Papers submission (`hf.co/papers/submit`)
+   - FB 公告（`FB_ANNOUNCEMENT.md`）
+
+**獨立並行（不受 Ko 影響）**：
+- ⏳ **Zenodo v2 上傳**（§20.4 待辦 #1、手動）：新版 30 頁 PDF（含 Appendix B）
+  取代 v1 27 頁版、拿 Concept DOI、回填 README badge
+  - 流程未做、見 §20.4 詳述
+- ⏳ 收 `myvno@hotmail.com` 看有無 arXiv endorsement 通知信
+
+### 21.6 未 commit 變更狀態（2026-04-23 進入新 PC / 新 session 前必 commit）
+
+```
+M Paper/paper_source/ARXIV_SUBMISSION.md     ← 本 stage：cs.CL → cs.CY pivot
+M Paper/paper_source/ENDORSEMENT_EMAILS.md   ← 本 stage：A.2 reply 新增 + B reposition
+?? Paper/ctw_va_2026_arxiv.tar.gz            ← 打包產出（已在 .gitignore）
+```
+
+建議 commit 訊息：
+```
+[CTW-VA-2026] Stage 21: arXiv primary cs.CL → cs.CY per Ko endorsement constraint
+
+- ARXIV_SUBMISSION.md §5: primary = cs.CY, cross-list adds cs.CL
+- ENDORSEMENT_EMAILS.md: add A.2 reply to Ko confirming cs.CY,
+  reposition Naseh email as paper-notification (no endorsement ask)
+- Rationale: paper is substantively AI governance/audit, not NLP
+  methodology — cs.CY is the more accurate category fit
+- arXiv submission in flight: submit/7508861, endorsement code BQYN84
+  sent to Ko, awaiting his click to unblock Start page
+```
+
+Tarball（`Paper/ctw_va_2026_arxiv.tar.gz`）**不要 commit**（進 `.gitignore` 了），
+會隨時可重產。
+
+### 21.7 決策 / 教訓（Stage 21 新增）
+
+1. **先回應人的限制再改系統設計**：Ko 提出「我沒 cs.CL endorsement 權限」時，
+   不是逼他去找補救，而是順他的限制重新審視 paper 的真實定位 → 反而發現 cs.CY
+   才是正確分類。**Endorsement 的技術限制變成了 classification 的品質檢查**。
+2. **合併 email 訊息省一次往返**：寄 endorsement code 時同時確認改投 cs.CY
+   （而不是 §A.2 先寄、code 後寄），省 Ko 一次回信、省時間。
+3. **arXiv Start 頁的 endorsement 擋法是 hard-block**：之前以為「未 endorsed
+   只擋最後 submit、其它可以填」是錯的。實際行為是 Start 頁就把 Authorship /
+   License / Archive **整片 render 掉**、只顯示 contact info + endorse warning。
+   未來投別的 category 時要記得：**endorsement 是投稿流程的第一關、不是最後一關**。
+4. **帳號 email vs 作者欄 email 可以不同**：arXiv 帳號 email 是 `myvno@hotmail.com`
+   （admin / endorsement 通知寄這裡），paper 作者欄 email 是 `chtseng.neural@gmail.com`
+   （讀者用）。**漏看 hotmail 會錯過 endorsement 通知**。新機 session 若要繼續，
+   確認 hotmail 收件匣是否有 `"You have been endorsed"` 信件。
+5. **CJK 字體 defensive fallback 是投稿必備**：`\IfFontExistsTF` 鏈讓 main.tex
+   能在 macOS (PingFang TC) / Linux arXiv (Noto) / 其它機器（default）三環境都
+   編過。未來 CJK paper 範本可 reuse 此 pattern。
+6. **Tarball sanity compile 不是必做**：paper_source/main.pdf 本身就是 source
+   未變下的驗證。只要打包器只做純路徑 rewrite（不動內容）、就沒必要再重編。
+
+### 21.8 新 session 接手步驟（最短路徑）
+
+```bash
+cd /Volumes/AI02/Civatas-TW
+
+# 1. 拉最新（如果有 commit 過）
+git status   # 確認有沒有 Stage 21 uncommitted 變更
+
+# 2. 檢查 Ko endorsement 狀態
+#    a. 去 https://arxiv.org/user 看有沒有 "Endorsed for cs.CY" 訊息
+#    b. 收 myvno@hotmail.com 看有沒有 "You have been endorsed" 通知
+
+# 3. 如果已 endorse → 直接接手 submission
+open https://arxiv.org/user       # 進 submit/7508861 繼續
+# tarball 在 Paper/ctw_va_2026_arxiv.tar.gz (151 KB)
+# metadata 在 Paper/paper_source/ARXIV_SUBMISSION.md
+# cross-list 加 cs.CL / cs.AI / stat.AP
+
+# 4. 如果還沒 endorse（>24 hr）→ LINE / email 禮貌提醒 Ko
+# 5. 如果還沒 endorse（>64 hr）→ 寄備用 endorser
+#    Paul Röttger paul.rottger@unibocconi.it（XSTest 作者）
+#    用 ENDORSEMENT_EMAILS.md §B 模板改寫 cite 對象
+
+# 6. 獨立並行：Zenodo v2 上傳（手動、見 §20.4 待辦 #1）
+open https://zenodo.org/records/19691574
+```
+
+### 21.9 一句話版本（一週後忘了的話）
+
+> **arXiv submission 啟動了，ID `submit/7508861`，主類別從 cs.CL 改為 cs.CY
+> （Ko 只能 endorse cs.CY、順勢發現 cs.CY 其實更對位）。Tarball 已打好
+> `Paper/ctw_va_2026_arxiv.tar.gz` (151 KB)，等 Ko click endorsement code
+> `BQYN84`。兩份 MD 變更（ARXIV_SUBMISSION.md + ENDORSEMENT_EMAILS.md）未 commit。
+> Zenodo v2 也還沒上傳，可獨立並行做。Ko 一按完就能 Upload → Submit → 2 天後拿
+> arXiv ID。**
+
 

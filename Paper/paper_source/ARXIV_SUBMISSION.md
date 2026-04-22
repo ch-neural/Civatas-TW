@@ -75,30 +75,42 @@ https://github.com/ch-neural/Civatas-TW
 Primary (choose exactly one):
 
 ```
-cs.CL  (Computation and Language)
+cs.CY  (Computers and Society)
 ```
 
 Cross-listed / secondary (choose up to 3):
 
 ```
-cs.CY  (Computers and Society)
+cs.CL  (Computation and Language)
 cs.AI  (Artificial Intelligence)
 stat.AP  (Statistics - Applications)
 ```
 
 **Rationale for this assignment**:
 
-- `cs.CL` is the canonical category for LLM-related studies and will
-  be read by the core NLP / alignment audience.
-- `cs.CY` (Computers and Society) is warranted because the paper's
-  central claims concern vendor-level alignment policy, with direct
-  implications for downstream simulation studies in political contexts
-  — a theme squarely within Computers and Society.
-- `cs.AI` is customary for LLM-audit papers and broadens the readership.
+- `cs.CY` (Computers and Society) is the primary category because the
+  paper's central contributions are substantively about AI governance
+  and accountability: vendor-level alignment-policy audit, empirical
+  refutation of the East-West dichotomy, Taiwan-statehood blocking as
+  a pre-generation infrastructure behavior, and a topic × vendor ×
+  layer framework for characterizing alignment culture. The paper
+  introduces no new NLP methodology, model, or benchmark — its
+  methodological backbone (four-class hand-labeling + paired bootstrap)
+  is standard audit machinery in service of governance claims.
+- `cs.CL` cross-list is appropriate because the paper will be of
+  interest to the core NLP / alignment-audience who study LLM
+  behavior, and Traditional Chinese political prompt design may
+  interest multilingual NLP readers.
+- `cs.AI` is customary for LLM-audit papers and broadens the readership
+  to AI-safety researchers who may not track cs.CY routinely.
 - `stat.AP` is appropriate because the paper reports paired bootstrap
   BCa confidence intervals throughout and argues multiple findings from
   CI-disjoint evidence; applied-statistics readers may find the
   methodological contribution relevant.
+
+**Endorsement note** (April 2026): Primary-category choice confirmed
+with endorser Ju-Chun Ko (Asst. Prof., NTU / Legislator), who has
+prior arXiv submissions in cs.CY and holds cs.CY endorsement rights.
 
 ## 6. MSC / ACM classifications (optional)
 
